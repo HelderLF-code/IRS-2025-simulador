@@ -1,0 +1,30 @@
+{
+  "_aviso": "VALORES A VALIDAR antes de qualquer uso com clientes reais. Estes números refletem a melhor estimativa disponível para os rendimentos de 2025 (declaração entregue em 2026), mas devem ser confirmados contra a Tabela de Retenção / OE2025 / Portal das Finanças antes de qualquer estimativa ser entregue a um cliente. Atualizar este ficheiro assim que confirmado.",
+  "ano": 2025,
+  "IAS": 522.50,
+  "escaloesIRS": [
+    { "ate": 8059,     "taxa": 0.13  },
+    { "ate": 12160,    "taxa": 0.165 },
+    { "ate": 17233,    "taxa": 0.22  },
+    { "ate": 22306,    "taxa": 0.25  },
+    { "ate": 28400,    "taxa": 0.32  },
+    { "ate": 41629,    "taxa": 0.355 },
+    { "ate": 44987,    "taxa": 0.435 },
+    { "ate": 83696,    "taxa": 0.45  },
+    { "ate": null,     "taxa": 0.48  }
+  ],
+  "deducaoEspecificaCategoriaA": {
+    "minimo": 4462.15,
+    "descricao": "Maior valor entre este mínimo e as contribuições obrigatórias efetivamente descontadas (SS/CGA/ADSE)."
+  },
+  "deducoesColeta": {
+    "porDependente1": 600,
+    "porDependenteAdicional": 750,
+    "porDependenteAte3Anos": 300,
+    "porAscendente": 635
+  },
+  "quocienteConjugal": {
+    "divisorCasadosConjunta": 2,
+    "divisorOutros": 1
+  }
+}

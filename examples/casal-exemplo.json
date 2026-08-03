@@ -1,0 +1,36 @@
+{
+  "agregado": {
+    "ano": 2025,
+    "nifA": "256675961",
+    "nifB": "215635963",
+    "tributacaoConjunta": true,
+    "iban": "PT50002300004578563319094",
+    "dependentes": [
+      { "nif": "215215698", "deficienteGrau": 80 },
+      {
+        "nif": "214785968",
+        "deficienteGrau": 80,
+        "guardaConjunta": true,
+        "respParentais": "A",
+        "nifProgenitor": "214321698",
+        "integraAgregadoSP": true,
+        "partilhaDespesas": 5000,
+        "residenciaAlternada": false
+      }
+    ]
+  },
+  "anexoA": {
+    "linhas": [
+      { "nifEntidade": "241365856", "codRendimento": 401, "titular": "A", "rendimentos": 85000.00, "retencoes": 6520.00, "contribuicoes": 2305.50, "retSobretaxa": 0, "quotizacoes": 0 }
+    ],
+    "pagamentosPorConta": [ { "CodRendimentos": 1, "Titular": "A", "Valor": 26.30 } ],
+    "outrasDeducoes": [ { "CodDespesa": 421, "Titular": "A", "Valor": 53.10 } ],
+    "segurosDesgasteRapido": [ { "ProfissaoCodigo": 1, "Titular": "A", "Valor": 20.00, "NifPortugues": "25632145", "Pais": 276, "NumeroFiscalUE": "236254126" } ],
+    "incentivoParticipacoesSociais": [ { "NIF": "236412369", "CodRendimento": 409, "Titular": "A", "MontanteGanho": 230.00 } ],
+    "incentivoStartups": [ { "NIF": "214563265", "CodRendimento": 414, "Titular": "A", "Ano": 2023, "Mes": 1, "Dia": 12, "NumeroTitulos": 22, "ValorUnitario": 12.21 } ],
+    "exResidentes": [ { "Ano": 2019, "Titular": "A" } ],
+    "irsJovemAntigo": [ { "Titular": "A", "AnoConclusaoEstudos": 2024, "NivelQualificacaoQNQ": 1, "NIF": "214569875", "CodPais": 276 } ],
+    "irsJovem": [ { "Titular": "A", "OpcaoIrsJovem": "S" } ],
+    "estudantesDependentes": [ { "Titular": "A", "EfetuouComunicacaoPrevista": "S", "NIF": "215365789", "CodPais": 276 } ]
+  }
+}
