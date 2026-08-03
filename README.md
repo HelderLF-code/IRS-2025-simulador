@@ -7,8 +7,19 @@ declaração no formato `Modelo3IRSv2026` usado pelo Portal das Finanças.
 ## Como correr
 
 Não é possível abrir `index.html` diretamente com duplo-clique (os browsers bloqueiam
-`import` de módulos JS a partir de `file://`). É preciso servir a pasta com um servidor
-local simples:
+`import` de módulos JS a partir de `file://`). Requer Python 3 instalado.
+
+**Forma mais simples — usar o atalho:**
+- Windows: duplo-clique em `iniciar.bat`
+- Mac: duplo-clique em `iniciar-mac.command` (na primeira vez pode ser preciso
+  autorizar em Preferências do Sistema → Privacidade e Segurança)
+- Linux: duplo-clique em `iniciar.sh`, ou correr `./iniciar.sh` no terminal
+
+O script arranca o servidor local e abre o browser automaticamente em
+`http://localhost:8000`. Para parar a aplicação, fecha a janela do servidor
+(ou Ctrl+C no terminal).
+
+**Manual (alternativa):**
 
 ```
 cd IRS-2025-simulador
