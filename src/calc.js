@@ -36,6 +36,29 @@
     return imposto;
   }
 
+  // Regime simplificado (art.º 31.º do CIRS): aplica o coeficiente de cada código de
+  // rendimento ao respetivo valor bruto para obter o rendimento tributável da Categoria B.
+  // Não cobre ainda a opção pelas regras da categoria A nem os encargos do quadro 7.
+  function calcularRendimentoCategoriaB(anexoB, parametros) {
+    const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
+    const coeficientes = parametros.coeficientesCategoriaB || {};
+    const coeficienteOmissao = parametros.coeficienteOmissao ?? 1;
+
+    const rendimentoBruto = rendimentos.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+    const rendimentoTributavel = rendimentos.reduce((acc, r) => {
+      const coef = coeficientes[Number(r.codigo)] ?? coeficienteOmissao;
+      return acc + (Number(r.valor) || 0) * coef;
+    }, 0);
+
+    const ret = (anexoB && anexoB.retencoes) || {};
+    return {
+      rendimentoBruto,
+      rendimentoTributavel,
+      retencoes: Number(ret.retencoesFonte) || 0,
+      pagamentosPorConta: Number(ret.pagamentosPorConta) || 0
+    };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -48,10 +71,14 @@
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.contribuicoes, parametros);
-    const rendimentoLiquido = Math.max(0, somaA.rendimentos - dedEspecifica);
+    const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
+
+    const categoriaB = calcularRendimentoCategoriaB(anexoB, parametros);
+
+    const rendimentoLiquido = rendimentoLiquidoA + categoriaB.rendimentoTributavel;
 
     const divisor = agregado.tributacaoConjunta
       ? parametros.quocienteConjugal.divisorCasadosConjunta
@@ -65,12 +92,16 @@
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
     const coletaLiquida = Math.max(0, coletaBruta - dedColetaDependentes);
 
-    const retencoesTotais = somaA.retencoes;
+    const retencoesTotais = somaA.retencoes + categoriaB.retencoes + categoriaB.pagamentosPorConta;
     const resultado = retencoesTotais - coletaLiquida; // positivo = reembolso, negativo = a pagar
 
     return {
-      rendimentoBruto: somaA.rendimentos,
+      rendimentoBrutoA: somaA.rendimentos,
       deducaoEspecifica: dedEspecifica,
+      rendimentoLiquidoA,
+      rendimentoBrutoB: categoriaB.rendimentoBruto,
+      rendimentoTributavelB: categoriaB.rendimentoTributavel,
+      rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoLiquido,
       divisorQuociente: divisor,
       coletaBruta,
@@ -85,6 +116,7 @@
   const api = {
     somaRendimentosCategoriaA,
     deducaoEspecificaCategoriaA,
+    calcularRendimentoCategoriaB,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa

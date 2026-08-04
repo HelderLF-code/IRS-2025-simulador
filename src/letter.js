@@ -39,19 +39,23 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>
 
   <table>
-    <tr><td>Rendimento bruto (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoBruto)} €</td></tr>
-    <tr><td>Dedução específica</td><td>${formatarMoeda(resultado.deducaoEspecifica)} €</td></tr>
-    <tr><td>Rendimento líquido</td><td>${formatarMoeda(resultado.rendimentoLiquido)} €</td></tr>
+    <tr><td>Rendimento bruto (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoBrutoA)} €</td></tr>
+    <tr><td>Dedução específica (Categoria A)</td><td>${formatarMoeda(resultado.deducaoEspecifica)} €</td></tr>
+    <tr><td>Rendimento líquido (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoLiquidoA)} €</td></tr>
+    ${resultado.rendimentoBrutoB ? `
+    <tr><td>Rendimento bruto (Categoria B)</td><td>${formatarMoeda(resultado.rendimentoBrutoB)} €</td></tr>
+    <tr><td>Rendimento tributável (Categoria B, regime simplificado)</td><td>${formatarMoeda(resultado.rendimentoTributavelB)} €</td></tr>` : ""}
+    <tr><td>Rendimento líquido total</td><td>${formatarMoeda(resultado.rendimentoLiquido)} €</td></tr>
     <tr><td>Coleta bruta de IRS</td><td>${formatarMoeda(resultado.coletaBruta)} €</td></tr>
     <tr><td>Dedução à coleta (dependentes)</td><td>${formatarMoeda(resultado.deducaoColetaDependentes)} €</td></tr>
     <tr><td>Coleta líquida</td><td>${formatarMoeda(resultado.coletaLiquida)} €</td></tr>
-    <tr><td>Retenções na fonte já efetuadas</td><td>${formatarMoeda(resultado.retencoesTotais)} €</td></tr>
+    <tr><td>Retenções na fonte / pagamentos por conta já efetuados</td><td>${formatarMoeda(resultado.retencoesTotais)} €</td></tr>
     <tr class="total"><td>${sinalResultado.toUpperCase()}</td><td>${valorAbs} €</td></tr>
   </table>
 
-  <p>Esta estimativa foi calculada com base nos dados fornecidos, considerando apenas rendimentos da
-  categoria A (trabalho dependente e/ou pensões). Não substitui a declaração oficial submetida no
-  Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
+  <p>Esta estimativa foi calculada com base nos dados fornecidos, considerando rendimentos da
+  categoria A (trabalho dependente e/ou pensões)${resultado.rendimentoBrutoB ? " e categoria B em regime simplificado (rendimentos empresariais e profissionais)" : ""}.
+  Não substitui a declaração oficial submetida no Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
 
   <div class="aviso">
     <strong>Aviso:</strong> Estimativa gerada por ferramenta interna de simulação, com base em

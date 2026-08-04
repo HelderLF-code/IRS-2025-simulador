@@ -276,20 +276,26 @@
   window.calcular = function () {
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, parametros });
+    const anexoB = lerAnexoB();
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
     const div = document.getElementById("resultado");
     div.style.display = "block";
     div.innerHTML = `
-      <strong>Rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBruto)} €<br>
-      <strong>Dedução específica:</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
-      <strong>Rendimento líquido:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
+      <strong>Rendimento bruto Categoria A:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
+      <strong>Dedução específica (Cat. A):</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
+      <strong>Rendimento líquido Categoria A:</strong> ${formatarMoeda(resultado.rendimentoLiquidoA)} €<br>` +
+      (resultado.rendimentoBrutoB
+        ? `<strong>Rendimento bruto Categoria B:</strong> ${formatarMoeda(resultado.rendimentoBrutoB)} €<br>
+      <strong>Rendimento tributável Categoria B (regime simplificado):</strong> ${formatarMoeda(resultado.rendimentoTributavelB)} €<br>`
+        : "") +
+      `<strong>Rendimento líquido total:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <strong>Coleta bruta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
       <strong>Dedução à coleta (dependentes):</strong> ${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
       <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
-      <strong>Retenções efetuadas:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
+      <strong>Retenções/pagamentos por conta efetuados:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
       <hr>
       <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong>
     `;

@@ -38,7 +38,24 @@ const PARAMETROS_2025 = {
   quocienteConjugal: {
     divisorCasadosConjunta: 2,
     divisorOutros: 1
-  }
+  },
+  // Coeficientes do regime simplificado (art.º 31.º do CIRS) por código de rendimento
+  // do Anexo B. Cobre os códigos mais comuns — os que faltarem usam coeficienteOmissao
+  // (1.00 = sem redução, resultado mais conservador/mais alto enquanto não confirmado).
+  coeficientesCategoriaB: {
+    401: 0.15, 402: 0.15, 419: 0.15, 420: 0.15, 421: 0.15,
+    415: 0.15, 416: 0.15, 417: 0.35,
+    403: 0.75,
+    404: 0.35,
+    405: 0.95, 406: 0.95, 408: 0.95, 410: 0.95, 411: 0.95,
+    412: 0.30,
+    451: 0.15, 452: 0.15,
+    454: 0.95,
+    455: 0.30,
+    457: 0.15, 458: 0.15,
+    460: 0
+  },
+  coeficienteOmissao: 1.00
 };
 
 if (typeof module !== "undefined" && module.exports) {

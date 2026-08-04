@@ -158,7 +158,24 @@ const PARAMETROS_2025 = {
   quocienteConjugal: {
     divisorCasadosConjunta: 2,
     divisorOutros: 1
-  }
+  },
+  // Coeficientes do regime simplificado (art.º 31.º do CIRS) por código de rendimento
+  // do Anexo B. Cobre os códigos mais comuns — os que faltarem usam coeficienteOmissao
+  // (1.00 = sem redução, resultado mais conservador/mais alto enquanto não confirmado).
+  coeficientesCategoriaB: {
+    401: 0.15, 402: 0.15, 419: 0.15, 420: 0.15, 421: 0.15,
+    415: 0.15, 416: 0.15, 417: 0.35,
+    403: 0.75,
+    404: 0.35,
+    405: 0.95, 406: 0.95, 408: 0.95, 410: 0.95, 411: 0.95,
+    412: 0.30,
+    451: 0.15, 452: 0.15,
+    454: 0.95,
+    455: 0.30,
+    457: 0.15, 458: 0.15,
+    460: 0
+  },
+  coeficienteOmissao: 1.00
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -209,6 +226,29 @@ if (typeof module !== "undefined" && module.exports) {
     return imposto;
   }
 
+  // Regime simplificado (art.º 31.º do CIRS): aplica o coeficiente de cada código de
+  // rendimento ao respetivo valor bruto para obter o rendimento tributável da Categoria B.
+  // Não cobre ainda a opção pelas regras da categoria A nem os encargos do quadro 7.
+  function calcularRendimentoCategoriaB(anexoB, parametros) {
+    const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
+    const coeficientes = parametros.coeficientesCategoriaB || {};
+    const coeficienteOmissao = parametros.coeficienteOmissao ?? 1;
+
+    const rendimentoBruto = rendimentos.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
+    const rendimentoTributavel = rendimentos.reduce((acc, r) => {
+      const coef = coeficientes[Number(r.codigo)] ?? coeficienteOmissao;
+      return acc + (Number(r.valor) || 0) * coef;
+    }, 0);
+
+    const ret = (anexoB && anexoB.retencoes) || {};
+    return {
+      rendimentoBruto,
+      rendimentoTributavel,
+      retencoes: Number(ret.retencoesFonte) || 0,
+      pagamentosPorConta: Number(ret.pagamentosPorConta) || 0
+    };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -221,10 +261,14 @@ if (typeof module !== "undefined" && module.exports) {
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.contribuicoes, parametros);
-    const rendimentoLiquido = Math.max(0, somaA.rendimentos - dedEspecifica);
+    const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
+
+    const categoriaB = calcularRendimentoCategoriaB(anexoB, parametros);
+
+    const rendimentoLiquido = rendimentoLiquidoA + categoriaB.rendimentoTributavel;
 
     const divisor = agregado.tributacaoConjunta
       ? parametros.quocienteConjugal.divisorCasadosConjunta
@@ -238,12 +282,16 @@ if (typeof module !== "undefined" && module.exports) {
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
     const coletaLiquida = Math.max(0, coletaBruta - dedColetaDependentes);
 
-    const retencoesTotais = somaA.retencoes;
+    const retencoesTotais = somaA.retencoes + categoriaB.retencoes + categoriaB.pagamentosPorConta;
     const resultado = retencoesTotais - coletaLiquida; // positivo = reembolso, negativo = a pagar
 
     return {
-      rendimentoBruto: somaA.rendimentos,
+      rendimentoBrutoA: somaA.rendimentos,
       deducaoEspecifica: dedEspecifica,
+      rendimentoLiquidoA,
+      rendimentoBrutoB: categoriaB.rendimentoBruto,
+      rendimentoTributavelB: categoriaB.rendimentoTributavel,
+      rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoLiquido,
       divisorQuociente: divisor,
       coletaBruta,
@@ -258,6 +306,7 @@ if (typeof module !== "undefined" && module.exports) {
   const api = {
     somaRendimentosCategoriaA,
     deducaoEspecificaCategoriaA,
+    calcularRendimentoCategoriaB,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa
@@ -930,19 +979,23 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>
 
   <table>
-    <tr><td>Rendimento bruto (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoBruto)} €</td></tr>
-    <tr><td>Dedução específica</td><td>${formatarMoeda(resultado.deducaoEspecifica)} €</td></tr>
-    <tr><td>Rendimento líquido</td><td>${formatarMoeda(resultado.rendimentoLiquido)} €</td></tr>
+    <tr><td>Rendimento bruto (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoBrutoA)} €</td></tr>
+    <tr><td>Dedução específica (Categoria A)</td><td>${formatarMoeda(resultado.deducaoEspecifica)} €</td></tr>
+    <tr><td>Rendimento líquido (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoLiquidoA)} €</td></tr>
+    ${resultado.rendimentoBrutoB ? `
+    <tr><td>Rendimento bruto (Categoria B)</td><td>${formatarMoeda(resultado.rendimentoBrutoB)} €</td></tr>
+    <tr><td>Rendimento tributável (Categoria B, regime simplificado)</td><td>${formatarMoeda(resultado.rendimentoTributavelB)} €</td></tr>` : ""}
+    <tr><td>Rendimento líquido total</td><td>${formatarMoeda(resultado.rendimentoLiquido)} €</td></tr>
     <tr><td>Coleta bruta de IRS</td><td>${formatarMoeda(resultado.coletaBruta)} €</td></tr>
     <tr><td>Dedução à coleta (dependentes)</td><td>${formatarMoeda(resultado.deducaoColetaDependentes)} €</td></tr>
     <tr><td>Coleta líquida</td><td>${formatarMoeda(resultado.coletaLiquida)} €</td></tr>
-    <tr><td>Retenções na fonte já efetuadas</td><td>${formatarMoeda(resultado.retencoesTotais)} €</td></tr>
+    <tr><td>Retenções na fonte / pagamentos por conta já efetuados</td><td>${formatarMoeda(resultado.retencoesTotais)} €</td></tr>
     <tr class="total"><td>${sinalResultado.toUpperCase()}</td><td>${valorAbs} €</td></tr>
   </table>
 
-  <p>Esta estimativa foi calculada com base nos dados fornecidos, considerando apenas rendimentos da
-  categoria A (trabalho dependente e/ou pensões). Não substitui a declaração oficial submetida no
-  Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
+  <p>Esta estimativa foi calculada com base nos dados fornecidos, considerando rendimentos da
+  categoria A (trabalho dependente e/ou pensões)${resultado.rendimentoBrutoB ? " e categoria B em regime simplificado (rendimentos empresariais e profissionais)" : ""}.
+  Não substitui a declaração oficial submetida no Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
 
   <div class="aviso">
     <strong>Aviso:</strong> Estimativa gerada por ferramenta interna de simulação, com base em
@@ -1118,20 +1171,26 @@ if (typeof module !== "undefined" && module.exports) {
   window.calcular = function () {
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, parametros });
+    const anexoB = lerAnexoB();
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
     const div = document.getElementById("resultado");
     div.style.display = "block";
     div.innerHTML = `
-      <strong>Rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBruto)} €<br>
-      <strong>Dedução específica:</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
-      <strong>Rendimento líquido:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
+      <strong>Rendimento bruto Categoria A:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
+      <strong>Dedução específica (Cat. A):</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
+      <strong>Rendimento líquido Categoria A:</strong> ${formatarMoeda(resultado.rendimentoLiquidoA)} €<br>` +
+      (resultado.rendimentoBrutoB
+        ? `<strong>Rendimento bruto Categoria B:</strong> ${formatarMoeda(resultado.rendimentoBrutoB)} €<br>
+      <strong>Rendimento tributável Categoria B (regime simplificado):</strong> ${formatarMoeda(resultado.rendimentoTributavelB)} €<br>`
+        : "") +
+      `<strong>Rendimento líquido total:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <strong>Coleta bruta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
       <strong>Dedução à coleta (dependentes):</strong> ${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
       <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
-      <strong>Retenções efetuadas:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
+      <strong>Retenções/pagamentos por conta efetuados:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
       <hr>
       <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong>
     `;
