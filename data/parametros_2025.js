@@ -63,7 +63,18 @@ const PARAMETROS_2025 = {
   // Mínimo de despesas com contribuições para a Segurança Social consideradas para efeitos
   // desta regra, mesmo sem nada declarado (replica o valor visto na Demonstração de
   // Liquidação da AT, que coincide com o mínimo da dedução específica da categoria A).
-  minimoContribuicoesCategoriaB: 4462.15
+  minimoContribuicoesCategoriaB: 4462.15,
+  // Deduções à coleta por despesas gerais (art.º 78.º e seguintes do CIRS), a partir dos
+  // totais anuais registados no e-fatura. "porAgregado: true" nos limites significa que o
+  // limite duplica em tributação conjunta (2 sujeitos passivos); os restantes são já por
+  // agregado.
+  deducoesArt78: {
+    geraisFamiliares: { taxa: 0.35, limite: 250, porAgregado: true, label: "Despesas gerais e familiares" },
+    saude: { taxa: 0.15, limite: 1000, porAgregado: false, label: "Despesas de saúde e seguros de saúde" },
+    educacao: { taxa: 0.30, limite: 800, porAgregado: false, label: "Despesas de educação e formação" },
+    imoveis: { taxa: 0.15, limite: 296, porAgregado: false, label: "Encargos com imóveis (juros/rendas habitação)" },
+    exigenciaFatura: { taxa: 0.15, limite: 250, porAgregado: true, label: "Dedução por exigência de fatura (IVA)" }
+  }
 };
 
 if (typeof module !== "undefined" && module.exports) {

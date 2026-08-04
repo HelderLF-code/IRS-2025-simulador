@@ -114,6 +114,25 @@
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
 
+<h2>Despesas (e-Fatura) — Deduções à Coleta</h2>
+<p class="aviso-topo">
+  Totais anuais por categoria, tal como aparecem na consulta de despesas do e-fatura no
+  Portal das Finanças. Usados para calcular a dedução à coleta (art.º 78.º e seguintes do
+  CIRS) e também contam para o mínimo de despesas exigido na Categoria B (regime
+  simplificado), quando aplicável.
+</p>
+<fieldset>
+  <div class="row">
+    <div><label>Despesas gerais e familiares (€)</label><input id="despesaGeraisFamiliares" type="number" step="0.01"></div>
+    <div><label>Despesas de saúde e seguros de saúde (€)</label><input id="despesaSaude" type="number" step="0.01"></div>
+    <div><label>Despesas de educação e formação (€)</label><input id="despesaEducacao" type="number" step="0.01"></div>
+  </div>
+  <div class="row">
+    <div><label>Encargos com imóveis (juros/rendas habitação) (€)</label><input id="despesaImoveis" type="number" step="0.01"></div>
+    <div><label>Base para exigência de fatura / IVA dedutível (€)</label><input id="despesaExigenciaFatura" type="number" step="0.01"></div>
+  </div>
+</fieldset>
+
 <div class="acoes">
   <button onclick="calcular()">Calcular estimativa</button>
   <button onclick="exportarXML()">Exportar XML (Modelo 3)</button>
@@ -245,6 +264,16 @@
     };
   }
 
+  function lerDespesasEFatura() {
+    return {
+      geraisFamiliares: document.getElementById("despesaGeraisFamiliares").value || 0,
+      saude: document.getElementById("despesaSaude").value || 0,
+      educacao: document.getElementById("despesaEducacao").value || 0,
+      imoveis: document.getElementById("despesaImoveis").value || 0,
+      exigenciaFatura: document.getElementById("despesaExigenciaFatura").value || 0
+    };
+  }
+
   function lerAgregado() {
     const dependentes = [...document.querySelectorAll("#tabelaDependentes tbody tr")].map(tr => ({
       nif: tr.querySelector(".dep-nif").value,
@@ -283,7 +312,8 @@
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
     const anexoB = lerAnexoB();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, parametros });
+    const despesasEFatura = lerDespesasEFatura();
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -292,6 +322,10 @@
     const temCategoriaA = !!resultado.rendimentoBrutoA;
     const temCategoriaB = !!resultado.rendimentoBrutoB;
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+    const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
+      .filter(c => c.despesa > 0)
+      .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
+      .join("");
     div.innerHTML =
       (temCategoriaA ? `
       <strong>Categoria A — rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
@@ -304,8 +338,9 @@
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>
       <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
-      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
-      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
+      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>` +
+      linhasDeducoesArt78 +
+      `<strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
       <hr>
       <strong>Retenções na fonte:</strong> ${formatarMoeda(resultado.retencoesFonte)} €<br>` +
       (resultado.pagamentosPorConta ? `<strong>Pagamentos por conta:</strong> ${formatarMoeda(resultado.pagamentosPorConta)} €<br>` : "") +

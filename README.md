@@ -33,7 +33,10 @@ regenerar o `simulador-irs.html`.
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
   a coeficiente reduzido — validado contra uma Demonstração de Liquidação real da AT),
-  quociente conjugal, escalões de IRS, dedução à coleta por dependente.
+  quociente conjugal, escalões de IRS, dedução à coleta por dependente, e deduções à
+  coleta por despesas do e-fatura (art.º 78.º e seguintes do CIRS — gerais e familiares,
+  saúde, educação, imóveis, exigência de fatura), cujos totais declarados também contam
+  para o mínimo de despesas da Categoria B.
 - Exportação XML validada byte-a-byte contra 4 exemplos reais fornecidos (esqueleto vazio,
   sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta,
   e uma declaração completa com todos os anexos preenchidos).
@@ -67,12 +70,11 @@ informação.
 5. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
-6. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — campo para carregar
-   manualmente as despesas do e-fatura (despesas gerais familiares, saúde, educação,
-   imóveis, exigência de fatura, etc.) e calcular a dedução efetiva de cada uma
-   (com os respetivos limites), tal como aparece na secção "Deduções à Coleta" da
-   Demonstração de Liquidação da AT. Atualmente a app só desconta a dedução por
-   dependentes.
+6. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — implementadas (despesas gerais
+   e familiares, saúde, educação, imóveis, exigência de fatura), com taxas e limites em
+   `data/parametros_2025.js` (a validar). Falta ainda o limite geral e decrescente por
+   escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos
+   coletáveis mais altos — a app aplica os limites por categoria mas não esse teto global.
 
 ## Estrutura do código
 

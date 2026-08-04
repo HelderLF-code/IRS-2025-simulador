@@ -46,12 +46,13 @@
   //
   // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas): para os rendimentos
   // sujeitos aos coeficientes 0,75 e 0,35, as despesas comprovadas (contribuições para a
-  // Segurança Social, no mínimo) têm de atingir 15% desses rendimentos; se ficarem abaixo
-  // desse mínimo, a diferença acresce ao rendimento tributável — replica a secção
-  // "Verificação das despesas da categoria B" da Demonstração de Liquidação da AT.
+  // Segurança Social + despesas gerais registadas no e-fatura) têm de atingir 15% desses
+  // rendimentos; se ficarem abaixo desse mínimo, a diferença acresce ao rendimento
+  // tributável — replica a secção "Verificação das despesas da categoria B" da
+  // Demonstração de Liquidação da AT.
   //
   // Não cobre ainda a opção pelas regras da categoria A nem os restantes encargos do quadro 7.
-  function calcularRendimentoCategoriaB(anexoB, parametros) {
+  function calcularRendimentoCategoriaB(anexoB, despesasEFaturaTotal, parametros) {
     const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
     const coeficientes = parametros.coeficientesCategoriaB || {};
     const coeficienteOmissao = parametros.coeficienteOmissao ?? 1;
@@ -70,7 +71,7 @@
       }
     });
 
-    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0);
+    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0) + Number(despesasEFaturaTotal || 0);
     const despesasCalculadas = Math.max(despesasDeclaradas, parametros.minimoContribuicoesCategoriaB || 0);
     const valorMinimoDespesas = rendimentoRelevanteMinimo * 0.15;
     const acrescimoAoRendimento = Math.max(0, valorMinimoDespesas - despesasCalculadas);
@@ -90,6 +91,30 @@
     };
   }
 
+  // Deduções à coleta por despesas gerais (art.º 78.º e seguintes do CIRS), a partir dos
+  // totais anuais por categoria (tipicamente consultados no e-fatura). Cada categoria tem
+  // uma taxa e um limite (que pode duplicar em tributação conjunta). Não inclui ainda o
+  // limite geral e decrescente por escalão de rendimento previsto no art.º 78.º-B.
+  function calcularDeducoesArt78(despesasEFatura, agregado, parametros) {
+    const config = parametros.deducoesArt78 || {};
+    const divisor = agregado.tributacaoConjunta
+      ? parametros.quocienteConjugal.divisorCasadosConjunta
+      : parametros.quocienteConjugal.divisorOutros;
+
+    const porCategoria = Object.keys(config).map(chave => {
+      const cfg = config[chave];
+      const despesa = Number((despesasEFatura && despesasEFatura[chave]) || 0);
+      const limite = cfg.porAgregado ? cfg.limite * divisor : cfg.limite;
+      const deducao = Math.min(despesa * cfg.taxa, limite);
+      return { chave, label: cfg.label, despesa, taxa: cfg.taxa, limite, deducao };
+    });
+
+    const totalDespesas = porCategoria.reduce((acc, c) => acc + c.despesa, 0);
+    const totalDeducao = porCategoria.reduce((acc, c) => acc + c.deducao, 0);
+
+    return { porCategoria, totalDespesas, totalDeducao };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -102,12 +127,13 @@
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
 
-    const categoriaB = calcularRendimentoCategoriaB(anexoB, parametros);
+    const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
+    const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo.
@@ -124,7 +150,8 @@
     const coletaBruta = coletaPorQuociente * divisor;
 
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
-    const coletaLiquida = Math.max(0, coletaBruta - dedColetaDependentes);
+    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao;
+    const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
 
     const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
     const pagamentosPorConta = categoriaB.pagamentosPorConta;
@@ -148,6 +175,8 @@
       divisorQuociente: divisor,
       coletaBruta,
       deducaoColetaDependentes: dedColetaDependentes,
+      deducoesArt78,
+      deducaoColetaTotal: dedColetaTotal,
       coletaLiquida,
       retencoesFonte,
       pagamentosPorConta,
@@ -162,6 +191,7 @@
     somaRendimentosCategoriaA,
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
+    calcularDeducoesArt78,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa

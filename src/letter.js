@@ -71,13 +71,15 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
-  comprovadas (contribuições para a Segurança Social, no mínimo) têm de atingir 15% dos rendimentos
-  sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
+  comprovadas (contribuições para a Segurança Social e despesas gerais do e-fatura) têm de atingir 15%
+  dos rendimentos sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
     ${linha("Coleta (aplicando os escalões de IRS)", resultado.coletaBruta)}
     ${linha("Dedução à coleta por dependentes", -resultado.deducaoColetaDependentes)}
+    ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
+      .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}
   </table>
 

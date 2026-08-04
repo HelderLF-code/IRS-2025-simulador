@@ -114,6 +114,25 @@
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
 
+<h2>Despesas (e-Fatura) — Deduções à Coleta</h2>
+<p class="aviso-topo">
+  Totais anuais por categoria, tal como aparecem na consulta de despesas do e-fatura no
+  Portal das Finanças. Usados para calcular a dedução à coleta (art.º 78.º e seguintes do
+  CIRS) e também contam para o mínimo de despesas exigido na Categoria B (regime
+  simplificado), quando aplicável.
+</p>
+<fieldset>
+  <div class="row">
+    <div><label>Despesas gerais e familiares (€)</label><input id="despesaGeraisFamiliares" type="number" step="0.01"></div>
+    <div><label>Despesas de saúde e seguros de saúde (€)</label><input id="despesaSaude" type="number" step="0.01"></div>
+    <div><label>Despesas de educação e formação (€)</label><input id="despesaEducacao" type="number" step="0.01"></div>
+  </div>
+  <div class="row">
+    <div><label>Encargos com imóveis (juros/rendas habitação) (€)</label><input id="despesaImoveis" type="number" step="0.01"></div>
+    <div><label>Base para exigência de fatura / IVA dedutível (€)</label><input id="despesaExigenciaFatura" type="number" step="0.01"></div>
+  </div>
+</fieldset>
+
 <div class="acoes">
   <button onclick="calcular()">Calcular estimativa</button>
   <button onclick="exportarXML()">Exportar XML (Modelo 3)</button>
@@ -188,7 +207,18 @@ const PARAMETROS_2025 = {
   // Mínimo de despesas com contribuições para a Segurança Social consideradas para efeitos
   // desta regra, mesmo sem nada declarado (replica o valor visto na Demonstração de
   // Liquidação da AT, que coincide com o mínimo da dedução específica da categoria A).
-  minimoContribuicoesCategoriaB: 4462.15
+  minimoContribuicoesCategoriaB: 4462.15,
+  // Deduções à coleta por despesas gerais (art.º 78.º e seguintes do CIRS), a partir dos
+  // totais anuais registados no e-fatura. "porAgregado: true" nos limites significa que o
+  // limite duplica em tributação conjunta (2 sujeitos passivos); os restantes são já por
+  // agregado.
+  deducoesArt78: {
+    geraisFamiliares: { taxa: 0.35, limite: 250, porAgregado: true, label: "Despesas gerais e familiares" },
+    saude: { taxa: 0.15, limite: 1000, porAgregado: false, label: "Despesas de saúde e seguros de saúde" },
+    educacao: { taxa: 0.30, limite: 800, porAgregado: false, label: "Despesas de educação e formação" },
+    imoveis: { taxa: 0.15, limite: 296, porAgregado: false, label: "Encargos com imóveis (juros/rendas habitação)" },
+    exigenciaFatura: { taxa: 0.15, limite: 250, porAgregado: true, label: "Dedução por exigência de fatura (IVA)" }
+  }
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -249,12 +279,13 @@ if (typeof module !== "undefined" && module.exports) {
   //
   // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas): para os rendimentos
   // sujeitos aos coeficientes 0,75 e 0,35, as despesas comprovadas (contribuições para a
-  // Segurança Social, no mínimo) têm de atingir 15% desses rendimentos; se ficarem abaixo
-  // desse mínimo, a diferença acresce ao rendimento tributável — replica a secção
-  // "Verificação das despesas da categoria B" da Demonstração de Liquidação da AT.
+  // Segurança Social + despesas gerais registadas no e-fatura) têm de atingir 15% desses
+  // rendimentos; se ficarem abaixo desse mínimo, a diferença acresce ao rendimento
+  // tributável — replica a secção "Verificação das despesas da categoria B" da
+  // Demonstração de Liquidação da AT.
   //
   // Não cobre ainda a opção pelas regras da categoria A nem os restantes encargos do quadro 7.
-  function calcularRendimentoCategoriaB(anexoB, parametros) {
+  function calcularRendimentoCategoriaB(anexoB, despesasEFaturaTotal, parametros) {
     const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
     const coeficientes = parametros.coeficientesCategoriaB || {};
     const coeficienteOmissao = parametros.coeficienteOmissao ?? 1;
@@ -273,7 +304,7 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
 
-    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0);
+    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0) + Number(despesasEFaturaTotal || 0);
     const despesasCalculadas = Math.max(despesasDeclaradas, parametros.minimoContribuicoesCategoriaB || 0);
     const valorMinimoDespesas = rendimentoRelevanteMinimo * 0.15;
     const acrescimoAoRendimento = Math.max(0, valorMinimoDespesas - despesasCalculadas);
@@ -293,6 +324,30 @@ if (typeof module !== "undefined" && module.exports) {
     };
   }
 
+  // Deduções à coleta por despesas gerais (art.º 78.º e seguintes do CIRS), a partir dos
+  // totais anuais por categoria (tipicamente consultados no e-fatura). Cada categoria tem
+  // uma taxa e um limite (que pode duplicar em tributação conjunta). Não inclui ainda o
+  // limite geral e decrescente por escalão de rendimento previsto no art.º 78.º-B.
+  function calcularDeducoesArt78(despesasEFatura, agregado, parametros) {
+    const config = parametros.deducoesArt78 || {};
+    const divisor = agregado.tributacaoConjunta
+      ? parametros.quocienteConjugal.divisorCasadosConjunta
+      : parametros.quocienteConjugal.divisorOutros;
+
+    const porCategoria = Object.keys(config).map(chave => {
+      const cfg = config[chave];
+      const despesa = Number((despesasEFatura && despesasEFatura[chave]) || 0);
+      const limite = cfg.porAgregado ? cfg.limite * divisor : cfg.limite;
+      const deducao = Math.min(despesa * cfg.taxa, limite);
+      return { chave, label: cfg.label, despesa, taxa: cfg.taxa, limite, deducao };
+    });
+
+    const totalDespesas = porCategoria.reduce((acc, c) => acc + c.despesa, 0);
+    const totalDeducao = porCategoria.reduce((acc, c) => acc + c.deducao, 0);
+
+    return { porCategoria, totalDespesas, totalDeducao };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -305,12 +360,13 @@ if (typeof module !== "undefined" && module.exports) {
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
 
-    const categoriaB = calcularRendimentoCategoriaB(anexoB, parametros);
+    const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
+    const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo.
@@ -327,7 +383,8 @@ if (typeof module !== "undefined" && module.exports) {
     const coletaBruta = coletaPorQuociente * divisor;
 
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
-    const coletaLiquida = Math.max(0, coletaBruta - dedColetaDependentes);
+    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao;
+    const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
 
     const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
     const pagamentosPorConta = categoriaB.pagamentosPorConta;
@@ -351,6 +408,8 @@ if (typeof module !== "undefined" && module.exports) {
       divisorQuociente: divisor,
       coletaBruta,
       deducaoColetaDependentes: dedColetaDependentes,
+      deducoesArt78,
+      deducaoColetaTotal: dedColetaTotal,
       coletaLiquida,
       retencoesFonte,
       pagamentosPorConta,
@@ -365,6 +424,7 @@ if (typeof module !== "undefined" && module.exports) {
     somaRendimentosCategoriaA,
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
+    calcularDeducoesArt78,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa
@@ -1078,13 +1138,15 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
-  comprovadas (contribuições para a Segurança Social, no mínimo) têm de atingir 15% dos rendimentos
-  sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
+  comprovadas (contribuições para a Segurança Social e despesas gerais do e-fatura) têm de atingir 15%
+  dos rendimentos sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
     ${linha("Coleta (aplicando os escalões de IRS)", resultado.coletaBruta)}
     ${linha("Dedução à coleta por dependentes", -resultado.deducaoColetaDependentes)}
+    ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
+      .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}
   </table>
 
@@ -1242,6 +1304,16 @@ if (typeof module !== "undefined" && module.exports) {
     };
   }
 
+  function lerDespesasEFatura() {
+    return {
+      geraisFamiliares: document.getElementById("despesaGeraisFamiliares").value || 0,
+      saude: document.getElementById("despesaSaude").value || 0,
+      educacao: document.getElementById("despesaEducacao").value || 0,
+      imoveis: document.getElementById("despesaImoveis").value || 0,
+      exigenciaFatura: document.getElementById("despesaExigenciaFatura").value || 0
+    };
+  }
+
   function lerAgregado() {
     const dependentes = [...document.querySelectorAll("#tabelaDependentes tbody tr")].map(tr => ({
       nif: tr.querySelector(".dep-nif").value,
@@ -1280,7 +1352,8 @@ if (typeof module !== "undefined" && module.exports) {
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
     const anexoB = lerAnexoB();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, parametros });
+    const despesasEFatura = lerDespesasEFatura();
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -1289,6 +1362,10 @@ if (typeof module !== "undefined" && module.exports) {
     const temCategoriaA = !!resultado.rendimentoBrutoA;
     const temCategoriaB = !!resultado.rendimentoBrutoB;
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+    const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
+      .filter(c => c.despesa > 0)
+      .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
+      .join("");
     div.innerHTML =
       (temCategoriaA ? `
       <strong>Categoria A — rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
@@ -1301,8 +1378,9 @@ if (typeof module !== "undefined" && module.exports) {
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>
       <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
-      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
-      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
+      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>` +
+      linhasDeducoesArt78 +
+      `<strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
       <hr>
       <strong>Retenções na fonte:</strong> ${formatarMoeda(resultado.retencoesFonte)} €<br>` +
       (resultado.pagamentosPorConta ? `<strong>Pagamentos por conta:</strong> ${formatarMoeda(resultado.pagamentosPorConta)} €<br>` : "") +
