@@ -59,6 +59,27 @@
 <button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
 
 <h2>Anexo A — Rendimentos de Trabalho Dependente / Pensões</h2>
+<datalist id="listaCodigosAnexoA">
+  <option value="401">401 — Trabalho dependente (rendimento bruto)</option>
+  <option value="402">402 — Gratificações não atribuídas pela entidade patronal</option>
+  <option value="403">403 — Pensões (exceto sobrevivência/alimentos)</option>
+  <option value="404">404 — Pensões de sobrevivência</option>
+  <option value="405">405 — Pensões de alimentos</option>
+  <option value="406">406 — Rendas temporárias e vitalícias</option>
+  <option value="407">407 — Pré-reforma (regime de transição)</option>
+  <option value="408">408 — Bombeiros — compensações/subsídios</option>
+  <option value="409">409 — Rendimentos em espécie não sujeitos a retenção (2018)</option>
+  <option value="410">410 — Ex-residentes — trabalho dependente (2019-2027)</option>
+  <option value="411">411 — Ex-residentes — gratificações (2019-2027)</option>
+  <option value="412">412 — Utilização de casa de habitação (entidade patronal)</option>
+  <option value="413">413 — Empréstimos sem juros / juro reduzido (entidade patronal)</option>
+  <option value="414">414 — Ganhos planos de opções/subscrição de valores mobiliários</option>
+  <option value="415">415 — Utilização pessoal de viatura automóvel</option>
+  <option value="416">416 — Aquisição de viatura por preço inferior ao mercado</option>
+  <option value="417">417 — IRS Jovem — subsídios férias/Natal (2020-2024)</option>
+  <option value="418">418 — Estudante dependente — regime art.º 12.º n.º 9 (2020+)</option>
+  <option value="419">419 — Rendimentos em criptoativos (2024+)</option>
+</datalist>
 <table id="tabelaAnexoA">
   <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th>Contribuições (€)</th><th></th></tr></thead>
   <tbody></tbody>
@@ -83,12 +104,47 @@
 </fieldset>
 
 <h3>Rendimentos brutos (Quadro 4)</h3>
+<datalist id="listaCodigosAnexoB">
+  <option value="401">401 — Vendas de mercadorias e produtos (4A)</option>
+  <option value="419">419 — Rendimentos de operações com criptoativos (4A)</option>
+  <option value="420">420 — Energia excedente para autoconsumo (4A)</option>
+  <option value="421">421 — Energia produzida em pequena produção (4A)</option>
+  <option value="402">402 — Prestação serviços hoteleiros/restauração 2015-2016 (4A)</option>
+  <option value="415">415 — Prestação de serviços de restauração e bebidas (4A)</option>
+  <option value="416">416 — Prestação de serviços de atividades hoteleiras (4A)</option>
+  <option value="417">417 — Exploração de alojamento local (4A)</option>
+  <option value="403">403 — Atividades profissionais específicas — Tabela 151.º (4A)</option>
+  <option value="404">404 — Outras prestações de serviços (4A)</option>
+  <option value="422">422 — Mineração de criptoativos (4A)</option>
+  <option value="405">405 — Propriedade intelectual não abrangida art.º 58.º EBF (4A)</option>
+  <option value="406">406 — Propriedade intelectual abrangida art.º 58.º EBF (4A)</option>
+  <option value="407">407 — Saldo positivo mais/menos-valias e outros incrementos (4A)</option>
+  <option value="408">408 — Atividades financeiras — CAE 64 a 66 (4A)</option>
+  <option value="409">409 — Serviços prestados a sociedades de profissionais (4A)</option>
+  <option value="418">418 — Serviços a sociedades com partes de capital detidas (4A)</option>
+  <option value="410">410 — Resultado positivo de rendimentos prediais (4A)</option>
+  <option value="411">411 — Rendimentos de capitais imputáveis à Categoria B (4A)</option>
+  <option value="412">412 — Subsídios à exploração (4A)</option>
+  <option value="413">413 — Outros subsídios (4A)</option>
+  <option value="414">414 — Rendimentos Categoria B não incluídos noutros campos (4A)</option>
+  <option value="451">451 — Vendas de produtos agrícolas/silvícolas/pecuários (4B)</option>
+  <option value="452">452 — Prestações de serviços agrícolas/silvícolas/pecuários (4B)</option>
+  <option value="459">459 — Serviços a sociedades com partes de capital detidas (4B)</option>
+  <option value="453">453 — Rendimentos capitais/propriedade intelectual/mais-valias (4B)</option>
+  <option value="454">454 — Resultado positivo de rendimentos prediais (4B)</option>
+  <option value="455">455 — Subsídios à exploração (4B)</option>
+  <option value="456">456 — Outros subsídios (4B)</option>
+  <option value="457">457 — Vendas em explorações silvícolas plurianuais (4B)</option>
+  <option value="460">460 — Prémios de primeira instalação de jovens agricultores (4B)</option>
+  <option value="458">458 — Rendimentos agrícolas não incluídos noutros campos (4B)</option>
+  <option value="481">481 — Acréscimo por não reinvestimento do valor realizado (4C)</option>
+  <option value="482">482 — Acréscimo de gastos com depreciações/imparidades (4C)</option>
+</datalist>
 <table id="tabelaAnexoBRendimentos">
   <thead><tr><th>Código</th><th>Valor (€)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
-<p><small class="hint">Códigos comuns: 401 vendas, 403 prestação de serviços (atividades da Tabela 151.º), 404 outras prestações de serviços, 410 resultado positivo de rendimentos prediais, 451 vendas agrícolas, 452 prestações de serviços agrícolas. Ver instruções de preenchimento para a lista completa.</small></p>
 
 <div class="row">
   <div><label>Contribuições para a Segurança Social declaradas (Quadro 7A)</label><input id="anexoBContribuicoesSS" type="number" step="0.01"></div>
@@ -143,6 +199,23 @@
 <button type="button" onclick="adicionarLinhaAnexoHPensao()">+ Adicionar pensão de alimentos</button>
 
 <h3>Rendimentos isentos (Quadro 4)</h3>
+<datalist id="listaCodigosAnexoHIsentos">
+  <option value="401">401 — Pessoal de missões diplomáticas/consulares</option>
+  <option value="402">402 — Pessoal ao serviço de organizações estrangeiras/internacionais</option>
+  <option value="403">403 — Obras/trabalhos infraestruturas NATO (Categoria B)</option>
+  <option value="404">404 — Recebimentos capital de importâncias para regimes de SS</option>
+  <option value="405">405 — Tripulante de navios (Registo Internacional — ZFM)</option>
+  <option value="406">406 — Acordos de cooperação (sem reconhecimento prévio)</option>
+  <option value="407">407 — Acordos de cooperação (trabalho dependente, c/ reconhecimento prévio)</option>
+  <option value="408">408 — Acordos de cooperação (Categoria B, c/ reconhecimento prévio)</option>
+  <option value="409">409 — Missões de caráter militar humanitárias no estrangeiro</option>
+  <option value="410">410 — Ex-residentes — trabalho dependente</option>
+  <option value="411">411 — Ex-residentes — gratificações</option>
+  <option value="412">412 — Tripulantes de navios/embarcações (regime especial)</option>
+  <option value="413">413 — Participação nos lucros / gratificação de balanço (2024)</option>
+  <option value="430">430 — Casa de habitação, entidade patronal (não englobado, 2024-2026)</option>
+  <option value="431">431 — Prémios produtividade/desempenho voluntários (não englobado, 2025/2026)</option>
+</datalist>
 <table id="tabelaAnexoHIsentos">
   <thead><tr><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção IRS (€)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
   <tbody></tbody>
@@ -1473,14 +1546,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="a-nif" size="10"></td>
-      <td>
-        <select class="a-codigo">
-          <option value="401">401 - Trabalho dependente</option>
-          <option value="403">403 - Pensões</option>
-          <option value="404">404 - Pensões de sobrevivência</option>
-          <option value="405">405 - Pensões de alimentos</option>
-        </select>
-      </td>
+      <td><input class="a-codigo" size="4" list="listaCodigosAnexoA"></td>
       <td><select class="a-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
       <td><input class="a-rendimento" type="number" step="0.01"></td>
       <td><input class="a-retencao" type="number" step="0.01"></td>
@@ -1494,7 +1560,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tbody = document.querySelector("#tabelaAnexoBRendimentos tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="ab-r-codigo" type="number" size="4"></td>
+      <td><input class="ab-r-codigo" size="4" list="listaCodigosAnexoB"></td>
       <td><input class="ab-r-valor" type="number" step="0.01"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
@@ -1564,7 +1630,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tbody = document.querySelector("#tabelaAnexoHIsentos tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="ah-i-codigo" size="4"></td>
+      <td><input class="ah-i-codigo" size="4" list="listaCodigosAnexoHIsentos"></td>
       <td><select class="ah-i-titular"><option value="A">A</option><option value="B">B</option></select></td>
       <td><input class="ah-i-rendimento" type="number" step="0.01"></td>
       <td><input class="ah-i-retencao" type="number" step="0.01"></td>

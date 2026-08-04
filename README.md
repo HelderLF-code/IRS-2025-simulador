@@ -94,6 +94,22 @@ novo — para não haver perda de informação.
    escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos
    coletáveis mais altos — a app aplica os limites por categoria mas não esse teto global.
 
+## Convenção: campos de código
+
+Todos os campos de "código" (código de rendimento, código de benefício, etc.) usam um
+`<input>` de texto normal com uma lista de sugestões (`<datalist>`) ao lado da tabela —
+nunca um `<select>` rígido. Isto porque:
+
+- Um `<select>` só com os códigos mais comuns causa perda silenciosa de dados ao importar
+  uma declaração com um código fora dessa lista (foi um bug real, corrigido no Anexo A —
+  o campo de código do Quadro 4A só tinha 4 das 19 opções possíveis).
+- O `<datalist>` dá as sugestões mais úteis, mas continua a aceitar qualquer valor, incluindo
+  códigos raros que a app ainda não lista (ex: os códigos de mecenato do Anexo H).
+
+Ao adicionar um anexo novo com um campo de código, seguir o mesmo padrão: `<input list="idDoDatalist">`
++ `<datalist id="idDoDatalist">` com as opções mais comuns desse quadro, com o código e uma
+descrição curta (`<option value="401">401 — Descrição</option>`).
+
 ## Estrutura do código
 
 ```
