@@ -80,6 +80,15 @@
 <script>
   const parametros = PARAMETROS_2025;
 
+  function formatarMoeda(valor) {
+    const num = Number(valor) || 0;
+    const negativo = num < 0;
+    const fixo = Math.abs(num).toFixed(2);
+    const [inteiro, decimal] = fixo.split(".");
+    const comSeparadores = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return (negativo ? "-" : "") + comSeparadores + "," + decimal;
+  }
+
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
   // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
@@ -172,15 +181,15 @@
     const div = document.getElementById("resultado");
     div.style.display = "block";
     div.innerHTML = `
-      <strong>Rendimento bruto:</strong> ${resultado.rendimentoBruto.toFixed(2)} €<br>
-      <strong>Dedução específica:</strong> ${resultado.deducaoEspecifica.toFixed(2)} €<br>
-      <strong>Rendimento líquido:</strong> ${resultado.rendimentoLiquido.toFixed(2)} €<br>
-      <strong>Coleta bruta:</strong> ${resultado.coletaBruta.toFixed(2)} €<br>
-      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes.toFixed(2)} €<br>
-      <strong>Coleta líquida:</strong> ${resultado.coletaLiquida.toFixed(2)} €<br>
-      <strong>Retenções efetuadas:</strong> ${resultado.retencoesTotais.toFixed(2)} €<br>
+      <strong>Rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBruto)} €<br>
+      <strong>Dedução específica:</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
+      <strong>Rendimento líquido:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
+      <strong>Coleta bruta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
+      <strong>Dedução à coleta (dependentes):</strong> ${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
+      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
+      <strong>Retenções efetuadas:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
       <hr>
-      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${Math.abs(resultado.resultado).toFixed(2)} €</strong>
+      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong>
     `;
   };
 

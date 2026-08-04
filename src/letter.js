@@ -3,10 +3,19 @@
 
 (function (root) {
 
+function formatarMoeda(valor) {
+  const num = Number(valor) || 0;
+  const negativo = num < 0;
+  const fixo = Math.abs(num).toFixed(2);
+  const [inteiro, decimal] = fixo.split(".");
+  const comSeparadores = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return (negativo ? "-" : "") + comSeparadores + "," + decimal;
+}
+
 function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const nomeAno = agregado.ano;
   const sinalResultado = resultado.tipoResultado === "reembolso" ? "reembolso estimado" : "valor estimado a pagar";
-  const valorAbs = Math.abs(resultado.resultado).toFixed(2);
+  const valorAbs = formatarMoeda(Math.abs(resultado.resultado));
 
   return `<!doctype html>
 <html lang="pt">
@@ -30,13 +39,13 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>
 
   <table>
-    <tr><td>Rendimento bruto (Categoria A)</td><td>${resultado.rendimentoBruto.toFixed(2)} €</td></tr>
-    <tr><td>Dedução específica</td><td>${resultado.deducaoEspecifica.toFixed(2)} €</td></tr>
-    <tr><td>Rendimento líquido</td><td>${resultado.rendimentoLiquido.toFixed(2)} €</td></tr>
-    <tr><td>Coleta bruta de IRS</td><td>${resultado.coletaBruta.toFixed(2)} €</td></tr>
-    <tr><td>Dedução à coleta (dependentes)</td><td>${resultado.deducaoColetaDependentes.toFixed(2)} €</td></tr>
-    <tr><td>Coleta líquida</td><td>${resultado.coletaLiquida.toFixed(2)} €</td></tr>
-    <tr><td>Retenções na fonte já efetuadas</td><td>${resultado.retencoesTotais.toFixed(2)} €</td></tr>
+    <tr><td>Rendimento bruto (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoBruto)} €</td></tr>
+    <tr><td>Dedução específica</td><td>${formatarMoeda(resultado.deducaoEspecifica)} €</td></tr>
+    <tr><td>Rendimento líquido</td><td>${formatarMoeda(resultado.rendimentoLiquido)} €</td></tr>
+    <tr><td>Coleta bruta de IRS</td><td>${formatarMoeda(resultado.coletaBruta)} €</td></tr>
+    <tr><td>Dedução à coleta (dependentes)</td><td>${formatarMoeda(resultado.deducaoColetaDependentes)} €</td></tr>
+    <tr><td>Coleta líquida</td><td>${formatarMoeda(resultado.coletaLiquida)} €</td></tr>
+    <tr><td>Retenções na fonte já efetuadas</td><td>${formatarMoeda(resultado.retencoesTotais)} €</td></tr>
     <tr class="total"><td>${sinalResultado.toUpperCase()}</td><td>${valorAbs} €</td></tr>
   </table>
 
