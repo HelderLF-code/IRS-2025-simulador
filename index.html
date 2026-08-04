@@ -32,6 +32,13 @@
   estimativa e devem ser confirmados antes de qualquer uso com clientes reais.
 </p>
 
+<fieldset>
+  <label>Começar a partir de uma declaração já existente (opcional)</label><br><br>
+  <input type="file" id="ficheiroImportar" accept=".xml">
+  <button type="button" onclick="importarXML()">Importar XML</button>
+  <div id="avisoImportacao" style="display:none; margin-top:10px; font-size:0.85rem;"></div>
+</fieldset>
+
 <h2>Agregado Familiar</h2>
 <fieldset>
   <div class="row">
@@ -45,7 +52,7 @@
 
 <h3>Dependentes <small class="hint">(opcional)</small></h3>
 <table id="tabelaDependentes">
-  <thead><tr><th>NIF</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th></th></tr></thead>
+  <thead><tr><th>NIF</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th>Integra agregado?</th><th>Partilha despesas</th><th>Residência alternada?</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
@@ -68,9 +75,15 @@
 <script src="./data/parametros_2025.js"></script>
 <script src="./src/calc.js"></script>
 <script src="./src/xml/build.js"></script>
+<script src="./src/xml/parse.js"></script>
 <script src="./src/letter.js"></script>
 <script>
   const parametros = PARAMETROS_2025;
+
+  // Dados de uma declaração importada que a interface ainda não sabe editar
+  // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
+  // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
+  let dadosPreservados = { extrasAnexoA: {}, rostoPassthrough: {}, anexosPassthrough: {} };
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -85,6 +98,9 @@
       <td><input class="dep-guarda" type="checkbox"></td>
       <td><select class="dep-resp"><option value="A">A</option><option value="B">B</option></select></td>
       <td><input class="dep-progenitor" size="10"></td>
+      <td><input class="dep-integra" type="checkbox"></td>
+      <td><input class="dep-partilha" type="number" size="4" placeholder="ex: 5000"></td>
+      <td><input class="dep-residencia-alt" type="checkbox"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -118,7 +134,10 @@
       deficienteGrau: Number(tr.querySelector(".dep-grau").value) || undefined,
       guardaConjunta: tr.querySelector(".dep-guarda").checked,
       respParentais: tr.querySelector(".dep-resp").value,
-      nifProgenitor: tr.querySelector(".dep-progenitor").value || undefined
+      nifProgenitor: tr.querySelector(".dep-progenitor").value || undefined,
+      integraAgregadoSP: tr.querySelector(".dep-integra").checked,
+      partilhaDespesas: tr.querySelector(".dep-partilha").value || undefined,
+      residenciaAlternada: tr.querySelector(".dep-residencia-alt").checked
     }));
 
     return {
@@ -140,7 +159,7 @@
       retencoes: Number(tr.querySelector(".a-retencao").value) || 0,
       contribuicoes: Number(tr.querySelector(".a-contribuicao").value) || 0
     }));
-    return { linhas };
+    return { linhas, ...dadosPreservados.extrasAnexoA };
   }
 
   window.calcular = function () {
@@ -166,13 +185,87 @@
   };
 
   window.exportarXML = function () {
-    const model = { agregado: lerAgregado(), anexoA: lerAnexoA() };
+    const model = {
+      agregado: lerAgregado(),
+      anexoA: lerAnexoA(),
+      rostoPassthrough: dadosPreservados.rostoPassthrough,
+      anexosPassthrough: dadosPreservados.anexosPassthrough
+    };
     const xml = IRSXml.buildModelo3XML(model);
     const blob = new Blob([xml], { type: "application/xml" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `declm3irs${model.agregado.ano}${model.agregado.nifA}.xml`;
     a.click();
+  };
+
+  window.importarXML = function () {
+    const input = document.getElementById("ficheiroImportar");
+    const ficheiro = input.files[0];
+    if (!ficheiro) { alert("Escolhe primeiro um ficheiro XML."); return; }
+
+    const leitor = new FileReader();
+    leitor.onload = function () {
+      let dados;
+      try {
+        dados = IRSXml.parseModelo3XML(leitor.result);
+      } catch (erro) {
+        alert("Não foi possível ler este ficheiro: " + erro.message);
+        return;
+      }
+
+      document.getElementById("ano").value = dados.agregado.ano;
+      document.getElementById("nifA").value = dados.agregado.nifA || "";
+      document.getElementById("iban").value = dados.agregado.iban || "";
+      document.getElementById("tributacaoConjunta").checked = dados.agregado.tributacaoConjunta;
+      document.getElementById("campoNifB").style.display = dados.agregado.tributacaoConjunta ? "flex" : "none";
+      document.getElementById("nifB").value = dados.agregado.nifB || "";
+
+      document.querySelector("#tabelaDependentes tbody").innerHTML = "";
+      dados.agregado.dependentes.forEach(dep => {
+        adicionarDependente();
+        const tr = document.querySelector("#tabelaDependentes tbody tr:last-child");
+        tr.querySelector(".dep-nif").value = dep.nif || "";
+        tr.querySelector(".dep-grau").value = dep.deficienteGrau || "";
+        tr.querySelector(".dep-guarda").checked = !!dep.guardaConjunta;
+        if (dep.respParentais) tr.querySelector(".dep-resp").value = dep.respParentais;
+        tr.querySelector(".dep-progenitor").value = dep.nifProgenitor || "";
+        tr.querySelector(".dep-integra").checked = !!dep.integraAgregadoSP;
+        tr.querySelector(".dep-partilha").value = dep.partilhaDespesas || "";
+        tr.querySelector(".dep-residencia-alt").checked = !!dep.residenciaAlternada;
+      });
+
+      document.querySelector("#tabelaAnexoA tbody").innerHTML = "";
+      dados.anexoA.linhas.forEach(l => {
+        adicionarLinhaAnexoA();
+        const tr = document.querySelector("#tabelaAnexoA tbody tr:last-child");
+        tr.querySelector(".a-nif").value = l.nifEntidade || "";
+        if (l.codRendimento) tr.querySelector(".a-codigo").value = l.codRendimento;
+        if (l.titular) tr.querySelector(".a-titular").value = l.titular;
+        tr.querySelector(".a-rendimento").value = l.rendimentos || "";
+        tr.querySelector(".a-retencao").value = l.retencoes || "";
+        tr.querySelector(".a-contribuicao").value = l.contribuicoes || "";
+      });
+
+      dadosPreservados = {
+        extrasAnexoA: dados.extrasAnexoA || {},
+        rostoPassthrough: dados.rostoPassthrough || {},
+        anexosPassthrough: dados.anexosPassthrough || {}
+      };
+
+      const secoesPreservadas = Object.keys(dadosPreservados.anexosPassthrough);
+      const aviso = document.getElementById("avisoImportacao");
+      aviso.style.display = "block";
+      aviso.innerHTML = `<strong>Importado.</strong> Ano ${dados.agregado.ano}, NIF ${dados.agregado.nifA}, ` +
+        `${dados.agregado.dependentes.length} dependente(s), ${dados.anexoA.linhas.length} linha(s) no Anexo A.` +
+        (secoesPreservadas.length
+          ? `<br>Nota: ${secoesPreservadas.join(", ")} têm dados neste ficheiro que a aplicação ainda não sabe mostrar/editar — ` +
+            `serão mantidos tal como estavam quando exportares de novo.`
+          : "");
+
+      calcular();
+    };
+    leitor.readAsText(ficheiro);
   };
 
   window.gerarCarta = function () {

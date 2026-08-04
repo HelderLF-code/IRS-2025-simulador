@@ -56,6 +56,7 @@ function listaComLinhas(container, linhasDados) {
 
 function buildRosto(model) {
   const { ano, nifA, nifB, tributacaoConjunta, iban, dependentes = [] } = model.agregado;
+  const passthrough = model.rostoPassthrough || {};
 
   const quadro04 = tributacaoConjunta ? `<Quadro04>${el("Q04B01", 1)}</Quadro04>` : `<Quadro04/>`;
   const quadro05 = tributacaoConjunta
@@ -91,12 +92,12 @@ function buildRosto(model) {
     quadro04 +
     quadro05 +
     quadro06 +
-    `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>` +
-    `<Quadro08/>` +
+    (passthrough.Quadro07 || `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>`) +
+    (passthrough.Quadro08 || `<Quadro08/>`) +
     `<Quadro09>${el("Q09C01", iban)}</Quadro09>` +
-    `<Quadro10/>` +
-    `<Quadro11/>` +
-    `<Quadro13>${el("Rostoq13T01")}</Quadro13>` +
+    (passthrough.Quadro10 || `<Quadro10/>`) +
+    (passthrough.Quadro11 || `<Quadro11/>`) +
+    (passthrough.Quadro13 || `<Quadro13>${el("Rostoq13T01")}</Quadro13>`) +
     `</Rosto>`;
 }
 
@@ -223,14 +224,15 @@ function buildModelo3XML(model) {
   partes.push(buildAnexoA(model));
 
   if (model.incluirAnexosVazios !== false) {
-    partes.push(buildAnexoB(model));
-    partes.push(buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
-    partes.push(buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
-    partes.push(buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
-    partes.push(buildAnexoEsqueleto("AnexoH", "AnexoH", model, ["04", "05", "06", "07", "08", "09", "10"], true));
-    partes.push(buildAnexoJ(model));
-    partes.push(buildAnexoL(model));
-    partes.push(buildAnexoSS(model));
+    const pass = model.anexosPassthrough || {};
+    partes.push(pass.AnexoB || buildAnexoB(model));
+    partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
+    partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
+    partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
+    partes.push(pass.AnexoH || buildAnexoEsqueleto("AnexoH", "AnexoH", model, ["04", "05", "06", "07", "08", "09", "10"], true));
+    partes.push(pass.AnexoJ || buildAnexoJ(model));
+    partes.push(pass.AnexoL || buildAnexoL(model));
+    partes.push(pass.AnexoSS || buildAnexoSS(model));
   }
 
   partes.push(`</Modelo3IRSv2026>`);

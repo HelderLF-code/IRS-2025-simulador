@@ -30,10 +30,16 @@ regenerar o `simulador-irs.html`.
 - Exportação XML validada byte-a-byte contra 3 exemplos reais fornecidos (esqueleto vazio,
   sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta).
 - Geração de carta/estimativa para o cliente (HTML imprimível → PDF via browser).
+- **Importação de XML**: permite carregar uma declaração já exportada do Portal das
+  Finanças e continuar a trabalhar a partir dela, em vez de começar sempre em branco.
+  Testado com round-trip perfeito (importar e voltar a exportar sem alterar nada dá
+  exatamente o mesmo ficheiro) nos 3 exemplos fornecidos.
 
 A estrutura XML dos Anexos B, E, G, G1, H, J, L, SS ainda **não** está mapeada em detalhe
-— são emitidos apenas com o cabeçalho ano/NIF (tal como aparecem numa declaração sem dados
-nesses anexos), para manter o XML estruturalmente válido enquanto essas fases não avançam.
+— são emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. Ao **importar**
+uma declaração que já tenha dados nesses anexos, esses dados são preservados tal como
+estavam (mas ainda não podem ser vistos/editados na interface) e mantidos ao exportar de
+novo — para não haver perda de informação.
 
 ## Por confirmar / próximos passos
 
@@ -54,6 +60,7 @@ nesses anexos), para manter o XML estruturalmente válido enquanto essas fases n
 index.html          formulário e interface
 src/calc.js          motor de cálculo (Categoria A)
 src/xml/build.js      gerador do XML Modelo3IRSv2026
+src/xml/parse.js      importador do XML Modelo3IRSv2026
 src/letter.js         gerador da carta/estimativa em HTML
 data/parametros_2025.js  escalões, deduções, IAS (a validar)
 examples/             modelos de dados de teste, validados contra XML reais

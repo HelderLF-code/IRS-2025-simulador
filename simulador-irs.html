@@ -32,6 +32,13 @@
   estimativa e devem ser confirmados antes de qualquer uso com clientes reais.
 </p>
 
+<fieldset>
+  <label>Começar a partir de uma declaração já existente (opcional)</label><br><br>
+  <input type="file" id="ficheiroImportar" accept=".xml">
+  <button type="button" onclick="importarXML()">Importar XML</button>
+  <div id="avisoImportacao" style="display:none; margin-top:10px; font-size:0.85rem;"></div>
+</fieldset>
+
 <h2>Agregado Familiar</h2>
 <fieldset>
   <div class="row">
@@ -45,7 +52,7 @@
 
 <h3>Dependentes <small class="hint">(opcional)</small></h3>
 <table id="tabelaDependentes">
-  <thead><tr><th>NIF</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th></th></tr></thead>
+  <thead><tr><th>NIF</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th>Integra agregado?</th><th>Partilha despesas</th><th>Residência alternada?</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
@@ -279,6 +286,7 @@ function listaComLinhas(container, linhasDados) {
 
 function buildRosto(model) {
   const { ano, nifA, nifB, tributacaoConjunta, iban, dependentes = [] } = model.agregado;
+  const passthrough = model.rostoPassthrough || {};
 
   const quadro04 = tributacaoConjunta ? `<Quadro04>${el("Q04B01", 1)}</Quadro04>` : `<Quadro04/>`;
   const quadro05 = tributacaoConjunta
@@ -314,12 +322,12 @@ function buildRosto(model) {
     quadro04 +
     quadro05 +
     quadro06 +
-    `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>` +
-    `<Quadro08/>` +
+    (passthrough.Quadro07 || `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>`) +
+    (passthrough.Quadro08 || `<Quadro08/>`) +
     `<Quadro09>${el("Q09C01", iban)}</Quadro09>` +
-    `<Quadro10/>` +
-    `<Quadro11/>` +
-    `<Quadro13>${el("Rostoq13T01")}</Quadro13>` +
+    (passthrough.Quadro10 || `<Quadro10/>`) +
+    (passthrough.Quadro11 || `<Quadro11/>`) +
+    (passthrough.Quadro13 || `<Quadro13>${el("Rostoq13T01")}</Quadro13>`) +
     `</Rosto>`;
 }
 
@@ -446,14 +454,15 @@ function buildModelo3XML(model) {
   partes.push(buildAnexoA(model));
 
   if (model.incluirAnexosVazios !== false) {
-    partes.push(buildAnexoB(model));
-    partes.push(buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
-    partes.push(buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
-    partes.push(buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
-    partes.push(buildAnexoEsqueleto("AnexoH", "AnexoH", model, ["04", "05", "06", "07", "08", "09", "10"], true));
-    partes.push(buildAnexoJ(model));
-    partes.push(buildAnexoL(model));
-    partes.push(buildAnexoSS(model));
+    const pass = model.anexosPassthrough || {};
+    partes.push(pass.AnexoB || buildAnexoB(model));
+    partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
+    partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
+    partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
+    partes.push(pass.AnexoH || buildAnexoEsqueleto("AnexoH", "AnexoH", model, ["04", "05", "06", "07", "08", "09", "10"], true));
+    partes.push(pass.AnexoJ || buildAnexoJ(model));
+    partes.push(pass.AnexoL || buildAnexoL(model));
+    partes.push(pass.AnexoSS || buildAnexoSS(model));
   }
 
   partes.push(`</Modelo3IRSv2026>`);
@@ -466,6 +475,181 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = api;
 } else {
   root.IRSXml = api;
+}
+
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+// Importador: lê um ficheiro XML Modelo3IRSv2026 (tirado do Portal das Finanças) e
+// devolve o modelo de dados usado pela aplicação, para continuar a preencher/editar
+// a partir daí.
+//
+// Secções que a aplicação ainda não sabe editar (Anexos B/E/G/G1/H/J/L/SS, e os
+// Quadros 07/08/10/11/13 do Rosto) são preservadas tal como vieram no ficheiro
+// importado ("passthrough"), para que exportar de novo não perca dados que o
+// utilizador não tocou.
+//
+// Ficheiro carregado como <script> normal (não módulo), tal como os restantes.
+
+(function (root) {
+
+function filhos(el, tag) {
+  if (!el) return [];
+  return Array.from(el.childNodes).filter(n => n.nodeType === 1 && n.tagName === tag);
+}
+
+function filho(el, tag) {
+  return filhos(el, tag)[0];
+}
+
+function texto(el, tag) {
+  const f = filho(el, tag);
+  return f ? f.textContent : undefined;
+}
+
+function serializar(el) {
+  if (!el) return undefined;
+  // O XMLSerializer repete o xmlns por defeito em cada elemento serializado
+  // isoladamente; removê-lo porque já está declarado uma vez na raiz do documento.
+  return new XMLSerializer().serializeToString(el)
+    .replace(/ xmlns="http:\/\/www\.dgci\.gov\.pt\/2009\/Modelo3IRSv2026"/g, "");
+}
+
+// Lê um contentor tipo <AnexoAq04BT01><AnexoAq04BT01-Linha numero="1">...</...-Linha></...>
+// e devolve um array de objetos simples {TagDoCampo: valor, ...} tal como aparecem no XML.
+function parseLinhasGenerico(container) {
+  if (!container) return [];
+  const linhas = Array.from(container.childNodes).filter(n => n.nodeType === 1);
+  return linhas.map(linha => {
+    const obj = {};
+    Array.from(linha.childNodes).filter(n => n.nodeType === 1).forEach(campo => {
+      obj[campo.tagName] = campo.textContent;
+    });
+    return obj;
+  });
+}
+
+function parseDependentes(quadro06) {
+  const deficientes = parseLinhasGenerico(filho(quadro06, "Rostoq06BT01")).map(l => ({
+    nif: l.NIF,
+    deficienteGrau: l.DeficienteGrau ? Number(l.DeficienteGrau) : undefined,
+    guardaConjunta: false
+  }));
+
+  const guardaConjunta = parseLinhasGenerico(filho(quadro06, "Rostoq06BT03")).map(l => ({
+    nif: l.NIF,
+    deficienteGrau: l.DeficienteGrau ? Number(l.DeficienteGrau) : undefined,
+    guardaConjunta: true,
+    respParentais: l.RespParentais,
+    nifProgenitor: l.NifProgenitor,
+    integraAgregadoSP: l.IntegraAgregadoSP === "true",
+    partilhaDespesas: l.PartilhaDespesas,
+    residenciaAlternada: l.ResidenciaAlternada === "S"
+  }));
+
+  return [...deficientes, ...guardaConjunta];
+}
+
+function parseRosto(rosto) {
+  const q02 = filho(rosto, "Quadro02");
+  const q03 = filho(rosto, "Quadro03");
+  const q05 = filho(rosto, "Quadro05");
+  const q06 = filho(rosto, "Quadro06");
+  const q09 = filho(rosto, "Quadro09");
+
+  const tributacaoConjunta = texto(q05, "Q05B01") === "S";
+
+  const agregado = {
+    ano: Number(texto(q02, "Q02C01")),
+    nifA: texto(q03, "Q03C01"),
+    nifB: tributacaoConjunta ? texto(q05, "Q05C03") : undefined,
+    tributacaoConjunta,
+    iban: texto(q09, "Q09C01"),
+    dependentes: parseDependentes(q06)
+  };
+
+  // Guarda tal como veio, para não perder dados nos quadros que a app ainda não edita.
+  const passthrough = {};
+  ["Quadro07", "Quadro08", "Quadro10", "Quadro11", "Quadro13"].forEach(nome => {
+    const el = filho(rosto, nome);
+    if (el) passthrough[nome] = serializar(el);
+  });
+
+  return { agregado, rostoPassthrough: passthrough };
+}
+
+function parseAnexoA(anexoA) {
+  if (!anexoA) return { anexoA: { linhas: [] }, extrasAnexoA: {} };
+  const q04 = filho(anexoA, "Quadro04");
+
+  const linhas = parseLinhasGenerico(filho(q04, "AnexoAq04AT01")).map(l => ({
+    nifEntidade: l.NIF,
+    codRendimento: l.CodRendimentos,
+    titular: l.Titular,
+    rendimentos: l.Rendimentos,
+    retencoes: l.Retencoes,
+    contribuicoes: l.Contribuicoes,
+    retSobretaxa: l.RetSobretaxa,
+    quotizacoes: l.Quotizacoes
+  }));
+
+  // Secções sem interface própria ainda: preservam-se tal como vieram, para reexportar sem perdas.
+  const extras = {
+    pagamentosPorConta: parseLinhasGenerico(filho(q04, "AnexoAq04BT01")),
+    outrasDeducoes: parseLinhasGenerico(filho(q04, "AnexoAq04CT01")),
+    segurosDesgasteRapido: parseLinhasGenerico(filho(q04, "AnexoAq04CT02")),
+    incentivoParticipacoesSociais: parseLinhasGenerico(filho(q04, "AnexoAq04DT01")),
+    incentivoStartups: parseLinhasGenerico(filho(q04, "AnexoAq04DT02")),
+    exResidentes: parseLinhasGenerico(filho(q04, "AnexoAq04ET01")),
+    irsJovemAntigo: parseLinhasGenerico(filho(q04, "AnexoAq04FT01")),
+    irsJovem: parseLinhasGenerico(filho(q04, "AnexoAq04FT02")),
+    estudantesDependentes: parseLinhasGenerico(filho(q04, "AnexoAq04GT01"))
+  };
+  // Remove listas vazias para não poluir o modelo.
+  Object.keys(extras).forEach(k => { if (extras[k].length === 0) delete extras[k]; });
+
+  return { anexoA: { linhas }, extrasAnexoA: extras };
+}
+
+function parseAnexosPassthrough(raiz) {
+  const nomes = ["AnexoB", "AnexoE", "AnexoG", "AnexoG1", "AnexoH", "AnexoJ", "AnexoL", "AnexoSS"];
+  const passthrough = {};
+  nomes.forEach(nome => {
+    const el = filho(raiz, nome);
+    if (el) passthrough[nome] = serializar(el);
+  });
+  return passthrough;
+}
+
+function parseModelo3XML(xmlTexto) {
+  const doc = new DOMParser().parseFromString(xmlTexto, "application/xml");
+  const erro = doc.querySelector("parsererror");
+  if (erro) {
+    throw new Error("O ficheiro não parece ser um XML válido: " + erro.textContent.slice(0, 200));
+  }
+
+  const raiz = doc.documentElement;
+  if (!raiz || raiz.tagName !== "Modelo3IRSv2026") {
+    throw new Error("Este ficheiro não parece ser uma declaração Modelo 3 de IRS (Modelo3IRSv2026).");
+  }
+
+  const rosto = filho(raiz, "Rosto");
+  const anexoA = filho(raiz, "AnexoA");
+
+  const { agregado, rostoPassthrough } = parseRosto(rosto);
+  const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
+  const anexosPassthrough = parseAnexosPassthrough(raiz);
+
+  return { agregado, anexoA: anexoAModel, extrasAnexoA, rostoPassthrough, anexosPassthrough };
+}
+
+const api = { parseModelo3XML };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = api;
+} else {
+  root.IRSXml = Object.assign(root.IRSXml || {}, api);
 }
 
 })(typeof window !== "undefined" ? window : globalThis);
@@ -541,6 +725,11 @@ if (typeof module !== "undefined" && module.exports) {
 <script>
   const parametros = PARAMETROS_2025;
 
+  // Dados de uma declaração importada que a interface ainda não sabe editar
+  // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
+  // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
+  let dadosPreservados = { extrasAnexoA: {}, rostoPassthrough: {}, anexosPassthrough: {} };
+
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
   });
@@ -554,6 +743,9 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="dep-guarda" type="checkbox"></td>
       <td><select class="dep-resp"><option value="A">A</option><option value="B">B</option></select></td>
       <td><input class="dep-progenitor" size="10"></td>
+      <td><input class="dep-integra" type="checkbox"></td>
+      <td><input class="dep-partilha" type="number" size="4" placeholder="ex: 5000"></td>
+      <td><input class="dep-residencia-alt" type="checkbox"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -587,7 +779,10 @@ if (typeof module !== "undefined" && module.exports) {
       deficienteGrau: Number(tr.querySelector(".dep-grau").value) || undefined,
       guardaConjunta: tr.querySelector(".dep-guarda").checked,
       respParentais: tr.querySelector(".dep-resp").value,
-      nifProgenitor: tr.querySelector(".dep-progenitor").value || undefined
+      nifProgenitor: tr.querySelector(".dep-progenitor").value || undefined,
+      integraAgregadoSP: tr.querySelector(".dep-integra").checked,
+      partilhaDespesas: tr.querySelector(".dep-partilha").value || undefined,
+      residenciaAlternada: tr.querySelector(".dep-residencia-alt").checked
     }));
 
     return {
@@ -609,7 +804,7 @@ if (typeof module !== "undefined" && module.exports) {
       retencoes: Number(tr.querySelector(".a-retencao").value) || 0,
       contribuicoes: Number(tr.querySelector(".a-contribuicao").value) || 0
     }));
-    return { linhas };
+    return { linhas, ...dadosPreservados.extrasAnexoA };
   }
 
   window.calcular = function () {
@@ -635,13 +830,87 @@ if (typeof module !== "undefined" && module.exports) {
   };
 
   window.exportarXML = function () {
-    const model = { agregado: lerAgregado(), anexoA: lerAnexoA() };
+    const model = {
+      agregado: lerAgregado(),
+      anexoA: lerAnexoA(),
+      rostoPassthrough: dadosPreservados.rostoPassthrough,
+      anexosPassthrough: dadosPreservados.anexosPassthrough
+    };
     const xml = IRSXml.buildModelo3XML(model);
     const blob = new Blob([xml], { type: "application/xml" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = `declm3irs${model.agregado.ano}${model.agregado.nifA}.xml`;
     a.click();
+  };
+
+  window.importarXML = function () {
+    const input = document.getElementById("ficheiroImportar");
+    const ficheiro = input.files[0];
+    if (!ficheiro) { alert("Escolhe primeiro um ficheiro XML."); return; }
+
+    const leitor = new FileReader();
+    leitor.onload = function () {
+      let dados;
+      try {
+        dados = IRSXml.parseModelo3XML(leitor.result);
+      } catch (erro) {
+        alert("Não foi possível ler este ficheiro: " + erro.message);
+        return;
+      }
+
+      document.getElementById("ano").value = dados.agregado.ano;
+      document.getElementById("nifA").value = dados.agregado.nifA || "";
+      document.getElementById("iban").value = dados.agregado.iban || "";
+      document.getElementById("tributacaoConjunta").checked = dados.agregado.tributacaoConjunta;
+      document.getElementById("campoNifB").style.display = dados.agregado.tributacaoConjunta ? "flex" : "none";
+      document.getElementById("nifB").value = dados.agregado.nifB || "";
+
+      document.querySelector("#tabelaDependentes tbody").innerHTML = "";
+      dados.agregado.dependentes.forEach(dep => {
+        adicionarDependente();
+        const tr = document.querySelector("#tabelaDependentes tbody tr:last-child");
+        tr.querySelector(".dep-nif").value = dep.nif || "";
+        tr.querySelector(".dep-grau").value = dep.deficienteGrau || "";
+        tr.querySelector(".dep-guarda").checked = !!dep.guardaConjunta;
+        if (dep.respParentais) tr.querySelector(".dep-resp").value = dep.respParentais;
+        tr.querySelector(".dep-progenitor").value = dep.nifProgenitor || "";
+        tr.querySelector(".dep-integra").checked = !!dep.integraAgregadoSP;
+        tr.querySelector(".dep-partilha").value = dep.partilhaDespesas || "";
+        tr.querySelector(".dep-residencia-alt").checked = !!dep.residenciaAlternada;
+      });
+
+      document.querySelector("#tabelaAnexoA tbody").innerHTML = "";
+      dados.anexoA.linhas.forEach(l => {
+        adicionarLinhaAnexoA();
+        const tr = document.querySelector("#tabelaAnexoA tbody tr:last-child");
+        tr.querySelector(".a-nif").value = l.nifEntidade || "";
+        if (l.codRendimento) tr.querySelector(".a-codigo").value = l.codRendimento;
+        if (l.titular) tr.querySelector(".a-titular").value = l.titular;
+        tr.querySelector(".a-rendimento").value = l.rendimentos || "";
+        tr.querySelector(".a-retencao").value = l.retencoes || "";
+        tr.querySelector(".a-contribuicao").value = l.contribuicoes || "";
+      });
+
+      dadosPreservados = {
+        extrasAnexoA: dados.extrasAnexoA || {},
+        rostoPassthrough: dados.rostoPassthrough || {},
+        anexosPassthrough: dados.anexosPassthrough || {}
+      };
+
+      const secoesPreservadas = Object.keys(dadosPreservados.anexosPassthrough);
+      const aviso = document.getElementById("avisoImportacao");
+      aviso.style.display = "block";
+      aviso.innerHTML = `<strong>Importado.</strong> Ano ${dados.agregado.ano}, NIF ${dados.agregado.nifA}, ` +
+        `${dados.agregado.dependentes.length} dependente(s), ${dados.anexoA.linhas.length} linha(s) no Anexo A.` +
+        (secoesPreservadas.length
+          ? `<br>Nota: ${secoesPreservadas.join(", ")} têm dados neste ficheiro que a aplicação ainda não sabe mostrar/editar — ` +
+            `serão mantidos tal como estavam quando exportares de novo.`
+          : "");
+
+      calcular();
+    };
+    leitor.readAsText(ficheiro);
   };
 
   window.gerarCarta = function () {
