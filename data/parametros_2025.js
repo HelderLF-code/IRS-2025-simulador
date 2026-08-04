@@ -74,6 +74,44 @@ const PARAMETROS_2025 = {
     educacao: { taxa: 0.30, limite: 800, porAgregado: false, label: "Despesas de educação e formação" },
     imoveis: { taxa: 0.15, limite: 296, porAgregado: false, label: "Encargos com imóveis (juros/rendas habitação)" },
     exigenciaFatura: { taxa: 0.15, limite: 250, porAgregado: true, label: "Dedução por exigência de fatura (IVA)" }
+  },
+  // Deduções à coleta do Anexo H, Quadro 6B — só os códigos mais comuns (PPR, regimes
+  // complementares de poupança-reforma, e despesas/benefícios de pessoas com deficiência).
+  // Os restantes códigos do quadro (mecenato científico/social/cultural/ambiental, doações
+  // a igrejas, etc. — dezenas de códigos, cada um com condições de elegibilidade próprias)
+  // ficam de fora do cálculo, mas continuam a ser exportados no XML tal como preenchidos.
+  //
+  // *** Estes valores são os que têm menos confirmação em toda a app — as instruções do
+  // anexo não indicam percentagens/limites (vêm do Estatuto dos Benefícios Fiscais e do
+  // CIRS). Confirmar antes de qualquer uso real, em especial os limites dos códigos 603 a 606. ***
+  //
+  // "limitePorIdade" aplica-se a 601/602: o limite depende da idade do titular em 31/12.
+  // Se a idade não for indicada, usa-se por omissão o escalão mais baixo (>50 anos), para
+  // não sobrestimar a dedução.
+  deducoesAnexoHQuadro6B: {
+    601: {
+      label: "PPR — Planos individuais de poupança-reforma",
+      taxa: 0.20,
+      limitePorIdade: [
+        { ateIdade: 35, limite: 400 },
+        { ateIdade: 50, limite: 350 },
+        { ateIdade: null, limite: 300 }
+      ]
+    },
+    602: {
+      label: "Regimes complementares de segurança social",
+      taxa: 0.25,
+      limitePorIdade: [
+        { ateIdade: 35, limite: 400 },
+        { ateIdade: 50, limite: 350 },
+        { ateIdade: null, limite: 300 }
+      ]
+    },
+    603: { label: "Regime Público de Capitalização", taxa: 0.20, limite: null },
+    604: { label: "Contribuições reforma por velhice (sujeito passivo com deficiência)", taxa: 0.25, limite: null },
+    605: { label: "Seguros de vida / contribuições (pessoas com deficiência)", taxa: 0.25, limite: null },
+    606: { label: "Despesas de educação e reabilitação (pessoas com deficiência)", taxa: 0.30, limite: null },
+    607: { label: "Encargos com reabilitação urbana", taxa: 0.30, limite: 500 }
   }
 };
 

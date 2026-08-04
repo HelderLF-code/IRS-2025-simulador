@@ -157,11 +157,22 @@
 <button type="button" onclick="adicionarLinhaAnexoHPropInt()">+ Adicionar</button>
 
 <h3>Benefícios fiscais e despesas com pessoas com deficiência (Quadro 6B)</h3>
-<p><small class="hint">Ainda não incluído no cálculo da estimativa (são dezenas de códigos, cada um com regras
-próprias — PPR, mecenato, reabilitação urbana, etc.). Fica registado no XML exportado, mas não afeta ainda
-o valor calculado.</small></p>
+<p><small class="hint">O cálculo cobre só os códigos mais comuns (601 a 607 — PPR, regimes complementares,
+Regime Público de Capitalização, e despesas/benefícios de pessoas com deficiência). Os restantes códigos
+(mecenato científico/social/cultural/ambiental, donativos a igrejas, etc.) ficam registados no XML mas sem
+entrar na estimativa. A idade só é usada nos códigos 601/602 (limite varia com a idade do titular); se não
+indicares, assume-se o escalão mais baixo.</small></p>
+<datalist id="listaCodigosBeneficiosH">
+  <option value="601">601 — PPR (Planos individuais de poupança-reforma)</option>
+  <option value="602">602 — Regimes complementares de segurança social</option>
+  <option value="603">603 — Regime Público de Capitalização</option>
+  <option value="604">604 — Contribuições reforma (sujeito passivo com deficiência)</option>
+  <option value="605">605 — Seguros de vida / contribuições (pessoas com deficiência)</option>
+  <option value="606">606 — Despesas educação/reabilitação (pessoas com deficiência)</option>
+  <option value="607">607 — Encargos com reabilitação urbana</option>
+</datalist>
 <table id="tabelaAnexoHBeneficios">
-  <thead><tr><th>Código</th><th>Titular</th><th>Importância aplicada (€)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
+  <thead><tr><th>Código</th><th>Titular</th><th>Importância aplicada (€)</th><th>Idade titular (601/602)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHBeneficio()">+ Adicionar</button>
@@ -340,9 +351,10 @@ o valor calculado.</small></p>
     const tbody = document.querySelector("#tabelaAnexoHBeneficios tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="ah-b-codigo" size="4"></td>
+      <td><input class="ah-b-codigo" size="4" list="listaCodigosBeneficiosH"></td>
       <td><select class="ah-b-titular"><option value="A">A</option><option value="B">B</option></select></td>
       <td><input class="ah-b-importancia" type="number" step="0.01"></td>
+      <td><input class="ah-b-idade" type="number" size="4"></td>
       <td><input class="ah-b-nif" size="10"></td>
       <td><input class="ah-b-pais" size="4"></td>
       <td><input class="ah-b-numfiscal" size="12"></td>
@@ -374,6 +386,7 @@ o valor calculado.</small></p>
       codigo: tr.querySelector(".ah-b-codigo").value,
       titular: tr.querySelector(".ah-b-titular").value,
       importancia: tr.querySelector(".ah-b-importancia").value || 0,
+      idade: tr.querySelector(".ah-b-idade").value || undefined,
       nifPortugues: tr.querySelector(".ah-b-nif").value || undefined,
       pais: tr.querySelector(".ah-b-pais").value || undefined,
       numeroFiscalUE: tr.querySelector(".ah-b-numfiscal").value || undefined
@@ -459,6 +472,10 @@ o valor calculado.</small></p>
       <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
       <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>` +
       (resultado.deducaoPensoesAlimentos ? `<strong>Dedução à coleta (pensões de alimentos):</strong> -${formatarMoeda(resultado.deducaoPensoesAlimentos)} €<br>` : "") +
+      resultado.deducaoBeneficiosDeficiencia.porLinha
+        .filter(l => l.calculado && l.deducao > 0)
+        .map(l => `<strong>Dedução à coleta (${l.codigo} — ${l.label}):</strong> -${formatarMoeda(l.deducao)} €<br>`)
+        .join("") +
       linhasDeducoesArt78 +
       `<strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
       <hr>

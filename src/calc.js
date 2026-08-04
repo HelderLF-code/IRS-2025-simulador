@@ -122,6 +122,37 @@
     return ((anexoH && anexoH.pensoesAlimentos) || []).reduce((acc, p) => acc + (Number(p.valor) || 0), 0);
   }
 
+  function limitePorIdade(cfg, idade) {
+    if (idade === undefined || idade === null || idade === "") {
+      // Sem idade indicada: usa o escalão mais baixo, para não sobrestimar a dedução.
+      return cfg.limitePorIdade[cfg.limitePorIdade.length - 1].limite;
+    }
+    const escalao = cfg.limitePorIdade.find(e => e.ateIdade === null || Number(idade) < e.ateIdade);
+    return escalao.limite;
+  }
+
+  // Dedução à coleta do Anexo H, Quadro 6B — só os códigos mais comuns (ver
+  // parametros.deducoesAnexoHQuadro6B); mecenato e restantes códigos ficam de fora.
+  function calcularDeducaoBeneficiosDeficiencia(anexoH, parametros) {
+    const config = parametros.deducoesAnexoHQuadro6B || {};
+    const linhas = (anexoH && anexoH.beneficiosDeficiencia) || [];
+
+    const porLinha = linhas.map(b => {
+      const cfg = config[Number(b.codigo)];
+      if (!cfg) return { codigo: b.codigo, calculado: false, importancia: Number(b.importancia) || 0, deducao: 0 };
+
+      const importancia = Number(b.importancia) || 0;
+      const limite = cfg.limitePorIdade ? limitePorIdade(cfg, b.idade) : cfg.limite;
+      const deducao = limite === null ? importancia * cfg.taxa : Math.min(importancia * cfg.taxa, limite);
+      return { codigo: b.codigo, label: cfg.label, calculado: true, importancia, taxa: cfg.taxa, limite, deducao };
+    });
+
+    const totalDeducao = porLinha.reduce((acc, l) => acc + l.deducao, 0);
+    const naoCalculados = porLinha.filter(l => !l.calculado).length;
+
+    return { porLinha, totalDeducao, naoCalculados };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -158,7 +189,8 @@
 
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
     const dedPensoesAlimentos = calcularDeducaoPensoesAlimentos(anexoH);
-    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos;
+    const deducaoBeneficios = calcularDeducaoBeneficiosDeficiencia(anexoH, parametros);
+    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos + deducaoBeneficios.totalDeducao;
     const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
 
     const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
@@ -185,6 +217,7 @@
       deducaoColetaDependentes: dedColetaDependentes,
       deducoesArt78,
       deducaoPensoesAlimentos: dedPensoesAlimentos,
+      deducaoBeneficiosDeficiencia: deducaoBeneficios,
       deducaoColetaTotal: dedColetaTotal,
       coletaLiquida,
       retencoesFonte,
@@ -202,6 +235,7 @@
     calcularRendimentoCategoriaB,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
+    calcularDeducaoBeneficiosDeficiencia,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa

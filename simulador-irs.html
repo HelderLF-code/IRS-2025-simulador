@@ -157,11 +157,22 @@
 <button type="button" onclick="adicionarLinhaAnexoHPropInt()">+ Adicionar</button>
 
 <h3>Benefícios fiscais e despesas com pessoas com deficiência (Quadro 6B)</h3>
-<p><small class="hint">Ainda não incluído no cálculo da estimativa (são dezenas de códigos, cada um com regras
-próprias — PPR, mecenato, reabilitação urbana, etc.). Fica registado no XML exportado, mas não afeta ainda
-o valor calculado.</small></p>
+<p><small class="hint">O cálculo cobre só os códigos mais comuns (601 a 607 — PPR, regimes complementares,
+Regime Público de Capitalização, e despesas/benefícios de pessoas com deficiência). Os restantes códigos
+(mecenato científico/social/cultural/ambiental, donativos a igrejas, etc.) ficam registados no XML mas sem
+entrar na estimativa. A idade só é usada nos códigos 601/602 (limite varia com a idade do titular); se não
+indicares, assume-se o escalão mais baixo.</small></p>
+<datalist id="listaCodigosBeneficiosH">
+  <option value="601">601 — PPR (Planos individuais de poupança-reforma)</option>
+  <option value="602">602 — Regimes complementares de segurança social</option>
+  <option value="603">603 — Regime Público de Capitalização</option>
+  <option value="604">604 — Contribuições reforma (sujeito passivo com deficiência)</option>
+  <option value="605">605 — Seguros de vida / contribuições (pessoas com deficiência)</option>
+  <option value="606">606 — Despesas educação/reabilitação (pessoas com deficiência)</option>
+  <option value="607">607 — Encargos com reabilitação urbana</option>
+</datalist>
 <table id="tabelaAnexoHBeneficios">
-  <thead><tr><th>Código</th><th>Titular</th><th>Importância aplicada (€)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
+  <thead><tr><th>Código</th><th>Titular</th><th>Importância aplicada (€)</th><th>Idade titular (601/602)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHBeneficio()">+ Adicionar</button>
@@ -251,6 +262,44 @@ const PARAMETROS_2025 = {
     educacao: { taxa: 0.30, limite: 800, porAgregado: false, label: "Despesas de educação e formação" },
     imoveis: { taxa: 0.15, limite: 296, porAgregado: false, label: "Encargos com imóveis (juros/rendas habitação)" },
     exigenciaFatura: { taxa: 0.15, limite: 250, porAgregado: true, label: "Dedução por exigência de fatura (IVA)" }
+  },
+  // Deduções à coleta do Anexo H, Quadro 6B — só os códigos mais comuns (PPR, regimes
+  // complementares de poupança-reforma, e despesas/benefícios de pessoas com deficiência).
+  // Os restantes códigos do quadro (mecenato científico/social/cultural/ambiental, doações
+  // a igrejas, etc. — dezenas de códigos, cada um com condições de elegibilidade próprias)
+  // ficam de fora do cálculo, mas continuam a ser exportados no XML tal como preenchidos.
+  //
+  // *** Estes valores são os que têm menos confirmação em toda a app — as instruções do
+  // anexo não indicam percentagens/limites (vêm do Estatuto dos Benefícios Fiscais e do
+  // CIRS). Confirmar antes de qualquer uso real, em especial os limites dos códigos 603 a 606. ***
+  //
+  // "limitePorIdade" aplica-se a 601/602: o limite depende da idade do titular em 31/12.
+  // Se a idade não for indicada, usa-se por omissão o escalão mais baixo (>50 anos), para
+  // não sobrestimar a dedução.
+  deducoesAnexoHQuadro6B: {
+    601: {
+      label: "PPR — Planos individuais de poupança-reforma",
+      taxa: 0.20,
+      limitePorIdade: [
+        { ateIdade: 35, limite: 400 },
+        { ateIdade: 50, limite: 350 },
+        { ateIdade: null, limite: 300 }
+      ]
+    },
+    602: {
+      label: "Regimes complementares de segurança social",
+      taxa: 0.25,
+      limitePorIdade: [
+        { ateIdade: 35, limite: 400 },
+        { ateIdade: 50, limite: 350 },
+        { ateIdade: null, limite: 300 }
+      ]
+    },
+    603: { label: "Regime Público de Capitalização", taxa: 0.20, limite: null },
+    604: { label: "Contribuições reforma por velhice (sujeito passivo com deficiência)", taxa: 0.25, limite: null },
+    605: { label: "Seguros de vida / contribuições (pessoas com deficiência)", taxa: 0.25, limite: null },
+    606: { label: "Despesas de educação e reabilitação (pessoas com deficiência)", taxa: 0.30, limite: null },
+    607: { label: "Encargos com reabilitação urbana", taxa: 0.30, limite: 500 }
   }
 };
 
@@ -388,6 +437,37 @@ if (typeof module !== "undefined" && module.exports) {
     return ((anexoH && anexoH.pensoesAlimentos) || []).reduce((acc, p) => acc + (Number(p.valor) || 0), 0);
   }
 
+  function limitePorIdade(cfg, idade) {
+    if (idade === undefined || idade === null || idade === "") {
+      // Sem idade indicada: usa o escalão mais baixo, para não sobrestimar a dedução.
+      return cfg.limitePorIdade[cfg.limitePorIdade.length - 1].limite;
+    }
+    const escalao = cfg.limitePorIdade.find(e => e.ateIdade === null || Number(idade) < e.ateIdade);
+    return escalao.limite;
+  }
+
+  // Dedução à coleta do Anexo H, Quadro 6B — só os códigos mais comuns (ver
+  // parametros.deducoesAnexoHQuadro6B); mecenato e restantes códigos ficam de fora.
+  function calcularDeducaoBeneficiosDeficiencia(anexoH, parametros) {
+    const config = parametros.deducoesAnexoHQuadro6B || {};
+    const linhas = (anexoH && anexoH.beneficiosDeficiencia) || [];
+
+    const porLinha = linhas.map(b => {
+      const cfg = config[Number(b.codigo)];
+      if (!cfg) return { codigo: b.codigo, calculado: false, importancia: Number(b.importancia) || 0, deducao: 0 };
+
+      const importancia = Number(b.importancia) || 0;
+      const limite = cfg.limitePorIdade ? limitePorIdade(cfg, b.idade) : cfg.limite;
+      const deducao = limite === null ? importancia * cfg.taxa : Math.min(importancia * cfg.taxa, limite);
+      return { codigo: b.codigo, label: cfg.label, calculado: true, importancia, taxa: cfg.taxa, limite, deducao };
+    });
+
+    const totalDeducao = porLinha.reduce((acc, l) => acc + l.deducao, 0);
+    const naoCalculados = porLinha.filter(l => !l.calculado).length;
+
+    return { porLinha, totalDeducao, naoCalculados };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -424,7 +504,8 @@ if (typeof module !== "undefined" && module.exports) {
 
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
     const dedPensoesAlimentos = calcularDeducaoPensoesAlimentos(anexoH);
-    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos;
+    const deducaoBeneficios = calcularDeducaoBeneficiosDeficiencia(anexoH, parametros);
+    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos + deducaoBeneficios.totalDeducao;
     const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
 
     const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
@@ -451,6 +532,7 @@ if (typeof module !== "undefined" && module.exports) {
       deducaoColetaDependentes: dedColetaDependentes,
       deducoesArt78,
       deducaoPensoesAlimentos: dedPensoesAlimentos,
+      deducaoBeneficiosDeficiencia: deducaoBeneficios,
       deducaoColetaTotal: dedColetaTotal,
       coletaLiquida,
       retencoesFonte,
@@ -468,6 +550,7 @@ if (typeof module !== "undefined" && module.exports) {
     calcularRendimentoCategoriaB,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
+    calcularDeducaoBeneficiosDeficiencia,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa
@@ -1304,6 +1387,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${linha("Coleta (aplicando os escalões de IRS)", resultado.coletaBruta)}
     ${linha("Dedução à coleta por dependentes", -resultado.deducaoColetaDependentes)}
     ${resultado.deducaoPensoesAlimentos ? linha("Dedução à coleta — Pensões de alimentos", -resultado.deducaoPensoesAlimentos) : ""}
+    ${resultado.deducaoBeneficiosDeficiencia.porLinha.filter(l => l.calculado && l.deducao > 0)
+      .map(l => linha(`Dedução à coleta — ${l.codigo} ${l.label}`, -l.deducao)).join("")}
     ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
       .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}
@@ -1506,9 +1591,10 @@ if (typeof module !== "undefined" && module.exports) {
     const tbody = document.querySelector("#tabelaAnexoHBeneficios tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="ah-b-codigo" size="4"></td>
+      <td><input class="ah-b-codigo" size="4" list="listaCodigosBeneficiosH"></td>
       <td><select class="ah-b-titular"><option value="A">A</option><option value="B">B</option></select></td>
       <td><input class="ah-b-importancia" type="number" step="0.01"></td>
+      <td><input class="ah-b-idade" type="number" size="4"></td>
       <td><input class="ah-b-nif" size="10"></td>
       <td><input class="ah-b-pais" size="4"></td>
       <td><input class="ah-b-numfiscal" size="12"></td>
@@ -1540,6 +1626,7 @@ if (typeof module !== "undefined" && module.exports) {
       codigo: tr.querySelector(".ah-b-codigo").value,
       titular: tr.querySelector(".ah-b-titular").value,
       importancia: tr.querySelector(".ah-b-importancia").value || 0,
+      idade: tr.querySelector(".ah-b-idade").value || undefined,
       nifPortugues: tr.querySelector(".ah-b-nif").value || undefined,
       pais: tr.querySelector(".ah-b-pais").value || undefined,
       numeroFiscalUE: tr.querySelector(".ah-b-numfiscal").value || undefined
@@ -1625,6 +1712,10 @@ if (typeof module !== "undefined" && module.exports) {
       <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
       <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>` +
       (resultado.deducaoPensoesAlimentos ? `<strong>Dedução à coleta (pensões de alimentos):</strong> -${formatarMoeda(resultado.deducaoPensoesAlimentos)} €<br>` : "") +
+      resultado.deducaoBeneficiosDeficiencia.porLinha
+        .filter(l => l.calculado && l.deducao > 0)
+        .map(l => `<strong>Dedução à coleta (${l.codigo} — ${l.label}):</strong> -${formatarMoeda(l.deducao)} €<br>`)
+        .join("") +
       linhasDeducoesArt78 +
       `<strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
       <hr>

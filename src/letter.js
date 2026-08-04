@@ -79,6 +79,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${linha("Coleta (aplicando os escalões de IRS)", resultado.coletaBruta)}
     ${linha("Dedução à coleta por dependentes", -resultado.deducaoColetaDependentes)}
     ${resultado.deducaoPensoesAlimentos ? linha("Dedução à coleta — Pensões de alimentos", -resultado.deducaoPensoesAlimentos) : ""}
+    ${resultado.deducaoBeneficiosDeficiencia.porLinha.filter(l => l.calculado && l.deducao > 0)
+      .map(l => linha(`Dedução à coleta — ${l.codigo} ${l.label}`, -l.deducao)).join("")}
     ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
       .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}

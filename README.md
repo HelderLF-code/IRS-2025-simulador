@@ -31,17 +31,22 @@ regenerar o `simulador-irs.html`.
   agrícola plurianual, alojamento local, etc.) ainda sem interface própria.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
-  (benefícios fiscais/deficiência — capturado no XML, ainda sem afetar o cálculo, dada a
-  quantidade de códigos de mecenato com regras próprias). Quadro 6C (opção de declarar
+  (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
+  campo de código dá sugestões via lista de autocompletar). Quadro 6C (opção de declarar
   despesas em alternativa às comunicadas à AT) e Quadros 7-10 ainda sem interface própria.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
   a coeficiente reduzido — validado contra uma Demonstração de Liquidação real da AT),
   quociente conjugal, escalões de IRS, dedução à coleta por dependente, dedução por
-  pensões de alimentos (Anexo H), e deduções à coleta por despesas do e-fatura (art.º
-  78.º e seguintes do CIRS — gerais e familiares, saúde, educação, imóveis, exigência de
-  fatura), cujos totais declarados também contam para o mínimo de despesas da Categoria B.
+  pensões de alimentos e por benefícios/despesas de pessoas com deficiência — códigos 601
+  (PPR), 602 (regimes complementares), 603 (Regime Público de Capitalização), 604-606
+  (deficiência) e 607 (reabilitação urbana), com limites por idade nos códigos 601/602 —
+  e deduções à coleta por despesas do e-fatura (art.º 78.º e seguintes do CIRS — gerais e
+  familiares, saúde, educação, imóveis, exigência de fatura), cujos totais declarados
+  também contam para o mínimo de despesas da Categoria B. Os restantes códigos do Quadro
+  6B (mecenato científico/social/cultural/ambiental, donativos a igrejas, etc.) ficam
+  registados no XML mas fora do cálculo.
 - Exportação XML validada byte-a-byte contra 4 exemplos reais fornecidos (esqueleto vazio,
   sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta,
   e uma declaração completa com todos os anexos preenchidos).
@@ -69,10 +74,14 @@ novo — para não haver perda de informação.
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
 3. **Anexo B, Quadros 7-18** — encargos, alienação de imóveis, mais-valias de partes
    sociais, atividade agrícola plurianual, alojamento local, etc.
-4. **Anexo H, Quadro 6B** — dezenas de códigos de benefícios fiscais/mecenato, cada um com
-   taxa e regras de elegibilidade próprias; por agora só fica registado no XML, sem entrar
-   no cálculo. Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10
-   também por implementar.
+4. **Anexo H, Quadro 6B** — calculados os códigos 601 a 607; os de mecenato (609 em
+   diante — científico/social/cultural/ambiental/donativos, dezenas de códigos com
+   condições de elegibilidade próprias) continuam só registados no XML, sem entrar no
+   cálculo. Os limites/taxas de 601-607 são os que têm menos confirmação em toda a app —
+   as instruções do anexo não indicam percentagens (vêm do Estatuto dos Benefícios
+   Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
+   Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
+   implementar.
 5. Cada anexo por implementar (E, G, G1, J, L, SS) vai precisar de um exemplo XML
    preenchido + as respetivas instruções de preenchimento, tal como foi feito para os
    Anexos A, B e H.
