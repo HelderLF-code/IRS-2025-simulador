@@ -27,9 +27,10 @@
 
 <h1>Simulador de IRS — Rendimentos de 2025</h1>
 <p class="aviso-topo">
-  Fase 1: cobre apenas Categoria A/H (Anexo A), sujeito passivo único ou tributação conjunta,
-  e dependentes. Os parâmetros fiscais (escalões, deduções) usados neste cálculo são uma
-  estimativa e devem ser confirmados antes de qualquer uso com clientes reais.
+  Cobre Categoria A/H (Anexo A) e Categoria B em regime simplificado (Anexo B), sujeito
+  passivo único ou tributação conjunta, e dependentes. Os parâmetros fiscais (escalões,
+  deduções) usados no cálculo são uma estimativa e devem ser confirmados antes de
+  qualquer uso com clientes reais.
 </p>
 
 <fieldset>
@@ -63,6 +64,50 @@
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoA()">+ Adicionar rendimento</button>
+
+<h2>Anexo B — Rendimentos Empresariais e Profissionais (Regime Simplificado / Ato Isolado)</h2>
+<fieldset>
+  <div class="row">
+    <div><label><input type="checkbox" id="anexoBRegimeSimplificado"> Regime simplificado</label></div>
+    <div><label><input type="checkbox" id="anexoBAtoIsolado"> Ato isolado</label></div>
+    <div><label><input type="checkbox" id="anexoBNaturezaProf"> Atividade profissional/comercial/industrial</label></div>
+    <div><label><input type="checkbox" id="anexoBNaturezaAgricola"> Atividade agrícola/silvícola/pecuária</label></div>
+  </div>
+  <div class="row">
+    <div><label>NIF do titular</label><input id="anexoBNifTitular" type="text" placeholder="por defeito, NIF do SP A"></div>
+    <div><label>Código atividade (Tabela art.º 151.º)</label><input id="anexoBCodigoAtividade" type="text" size="8"></div>
+    <div><label>Código CAE (profissional)</label><input id="anexoBCaeProf" type="text" size="8"></div>
+    <div><label>Código CAE (agrícola)</label><input id="anexoBCaeAgricola" type="text" size="8"></div>
+    <div><label><input type="checkbox" id="anexoBEstabelecimentoEstavel"> Possui estabelecimento estável</label></div>
+  </div>
+</fieldset>
+
+<h3>Rendimentos brutos (Quadro 4)</h3>
+<table id="tabelaAnexoBRendimentos">
+  <thead><tr><th>Código</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
+<p><small class="hint">Códigos comuns: 401 vendas, 403 prestação de serviços (atividades da Tabela 151.º), 404 outras prestações de serviços, 410 resultado positivo de rendimentos prediais, 451 vendas agrícolas, 452 prestações de serviços agrícolas. Ver instruções de preenchimento para a lista completa.</small></p>
+
+<fieldset>
+  <div class="row">
+    <div><label><input type="checkbox" id="anexoBUnicaEntidade"> Totalidade dos rendimentos de uma única entidade</label></div>
+    <div><label><input type="checkbox" id="anexoBOptaCategoriaA"> Opta pela tributação segundo as regras da categoria A</label></div>
+  </div>
+</fieldset>
+
+<h3>Retenções na fonte e pagamentos por conta (Quadro 6)</h3>
+<div class="row">
+  <div><label>Rendimentos sujeitos a retenção (€)</label><input id="anexoBRendimentosSujeitos" type="number" step="0.01"></div>
+  <div><label>Retenções na fonte (€)</label><input id="anexoBRetencoesFonte" type="number" step="0.01"></div>
+  <div><label>Pagamentos por conta (€)</label><input id="anexoBPagamentosConta" type="number" step="0.01"></div>
+</div>
+<table id="tabelaAnexoBEntidadesRetencao">
+  <thead><tr><th>NIF da entidade</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
 
 <div class="acoes">
   <button onclick="calcular()">Calcular estimativa</button>
@@ -396,18 +441,107 @@ function buildAnexoEsqueleto(nomeAnexo, prefixo, model, quadrosVazios, temC02) {
     `</${nomeAnexo}>`;
 }
 
+// Códigos dos quadros 4A/4B/4C, pela ordem em que aparecem no formulário em papel
+// (não é ordem numérica — ex: 459 aparece antes de 454 no quadro 4B).
+const ANEXOB_CODIGOS_4A = [401, 419, 420, 421, 402, 415, 416, 417, 403, 404, 422, 405, 406, 407, 408, 409, 418, 410, 411, 412, 413, 414];
+const ANEXOB_CODIGOS_4B = [451, 452, 459, 453, 454, 455, 456, 457, 460, 458];
+const ANEXOB_CODIGOS_4C = [481, 482];
+
 // AnexoB/J/L/SS têm atributo id=NIF e repetem-se por sujeito passivo quando ambos têm
 // atividade/rendimentos próprios nesse anexo. Nesta fase ainda não temos exemplo preenchido
 // nem confirmação de como fica o segundo anexo repetido, por isso emite-se apenas o esqueleto
-// para o sujeito passivo A, tal como visto nos exemplos.
+// para o sujeito passivo A.
+//
+// Quadros 1, 3, 4, 5 e 6 são construídos a partir do modelo (dados editáveis na interface).
+// Quadros 7 a 18 (situações mais raras: alienação de imóveis, mais-valias de partes sociais,
+// atividade agrícola plurianual, alojamento local, etc.) ainda não têm interface própria —
+// são preservados tal como vieram de uma importação (model.anexoBPassthrough), ou ficam
+// vazios se se começar uma declaração em branco.
 function buildAnexoB(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const b = model.anexoB || {};
+  const pass = model.anexoBPassthrough || {};
   const campoC02 = tributacaoConjunta ? el("AnexoBq03C02", nifB) : "";
+
+  const quadro01 = (b.regimeSimplificado || b.atoIsolado || b.naturezaProfComInd || b.naturezaAgricola)
+    ? `<Quadro01>` +
+      (b.regimeSimplificado ? el("AnexoBq01B01", 1) : "") +
+      (b.atoIsolado ? el("AnexoBq01B02", 1) : "") +
+      (b.naturezaProfComInd ? el("AnexoBq01B03", true) : "") +
+      (b.naturezaAgricola ? el("AnexoBq01B04", true) : "") +
+      `</Quadro01>`
+    : `<Quadro01/>`;
+
+  const quadro03 = `<Quadro03>` +
+    el("AnexoBq03C01", nifA) +
+    campoC02 +
+    el("AnexoBq03B03", b.herancaIndivisa ? "S" : "N") +
+    el("AnexoBq03C05", b.nifTitular || nifA) +
+    (b.nifHerancaIndivisa ? el("AnexoBq03C06", b.nifHerancaIndivisa) : "") +
+    (b.codigoAtividade ? el("AnexoBq03C07", b.codigoAtividade) : "") +
+    (b.codigoCAEProf ? el("AnexoBq03C08", b.codigoCAEProf) : "") +
+    (b.codigoCAEAgricola ? el("AnexoBq03C09", b.codigoCAEAgricola) : "") +
+    (b.estabelecimentoEstavel !== undefined ? el("AnexoBq03B10", b.estabelecimentoEstavel ? "S" : "N") : "") +
+    (b.exResidentesAno ? el("AnexoBq03C12", b.exResidentesAno) : "") +
+    (b.regime910Comunicacao !== undefined ? el("AnexoBq03B13", b.regime910Comunicacao ? "S" : "N") : "") +
+    (b.regime910NifEstabelecimento ? el("AnexoBq03C15", b.regime910NifEstabelecimento) : "") +
+    (b.regime910CodPais ? el("AnexoBq03C16", b.regime910CodPais) : "") +
+    (b.irsJovemAntigoAno ? el("AnexoBq03C17a", b.irsJovemAntigoAno) : "") +
+    (b.irsJovemAntigoNivel ? el("AnexoBq03C17b", b.irsJovemAntigoNivel) : "") +
+    (b.irsJovemAntigoNif ? el("AnexoBq03C17c", b.irsJovemAntigoNif) : "") +
+    (b.irsJovemAntigoPais ? el("AnexoBq03C17d", b.irsJovemAntigoPais) : "") +
+    (b.irsJovemNovoOpcao !== undefined ? el("AnexoBq03B18", b.irsJovemNovoOpcao ? "S" : "N") : "") +
+    `</Quadro03>`;
+
+  const rendimentos = b.rendimentosBrutos || [];
+  const valorPorCodigo = (codigo) => {
+    const item = rendimentos.find(r => Number(r.codigo) === codigo);
+    return item ? Number(item.valor || 0) : undefined;
+  };
+  const somaGrupo = (codigos) => codigos.reduce((acc, c) => acc + (valorPorCodigo(c) || 0), 0);
+  const camposGrupo = (codigos) => codigos
+    .map(c => { const v = valorPorCodigo(c); return v !== undefined ? el(`AnexoBq04C${c}`, v.toFixed(2)) : ""; })
+    .join("");
+
+  const quadro04 = rendimentos.length
+    ? `<Quadro04>` +
+      camposGrupo(ANEXOB_CODIGOS_4A) +
+      el("AnexoBq04SomaC01", somaGrupo(ANEXOB_CODIGOS_4A).toFixed(2)) +
+      camposGrupo(ANEXOB_CODIGOS_4B) +
+      el("AnexoBq04SomaC02", somaGrupo(ANEXOB_CODIGOS_4B).toFixed(2)) +
+      camposGrupo(ANEXOB_CODIGOS_4C) +
+      el("AnexoBq04SomaC03", somaGrupo(ANEXOB_CODIGOS_4C).toFixed(2)) +
+      `</Quadro04>`
+    : `<Quadro04/>`;
+
+  const quadro05 = b.categoriaA
+    ? `<Quadro05>${el("AnexoBq05B01", b.categoriaA.unicaEntidade ? "S" : "N")}${el("AnexoBq05B03", b.categoriaA.optaRegrasCategoriaA ? "S" : "N")}</Quadro05>`
+    : `<Quadro05/>`;
+
+  const ret = b.retencoes;
+  const quadro06 = ret && (ret.rendimentosSujeitos || ret.retencoesFonte || ret.pagamentosPorConta || (ret.entidades && ret.entidades.length))
+    ? `<Quadro06>` +
+      el("AnexoBq06C601", Number(ret.rendimentosSujeitos || 0).toFixed(2)) +
+      el("AnexoBq06C602", Number(ret.retencoesFonte || 0).toFixed(2)) +
+      el("AnexoBq06C603", Number(ret.pagamentosPorConta || 0).toFixed(2)) +
+      listaComLinhas("AnexoBq06T01", (ret.entidades || []).map(e => ({ NIF: e.nif, Valor: e.valor }))) +
+      `</Quadro06>`
+    : `<Quadro06/>`;
+
+  const quadrosRaros = Array.from({ length: 12 }, (_, i) => {
+    const numero = String(i + 7).padStart(2, "0");
+    return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
+  }).join("");
+
   return `<AnexoB id="${esc(nifA)}">` +
-    `<Quadro00/><Quadro01/>` +
+    `<Quadro00/>` +
+    quadro01 +
     `<Quadro02>${el("AnexoBq02C01", ano)}</Quadro02>` +
-    `<Quadro03>${el("AnexoBq03C01", nifA)}${campoC02}${el("AnexoBq03B03", "N")}${el("AnexoBq03C05", nifA)}</Quadro03>` +
-    Array.from({ length: 15 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    quadro03 +
+    quadro04 +
+    quadro05 +
+    quadro06 +
+    quadrosRaros +
     `</AnexoB>`;
 }
 
@@ -455,7 +589,7 @@ function buildModelo3XML(model) {
 
   if (model.incluirAnexosVazios !== false) {
     const pass = model.anexosPassthrough || {};
-    partes.push(pass.AnexoB || buildAnexoB(model));
+    partes.push(buildAnexoB(model));
     partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
     partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
@@ -613,13 +747,101 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoB", "AnexoE", "AnexoG", "AnexoG1", "AnexoH", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoE", "AnexoG", "AnexoG1", "AnexoH", "AnexoJ", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
     if (el) passthrough[nome] = serializar(el);
   });
   return passthrough;
+}
+
+// Códigos dos quadros 4A/4B/4C do Anexo B, pela ordem em que aparecem no formulário em papel.
+const ANEXOB_CODIGOS_4A = [401, 419, 420, 421, 402, 415, 416, 417, 403, 404, 422, 405, 406, 407, 408, 409, 418, 410, 411, 412, 413, 414];
+const ANEXOB_CODIGOS_4B = [451, 452, 459, 453, 454, 455, 456, 457, 460, 458];
+const ANEXOB_CODIGOS_4C = [481, 482];
+
+function temConteudo(el) {
+  return !!(el && Array.from(el.childNodes).some(n => n.nodeType === 1));
+}
+
+function parseAnexoB(anexoB) {
+  if (!anexoB) return { anexoB: undefined, anexoBPassthrough: {}, anexoBTemDados: false };
+
+  const q01 = filho(anexoB, "Quadro01");
+  const q03 = filho(anexoB, "Quadro03");
+  const q04 = filho(anexoB, "Quadro04");
+  const q05 = filho(anexoB, "Quadro05");
+  const q06 = filho(anexoB, "Quadro06");
+
+  const b = {};
+
+  if (temConteudo(q01)) {
+    b.regimeSimplificado = !!texto(q01, "AnexoBq01B01");
+    b.atoIsolado = !!texto(q01, "AnexoBq01B02");
+    b.naturezaProfComInd = texto(q01, "AnexoBq01B03") === "true";
+    b.naturezaAgricola = texto(q01, "AnexoBq01B04") === "true";
+  }
+
+  if (q03) {
+    const camposSN = (tag) => { const v = texto(q03, tag); return v === undefined ? undefined : v === "S"; };
+    b.herancaIndivisa = camposSN("AnexoBq03B03");
+    b.nifTitular = texto(q03, "AnexoBq03C05");
+    b.nifHerancaIndivisa = texto(q03, "AnexoBq03C06");
+    b.codigoAtividade = texto(q03, "AnexoBq03C07");
+    b.codigoCAEProf = texto(q03, "AnexoBq03C08");
+    b.codigoCAEAgricola = texto(q03, "AnexoBq03C09");
+    b.estabelecimentoEstavel = camposSN("AnexoBq03B10");
+    b.exResidentesAno = texto(q03, "AnexoBq03C12");
+    b.regime910Comunicacao = camposSN("AnexoBq03B13");
+    b.regime910NifEstabelecimento = texto(q03, "AnexoBq03C15");
+    b.regime910CodPais = texto(q03, "AnexoBq03C16");
+    b.irsJovemAntigoAno = texto(q03, "AnexoBq03C17a");
+    b.irsJovemAntigoNivel = texto(q03, "AnexoBq03C17b");
+    b.irsJovemAntigoNif = texto(q03, "AnexoBq03C17c");
+    b.irsJovemAntigoPais = texto(q03, "AnexoBq03C17d");
+    b.irsJovemNovoOpcao = camposSN("AnexoBq03B18");
+  }
+
+  if (q04) {
+    const rendimentos = [];
+    [...ANEXOB_CODIGOS_4A, ...ANEXOB_CODIGOS_4B, ...ANEXOB_CODIGOS_4C].forEach(codigo => {
+      const v = texto(q04, `AnexoBq04C${codigo}`);
+      if (v !== undefined) rendimentos.push({ codigo, valor: v });
+    });
+    b.rendimentosBrutos = rendimentos;
+  }
+
+  if (temConteudo(q05)) {
+    b.categoriaA = {
+      unicaEntidade: texto(q05, "AnexoBq05B01") === "S",
+      optaRegrasCategoriaA: texto(q05, "AnexoBq05B03") === "S"
+    };
+  }
+
+  if (temConteudo(q06)) {
+    b.retencoes = {
+      rendimentosSujeitos: texto(q06, "AnexoBq06C601"),
+      retencoesFonte: texto(q06, "AnexoBq06C602"),
+      pagamentosPorConta: texto(q06, "AnexoBq06C603"),
+      entidades: parseLinhasGenerico(filho(q06, "AnexoBq06T01")).map(l => ({ nif: l.NIF, valor: l.Valor }))
+    };
+  }
+
+  const passthrough = {};
+  for (let i = 7; i <= 18; i++) {
+    const numero = String(i).padStart(2, "0");
+    const elQ = filho(anexoB, `Quadro${numero}`);
+    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
+  }
+
+  // Sinal direto (a partir da estrutura do XML) de que há atividade real de Anexo B,
+  // usado para decidir se se deve voltar a emitir os quadros 3B/5/6 ao reexportar
+  // sem reduzir tudo a um "Não" implícito quando não há realmente nada preenchido.
+  const anexoBTemDados = temConteudo(q01) || temConteudo(q04) || temConteudo(q05) || temConteudo(q06) ||
+    Object.keys(passthrough).length > 0;
+
+  return { anexoB: b, anexoBPassthrough: passthrough, anexoBTemDados };
 }
 
 function parseModelo3XML(xmlTexto) {
@@ -636,12 +858,23 @@ function parseModelo3XML(xmlTexto) {
 
   const rosto = filho(raiz, "Rosto");
   const anexoA = filho(raiz, "AnexoA");
+  const anexoB = filho(raiz, "AnexoB");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
+  const { anexoB: anexoBModel, anexoBPassthrough, anexoBTemDados } = parseAnexoB(anexoB);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
-  return { agregado, anexoA: anexoAModel, extrasAnexoA, rostoPassthrough, anexosPassthrough };
+  return {
+    agregado,
+    anexoA: anexoAModel,
+    extrasAnexoA,
+    anexoB: anexoBModel,
+    anexoBPassthrough,
+    anexoBTemDados,
+    rostoPassthrough,
+    anexosPassthrough
+  };
 }
 
 const api = { parseModelo3XML };
@@ -746,7 +979,7 @@ if (typeof module !== "undefined" && module.exports) {
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
   // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
-  let dadosPreservados = { extrasAnexoA: {}, rostoPassthrough: {}, anexosPassthrough: {} };
+  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -790,6 +1023,63 @@ if (typeof module !== "undefined" && module.exports) {
     `;
     tbody.appendChild(tr);
   };
+
+  window.adicionarLinhaAnexoBRendimento = function () {
+    const tbody = document.querySelector("#tabelaAnexoBRendimentos tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab-r-codigo" type="number" size="4"></td>
+      <td><input class="ab-r-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoBEntidade = function () {
+    const tbody = document.querySelector("#tabelaAnexoBEntidadesRetencao tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab-e-nif" size="10"></td>
+      <td><input class="ab-e-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerAnexoB() {
+    const rendimentosBrutos = [...document.querySelectorAll("#tabelaAnexoBRendimentos tbody tr")].map(tr => ({
+      codigo: tr.querySelector(".ab-r-codigo").value,
+      valor: tr.querySelector(".ab-r-valor").value || 0
+    }));
+    const entidades = [...document.querySelectorAll("#tabelaAnexoBEntidadesRetencao tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab-e-nif").value,
+      valor: tr.querySelector(".ab-e-valor").value || 0
+    }));
+
+    return {
+      ...dadosPreservados.anexoBExtrasQ03,
+      regimeSimplificado: document.getElementById("anexoBRegimeSimplificado").checked,
+      atoIsolado: document.getElementById("anexoBAtoIsolado").checked,
+      naturezaProfComInd: document.getElementById("anexoBNaturezaProf").checked,
+      naturezaAgricola: document.getElementById("anexoBNaturezaAgricola").checked,
+      nifTitular: document.getElementById("anexoBNifTitular").value || undefined,
+      codigoAtividade: document.getElementById("anexoBCodigoAtividade").value || undefined,
+      codigoCAEProf: document.getElementById("anexoBCaeProf").value || undefined,
+      codigoCAEAgricola: document.getElementById("anexoBCaeAgricola").value || undefined,
+      estabelecimentoEstavel: document.getElementById("anexoBEstabelecimentoEstavel").checked,
+      rendimentosBrutos,
+      categoriaA: {
+        unicaEntidade: document.getElementById("anexoBUnicaEntidade").checked,
+        optaRegrasCategoriaA: document.getElementById("anexoBOptaCategoriaA").checked
+      },
+      retencoes: {
+        rendimentosSujeitos: document.getElementById("anexoBRendimentosSujeitos").value || 0,
+        retencoesFonte: document.getElementById("anexoBRetencoesFonte").value || 0,
+        pagamentosPorConta: document.getElementById("anexoBPagamentosConta").value || 0,
+        entidades
+      }
+    };
+  }
 
   function lerAgregado() {
     const dependentes = [...document.querySelectorAll("#tabelaDependentes tbody tr")].map(tr => ({
@@ -847,10 +1137,23 @@ if (typeof module !== "undefined" && module.exports) {
     `;
   };
 
+  // Só inclui dados do Anexo B se houver alguma atividade de facto preenchida — caso
+  // contrário os quadros 3B/5/6 ficam vazios, tal como numa declaração sem Anexo B.
+  // dadosPreservados.anexoBAtivo vem diretamente da estrutura do XML importado (se aplicável);
+  // os restantes casos cobrem quando se preenche o Anexo B a partir de uma declaração em branco.
+  function temAtividadeAnexoB(anexoB) {
+    return !!(dadosPreservados.anexoBAtivo || anexoB.regimeSimplificado || anexoB.atoIsolado ||
+      anexoB.naturezaProfComInd || anexoB.naturezaAgricola || anexoB.rendimentosBrutos.length ||
+      Object.keys(dadosPreservados.anexoBPassthrough || {}).length);
+  }
+
   window.exportarXML = function () {
+    const anexoBLido = lerAnexoB();
     const model = {
       agregado: lerAgregado(),
       anexoA: lerAnexoA(),
+      anexoB: temAtividadeAnexoB(anexoBLido) ? anexoBLido : undefined,
+      anexoBPassthrough: dadosPreservados.anexoBPassthrough,
       rostoPassthrough: dadosPreservados.rostoPassthrough,
       anexosPassthrough: dadosPreservados.anexosPassthrough
     };
@@ -910,17 +1213,91 @@ if (typeof module !== "undefined" && module.exports) {
         tr.querySelector(".a-contribuicao").value = l.contribuicoes || "";
       });
 
+      document.getElementById("anexoBRegimeSimplificado").checked = false;
+      document.getElementById("anexoBAtoIsolado").checked = false;
+      document.getElementById("anexoBNaturezaProf").checked = false;
+      document.getElementById("anexoBNaturezaAgricola").checked = false;
+      document.getElementById("anexoBNifTitular").value = "";
+      document.getElementById("anexoBCodigoAtividade").value = "";
+      document.getElementById("anexoBCaeProf").value = "";
+      document.getElementById("anexoBCaeAgricola").value = "";
+      document.getElementById("anexoBEstabelecimentoEstavel").checked = false;
+      document.getElementById("anexoBUnicaEntidade").checked = false;
+      document.getElementById("anexoBOptaCategoriaA").checked = false;
+      document.getElementById("anexoBRendimentosSujeitos").value = "";
+      document.getElementById("anexoBRetencoesFonte").value = "";
+      document.getElementById("anexoBPagamentosConta").value = "";
+      document.querySelector("#tabelaAnexoBRendimentos tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoBEntidadesRetencao tbody").innerHTML = "";
+
+      const camposAnexoBNaInterface = [
+        "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
+        "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
+        "estabelecimentoEstavel", "rendimentosBrutos", "categoriaA", "retencoes"
+      ];
+      let anexoBExtrasQ03 = {};
+
+      if (dados.anexoB) {
+        const b = dados.anexoB;
+        document.getElementById("anexoBRegimeSimplificado").checked = !!b.regimeSimplificado;
+        document.getElementById("anexoBAtoIsolado").checked = !!b.atoIsolado;
+        document.getElementById("anexoBNaturezaProf").checked = !!b.naturezaProfComInd;
+        document.getElementById("anexoBNaturezaAgricola").checked = !!b.naturezaAgricola;
+        document.getElementById("anexoBNifTitular").value = b.nifTitular || "";
+        document.getElementById("anexoBCodigoAtividade").value = b.codigoAtividade || "";
+        document.getElementById("anexoBCaeProf").value = b.codigoCAEProf || "";
+        document.getElementById("anexoBCaeAgricola").value = b.codigoCAEAgricola || "";
+        document.getElementById("anexoBEstabelecimentoEstavel").checked = !!b.estabelecimentoEstavel;
+
+        (b.rendimentosBrutos || []).forEach(r => {
+          adicionarLinhaAnexoBRendimento();
+          const tr = document.querySelector("#tabelaAnexoBRendimentos tbody tr:last-child");
+          tr.querySelector(".ab-r-codigo").value = r.codigo;
+          tr.querySelector(".ab-r-valor").value = r.valor;
+        });
+
+        if (b.categoriaA) {
+          document.getElementById("anexoBUnicaEntidade").checked = !!b.categoriaA.unicaEntidade;
+          document.getElementById("anexoBOptaCategoriaA").checked = !!b.categoriaA.optaRegrasCategoriaA;
+        }
+
+        if (b.retencoes) {
+          document.getElementById("anexoBRendimentosSujeitos").value = b.retencoes.rendimentosSujeitos || "";
+          document.getElementById("anexoBRetencoesFonte").value = b.retencoes.retencoesFonte || "";
+          document.getElementById("anexoBPagamentosConta").value = b.retencoes.pagamentosPorConta || "";
+          (b.retencoes.entidades || []).forEach(e => {
+            adicionarLinhaAnexoBEntidade();
+            const tr = document.querySelector("#tabelaAnexoBEntidadesRetencao tbody tr:last-child");
+            tr.querySelector(".ab-e-nif").value = e.nif || "";
+            tr.querySelector(".ab-e-valor").value = e.valor || "";
+          });
+        }
+
+        Object.keys(b).forEach(k => {
+          if (!camposAnexoBNaInterface.includes(k)) anexoBExtrasQ03[k] = b[k];
+        });
+      }
+
       dadosPreservados = {
         extrasAnexoA: dados.extrasAnexoA || {},
+        anexoBExtrasQ03,
+        anexoBAtivo: !!dados.anexoBTemDados,
+        anexoBPassthrough: dados.anexoBPassthrough || {},
         rostoPassthrough: dados.rostoPassthrough || {},
         anexosPassthrough: dados.anexosPassthrough || {}
       };
 
       const secoesPreservadas = Object.keys(dadosPreservados.anexosPassthrough);
+      const quadrosBPreservados = Object.keys(dadosPreservados.anexoBPassthrough);
       const aviso = document.getElementById("avisoImportacao");
       aviso.style.display = "block";
       aviso.innerHTML = `<strong>Importado.</strong> Ano ${dados.agregado.ano}, NIF ${dados.agregado.nifA}, ` +
-        `${dados.agregado.dependentes.length} dependente(s), ${dados.anexoA.linhas.length} linha(s) no Anexo A.` +
+        `${dados.agregado.dependentes.length} dependente(s), ${dados.anexoA.linhas.length} linha(s) no Anexo A` +
+        (dados.anexoB ? `, ${(dados.anexoB.rendimentosBrutos || []).length} linha(s) no Anexo B` : "") + `.` +
+        (quadrosBPreservados.length
+          ? `<br>Nota: os quadros ${quadrosBPreservados.map(q => q.replace("Quadro", "")).join(", ")} do Anexo B ` +
+            `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
+          : "") +
         (secoesPreservadas.length
           ? `<br>Nota: ${secoesPreservadas.join(", ")} têm dados neste ficheiro que a aplicação ainda não sabe mostrar/editar — ` +
             `serão mantidos tal como estavam quando exportares de novo.`

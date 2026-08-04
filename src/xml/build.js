@@ -166,18 +166,107 @@ function buildAnexoEsqueleto(nomeAnexo, prefixo, model, quadrosVazios, temC02) {
     `</${nomeAnexo}>`;
 }
 
+// Códigos dos quadros 4A/4B/4C, pela ordem em que aparecem no formulário em papel
+// (não é ordem numérica — ex: 459 aparece antes de 454 no quadro 4B).
+const ANEXOB_CODIGOS_4A = [401, 419, 420, 421, 402, 415, 416, 417, 403, 404, 422, 405, 406, 407, 408, 409, 418, 410, 411, 412, 413, 414];
+const ANEXOB_CODIGOS_4B = [451, 452, 459, 453, 454, 455, 456, 457, 460, 458];
+const ANEXOB_CODIGOS_4C = [481, 482];
+
 // AnexoB/J/L/SS têm atributo id=NIF e repetem-se por sujeito passivo quando ambos têm
 // atividade/rendimentos próprios nesse anexo. Nesta fase ainda não temos exemplo preenchido
 // nem confirmação de como fica o segundo anexo repetido, por isso emite-se apenas o esqueleto
-// para o sujeito passivo A, tal como visto nos exemplos.
+// para o sujeito passivo A.
+//
+// Quadros 1, 3, 4, 5 e 6 são construídos a partir do modelo (dados editáveis na interface).
+// Quadros 7 a 18 (situações mais raras: alienação de imóveis, mais-valias de partes sociais,
+// atividade agrícola plurianual, alojamento local, etc.) ainda não têm interface própria —
+// são preservados tal como vieram de uma importação (model.anexoBPassthrough), ou ficam
+// vazios se se começar uma declaração em branco.
 function buildAnexoB(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const b = model.anexoB || {};
+  const pass = model.anexoBPassthrough || {};
   const campoC02 = tributacaoConjunta ? el("AnexoBq03C02", nifB) : "";
+
+  const quadro01 = (b.regimeSimplificado || b.atoIsolado || b.naturezaProfComInd || b.naturezaAgricola)
+    ? `<Quadro01>` +
+      (b.regimeSimplificado ? el("AnexoBq01B01", 1) : "") +
+      (b.atoIsolado ? el("AnexoBq01B02", 1) : "") +
+      (b.naturezaProfComInd ? el("AnexoBq01B03", true) : "") +
+      (b.naturezaAgricola ? el("AnexoBq01B04", true) : "") +
+      `</Quadro01>`
+    : `<Quadro01/>`;
+
+  const quadro03 = `<Quadro03>` +
+    el("AnexoBq03C01", nifA) +
+    campoC02 +
+    el("AnexoBq03B03", b.herancaIndivisa ? "S" : "N") +
+    el("AnexoBq03C05", b.nifTitular || nifA) +
+    (b.nifHerancaIndivisa ? el("AnexoBq03C06", b.nifHerancaIndivisa) : "") +
+    (b.codigoAtividade ? el("AnexoBq03C07", b.codigoAtividade) : "") +
+    (b.codigoCAEProf ? el("AnexoBq03C08", b.codigoCAEProf) : "") +
+    (b.codigoCAEAgricola ? el("AnexoBq03C09", b.codigoCAEAgricola) : "") +
+    (b.estabelecimentoEstavel !== undefined ? el("AnexoBq03B10", b.estabelecimentoEstavel ? "S" : "N") : "") +
+    (b.exResidentesAno ? el("AnexoBq03C12", b.exResidentesAno) : "") +
+    (b.regime910Comunicacao !== undefined ? el("AnexoBq03B13", b.regime910Comunicacao ? "S" : "N") : "") +
+    (b.regime910NifEstabelecimento ? el("AnexoBq03C15", b.regime910NifEstabelecimento) : "") +
+    (b.regime910CodPais ? el("AnexoBq03C16", b.regime910CodPais) : "") +
+    (b.irsJovemAntigoAno ? el("AnexoBq03C17a", b.irsJovemAntigoAno) : "") +
+    (b.irsJovemAntigoNivel ? el("AnexoBq03C17b", b.irsJovemAntigoNivel) : "") +
+    (b.irsJovemAntigoNif ? el("AnexoBq03C17c", b.irsJovemAntigoNif) : "") +
+    (b.irsJovemAntigoPais ? el("AnexoBq03C17d", b.irsJovemAntigoPais) : "") +
+    (b.irsJovemNovoOpcao !== undefined ? el("AnexoBq03B18", b.irsJovemNovoOpcao ? "S" : "N") : "") +
+    `</Quadro03>`;
+
+  const rendimentos = b.rendimentosBrutos || [];
+  const valorPorCodigo = (codigo) => {
+    const item = rendimentos.find(r => Number(r.codigo) === codigo);
+    return item ? Number(item.valor || 0) : undefined;
+  };
+  const somaGrupo = (codigos) => codigos.reduce((acc, c) => acc + (valorPorCodigo(c) || 0), 0);
+  const camposGrupo = (codigos) => codigos
+    .map(c => { const v = valorPorCodigo(c); return v !== undefined ? el(`AnexoBq04C${c}`, v.toFixed(2)) : ""; })
+    .join("");
+
+  const quadro04 = rendimentos.length
+    ? `<Quadro04>` +
+      camposGrupo(ANEXOB_CODIGOS_4A) +
+      el("AnexoBq04SomaC01", somaGrupo(ANEXOB_CODIGOS_4A).toFixed(2)) +
+      camposGrupo(ANEXOB_CODIGOS_4B) +
+      el("AnexoBq04SomaC02", somaGrupo(ANEXOB_CODIGOS_4B).toFixed(2)) +
+      camposGrupo(ANEXOB_CODIGOS_4C) +
+      el("AnexoBq04SomaC03", somaGrupo(ANEXOB_CODIGOS_4C).toFixed(2)) +
+      `</Quadro04>`
+    : `<Quadro04/>`;
+
+  const quadro05 = b.categoriaA
+    ? `<Quadro05>${el("AnexoBq05B01", b.categoriaA.unicaEntidade ? "S" : "N")}${el("AnexoBq05B03", b.categoriaA.optaRegrasCategoriaA ? "S" : "N")}</Quadro05>`
+    : `<Quadro05/>`;
+
+  const ret = b.retencoes;
+  const quadro06 = ret && (ret.rendimentosSujeitos || ret.retencoesFonte || ret.pagamentosPorConta || (ret.entidades && ret.entidades.length))
+    ? `<Quadro06>` +
+      el("AnexoBq06C601", Number(ret.rendimentosSujeitos || 0).toFixed(2)) +
+      el("AnexoBq06C602", Number(ret.retencoesFonte || 0).toFixed(2)) +
+      el("AnexoBq06C603", Number(ret.pagamentosPorConta || 0).toFixed(2)) +
+      listaComLinhas("AnexoBq06T01", (ret.entidades || []).map(e => ({ NIF: e.nif, Valor: e.valor }))) +
+      `</Quadro06>`
+    : `<Quadro06/>`;
+
+  const quadrosRaros = Array.from({ length: 12 }, (_, i) => {
+    const numero = String(i + 7).padStart(2, "0");
+    return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
+  }).join("");
+
   return `<AnexoB id="${esc(nifA)}">` +
-    `<Quadro00/><Quadro01/>` +
+    `<Quadro00/>` +
+    quadro01 +
     `<Quadro02>${el("AnexoBq02C01", ano)}</Quadro02>` +
-    `<Quadro03>${el("AnexoBq03C01", nifA)}${campoC02}${el("AnexoBq03B03", "N")}${el("AnexoBq03C05", nifA)}</Quadro03>` +
-    Array.from({ length: 15 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    quadro03 +
+    quadro04 +
+    quadro05 +
+    quadro06 +
+    quadrosRaros +
     `</AnexoB>`;
 }
 
@@ -225,7 +314,7 @@ function buildModelo3XML(model) {
 
   if (model.incluirAnexosVazios !== false) {
     const pass = model.anexosPassthrough || {};
-    partes.push(pass.AnexoB || buildAnexoB(model));
+    partes.push(buildAnexoB(model));
     partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
     partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));

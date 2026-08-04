@@ -18,28 +18,35 @@ caminhos relativos para as pastas `src/` e `data/` se manterem intactos.
 Depois de alterar algo em `src/` ou `data/`, correr `node scripts/build.js` para
 regenerar o `simulador-irs.html`.
 
-## Estado atual (Fase 1)
+## Estado atual
 
 - Rosto: Quadros 1, 2, 3 (ano/NIF), 4/5 (tributação conjunta), 6 (dependentes,
   incluindo deficiência e guarda conjunta), 9 (IBAN).
 - Anexo A: Quadro 4 completo (rendimentos/retenções/contribuições, pagamentos por
   conta, outras deduções, seguros de desgaste rápido, incentivos fiscais, ex-residentes,
   IRS Jovem, estudantes dependentes).
+- Anexo B: Quadros 1 (regime), 3 (titular/atividade), 4 (rendimentos brutos, todos os
+  códigos 4A/4B/4C), 5 (regras da categoria A) e 6 (retenções na fonte/pagamentos por
+  conta). Quadros 7 a 18 (alienação de imóveis, mais-valias de partes sociais, atividade
+  agrícola plurianual, alojamento local, etc.) ainda sem interface própria.
 - Cálculo: Categoria A/H — dedução específica, quociente conjugal, escalões de IRS,
   dedução à coleta por dependente.
-- Exportação XML validada byte-a-byte contra 3 exemplos reais fornecidos (esqueleto vazio,
-  sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta).
-- Geração de carta/estimativa para o cliente (HTML imprimível → PDF via browser).
+- Exportação XML validada byte-a-byte contra 4 exemplos reais fornecidos (esqueleto vazio,
+  sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta,
+  e uma declaração completa com todos os anexos preenchidos).
+- Geração de carta/estimativa para o cliente (HTML imprimível → PDF via browser),
+  com valores formatados com separador de milhares (100.000,00).
 - **Importação de XML**: permite carregar uma declaração já exportada do Portal das
   Finanças e continuar a trabalhar a partir dela, em vez de começar sempre em branco.
   Testado com round-trip perfeito (importar e voltar a exportar sem alterar nada dá
-  exatamente o mesmo ficheiro) nos 3 exemplos fornecidos.
+  exatamente o mesmo ficheiro) em todos os exemplos fornecidos.
 
-A estrutura XML dos Anexos B, E, G, G1, H, J, L, SS ainda **não** está mapeada em detalhe
-— são emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. Ao **importar**
-uma declaração que já tenha dados nesses anexos, esses dados são preservados tal como
-estavam (mas ainda não podem ser vistos/editados na interface) e mantidos ao exportar de
-novo — para não haver perda de informação.
+A estrutura XML dos Anexos E, G, G1, H, J, L, SS ainda **não** está mapeada em detalhe
+— são emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se
+aplica aos Quadros 7-18 do Anexo B. Ao **importar** uma declaração que já tenha dados
+nessas secções, esses dados são preservados tal como estavam (mas ainda não podem ser
+vistos/editados na interface) e mantidos ao exportar de novo — para não haver perda de
+informação.
 
 ## Por confirmar / próximos passos
 
@@ -48,9 +55,12 @@ novo — para não haver perda de informação.
    assinatura). Preciso de um exemplo preenchido ou das instruções do Rosto.
 2. **Anexo B/J/L/SS com 2 sujeitos passivos** — confirmar como o segundo anexo se repete
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
-3. Cada anexo por implementar (B, E, G, G1, H, J, L, SS) vai precisar de um exemplo XML
-   preenchido + as respetivas instruções de preenchimento, tal como foi feito para o Anexo A.
-4. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
+3. **Anexo B, Quadros 7-18** — encargos, alienação de imóveis, mais-valias de partes
+   sociais, atividade agrícola plurianual, alojamento local, etc.
+4. Cada anexo por implementar (E, G, G1, H, J, L, SS) vai precisar de um exemplo XML
+   preenchido + as respetivas instruções de preenchimento, tal como foi feito para os
+   Anexos A e B.
+5. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
 
