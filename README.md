@@ -67,6 +67,12 @@ informação.
 5. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
+6. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — campo para carregar
+   manualmente as despesas do e-fatura (despesas gerais familiares, saúde, educação,
+   imóveis, exigência de fatura, etc.) e calcular a dedução efetiva de cada uma
+   (com os respetivos limites), tal como aparece na secção "Deduções à Coleta" da
+   Demonstração de Liquidação da AT. Atualmente a app só desconta a dedução por
+   dependentes.
 
 ## Estrutura do código
 
