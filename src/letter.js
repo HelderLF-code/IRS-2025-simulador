@@ -1,4 +1,9 @@
-export function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
+// Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
+// com duplo-clique, sem servidor. Expõe-se em window.IRSLetter.
+
+(function (root) {
+
+function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const nomeAno = agregado.ano;
   const sinalResultado = resultado.tipoResultado === "reembolso" ? "reembolso estimado" : "valor estimado a pagar";
   const valorAbs = Math.abs(resultado.resultado).toFixed(2);
@@ -47,3 +52,13 @@ export function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
 </body>
 </html>`;
 }
+
+const api = { gerarCartaHTML };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = api;
+} else {
+  root.IRSLetter = api;
+}
+
+})(typeof window !== "undefined" ? window : globalThis);

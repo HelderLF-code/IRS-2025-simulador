@@ -65,13 +65,12 @@
 
 <div id="resultado" style="display:none"></div>
 
-<script type="module">
-  import { calcularEstimativa } from "./src/calc.js";
-  import { buildModelo3XML } from "./src/xml/build.js";
-  import { gerarCartaHTML } from "./src/letter.js";
-
-  let parametros = null;
-  fetch("./data/parametros_2025.json").then(r => r.json()).then(p => parametros = p);
+<script src="./data/parametros_2025.js"></script>
+<script src="./src/calc.js"></script>
+<script src="./src/xml/build.js"></script>
+<script src="./src/letter.js"></script>
+<script>
+  const parametros = PARAMETROS_2025;
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -145,10 +144,9 @@
   }
 
   window.calcular = function () {
-    if (!parametros) { alert("A carregar parâmetros fiscais, tenta novamente em instantes."); return; }
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
-    const resultado = calcularEstimativa({ agregado, anexoA, parametros });
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -169,7 +167,7 @@
 
   window.exportarXML = function () {
     const model = { agregado: lerAgregado(), anexoA: lerAnexoA() };
-    const xml = buildModelo3XML(model);
+    const xml = IRSXml.buildModelo3XML(model);
     const blob = new Blob([xml], { type: "application/xml" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -179,7 +177,7 @@
 
   window.gerarCarta = function () {
     if (!window._ultimoResultado) { calcular(); }
-    const html = gerarCartaHTML({
+    const html = IRSLetter.gerarCartaHTML({
       agregado: window._ultimoAgregado,
       resultado: window._ultimoResultado,
       dataGeracao: new Date().toLocaleDateString("pt-PT")

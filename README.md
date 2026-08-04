@@ -6,27 +6,9 @@ declaração no formato `Modelo3IRSv2026` usado pelo Portal das Finanças.
 
 ## Como correr
 
-Não é possível abrir `index.html` diretamente com duplo-clique (os browsers bloqueiam
-`import` de módulos JS a partir de `file://`). Requer Python 3 instalado.
-
-**Forma mais simples — usar o atalho:**
-- Windows: duplo-clique em `iniciar.bat`
-- Mac: duplo-clique em `iniciar-mac.command` (na primeira vez pode ser preciso
-  autorizar em Preferências do Sistema → Privacidade e Segurança)
-- Linux: duplo-clique em `iniciar.sh`, ou correr `./iniciar.sh` no terminal
-
-O script arranca o servidor local e abre o browser automaticamente em
-`http://localhost:8000`. Para parar a aplicação, fecha a janela do servidor
-(ou Ctrl+C no terminal).
-
-**Manual (alternativa):**
-
-```
-cd IRS-2025-simulador
-python3 -m http.server 8000
-```
-
-Depois abre `http://localhost:8000` no browser.
+Basta abrir o ficheiro `index.html` com duplo-clique — abre diretamente no browser
+por defeito. Não precisa de instalação de nada (nem Python, nem servidor, nem ligação
+à internet).
 
 ## Estado atual (Fase 1)
 
@@ -54,7 +36,7 @@ nesses anexos), para manter o XML estruturalmente válido enquanto essas fases n
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
 3. Cada anexo por implementar (B, E, G, G1, H, J, L, SS) vai precisar de um exemplo XML
    preenchido + as respetivas instruções de preenchimento, tal como foi feito para o Anexo A.
-4. **Parâmetros fiscais em `data/parametros_2025.json`** (escalões, IAS, deduções) são a
+4. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
 
@@ -65,6 +47,10 @@ index.html          formulário e interface
 src/calc.js          motor de cálculo (Categoria A)
 src/xml/build.js      gerador do XML Modelo3IRSv2026
 src/letter.js         gerador da carta/estimativa em HTML
-data/parametros_2025.json  escalões, deduções, IAS (a validar)
+data/parametros_2025.js  escalões, deduções, IAS (a validar)
 examples/             modelos de dados de teste, validados contra XML reais
 ```
+
+Todos os ficheiros `.js` são scripts normais (não módulos), carregados por `index.html`
+via `<script src="...">`, precisamente para que a aplicação funcione ao abrir o ficheiro
+diretamente (`file://`) sem precisar de servidor.

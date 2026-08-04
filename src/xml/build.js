@@ -6,6 +6,11 @@
 // Partes ainda não mapeadas (ficam com a estrutura "esqueleto" tal como observada nos exemplos,
 // até serem fornecidos exemplos preenchidos): Rosto Quadro07/08/10/11/13, e os conteúdos dos
 // Anexos B/E/G/G1/H/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
+//
+// Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
+// com duplo-clique, sem servidor. Expõe-se em window.IRSXml.
+
+(function (root) {
 
 function esc(valor) {
   return String(valor)
@@ -206,7 +211,7 @@ function buildAnexoSS(model) {
     `</AnexoSS>`;
 }
 
-export function buildModelo3XML(model) {
+function buildModelo3XML(model) {
   const partes = [];
   partes.push(`<?xml version="1.0" encoding="UTF-8"?>`);
   partes.push(
@@ -231,3 +236,13 @@ export function buildModelo3XML(model) {
   partes.push(`</Modelo3IRSv2026>`);
   return partes.join("\n");
 }
+
+const api = { buildModelo3XML };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = api;
+} else {
+  root.IRSXml = api;
+}
+
+})(typeof window !== "undefined" ? window : globalThis);
