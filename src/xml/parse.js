@@ -130,7 +130,7 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoE", "AnexoG", "AnexoG1", "AnexoH", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoE", "AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
@@ -236,6 +236,49 @@ function parseAnexoB(anexoB) {
   return { anexoB: b, anexoBPassthrough: passthrough, anexoBTemDados };
 }
 
+function parseAnexoH(anexoH) {
+  if (!anexoH) return { anexoH: undefined, anexoHPassthrough: {} };
+
+  const q04 = filho(anexoH, "Quadro04");
+  const q05 = filho(anexoH, "Quadro05");
+  const q06 = filho(anexoH, "Quadro06");
+
+  const h = {};
+
+  h.rendimentosIsentos = parseLinhasGenerico(filho(q04, "AnexoHq04T01")).map(l => ({
+    codigo: l.CodRendimentos, titular: l.Titular, rendimento: l.Rendimentos,
+    retencao: l.RetencaoIRS, nifPortugues: l.NifPortugues, pais: l.Pais, numeroFiscalUE: l.NumeroFiscalUE
+  }));
+
+  h.propriedadeIntelectual = parseLinhasGenerico(filho(q05, "AnexoHq05T01")).map(l => ({
+    titular: l.Titular, montante: l.MontanteRendimento
+  }));
+
+  h.pensoesAlimentos = parseLinhasGenerico(filho(q06, "AnexoHq06AT01")).map(l => ({
+    sujeitoPassivo: l.SujeitoPassivo, nifBeneficiario: l.NifBeneficiario, valor: l.ValorPensao
+  }));
+
+  h.beneficiosDeficiencia = parseLinhasGenerico(filho(q06, "AnexoHq06BT01")).map(l => ({
+    codigo: l.CodBeneficio, titular: l.Titular, importancia: l.ImportanciaAplicada,
+    nifPortugues: l.NifPortugues, pais: l.Pais, numeroFiscalUE: l.NumeroFiscalUE
+  }));
+
+  const passthrough = {};
+  // Quadro 6C (opção de declarar despesas em alternativa aos valores comunicados à AT) vive
+  // dentro do Quadro06, junto com as pensões/benefícios — preserva-se só esses campos.
+  if (temConteudo(q06)) {
+    const camposQ06C = ["AnexoHq06B01", "AnexoHq06CT01", "AnexoHq06CT02", "AnexoHq06B03", "AnexoHq06CT03", "AnexoHq06CT04"];
+    const fragmento = camposQ06C.map(tag => serializar(filho(q06, tag))).filter(Boolean).join("");
+    if (fragmento) passthrough.Quadro06C = fragmento;
+  }
+  ["Quadro07", "Quadro08", "Quadro09", "Quadro10"].forEach(nome => {
+    const elQ = filho(anexoH, nome);
+    if (temConteudo(elQ)) passthrough[nome] = serializar(elQ);
+  });
+
+  return { anexoH: h, anexoHPassthrough: passthrough };
+}
+
 function parseModelo3XML(xmlTexto) {
   const doc = new DOMParser().parseFromString(xmlTexto, "application/xml");
   const erro = doc.querySelector("parsererror");
@@ -251,10 +294,12 @@ function parseModelo3XML(xmlTexto) {
   const rosto = filho(raiz, "Rosto");
   const anexoA = filho(raiz, "AnexoA");
   const anexoB = filho(raiz, "AnexoB");
+  const anexoH = filho(raiz, "AnexoH");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
   const { anexoB: anexoBModel, anexoBPassthrough, anexoBTemDados } = parseAnexoB(anexoB);
+  const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
   return {
@@ -264,6 +309,8 @@ function parseModelo3XML(xmlTexto) {
     anexoB: anexoBModel,
     anexoBPassthrough,
     anexoBTemDados,
+    anexoH: anexoHModel,
+    anexoHPassthrough,
     rostoPassthrough,
     anexosPassthrough
   };

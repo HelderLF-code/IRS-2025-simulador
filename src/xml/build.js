@@ -28,7 +28,8 @@ function el(nome, conteudo) {
 
 const CAMPOS_MONETARIOS = new Set([
   "Valor", "MontanteGanho", "ValorUnitario", "ValorTotal",
-  "Rendimentos", "Retencoes", "Contribuicoes", "RetSobretaxa", "Quotizacoes"
+  "Rendimentos", "Retencoes", "Contribuicoes", "RetSobretaxa", "Quotizacoes",
+  "RetencaoIRS", "MontanteRendimento", "ValorPensao", "ImportanciaAplicada"
 ]);
 
 function formatarValor(tag, v) {
@@ -270,6 +271,73 @@ function buildAnexoB(model) {
     `</AnexoB>`;
 }
 
+// Quadros 4 (rendimentos isentos), 5 (propriedade intelectual isenta) e 6A/6B (pensões de
+// alimentos, benefícios fiscais/deficiência) são construídos a partir do modelo. O Quadro 6C
+// (opção de declarar despesas de saúde/educação/imóveis/lares em alternativa aos valores
+// comunicados à AT) e os Quadros 7-10 (info. de imóveis, acréscimos por incumprimento,
+// incentivos à recapitalização, famílias de acolhimento) ainda não têm interface própria e
+// ficam preservados tal como vierem de uma importação.
+function buildAnexoH(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const h = model.anexoH || {};
+  const pass = model.anexoHPassthrough || {};
+
+  const quadro03 = tributacaoConjunta
+    ? `<Quadro03>${el("AnexoHq03C01", nifA)}${el("AnexoHq03C02", nifB)}</Quadro03>`
+    : `<Quadro03>${el("AnexoHq03C01", nifA)}</Quadro03>`;
+
+  const isentos = (h.rendimentosIsentos || []).map(r => ({
+    CodRendimentos: r.codigo, Titular: r.titular, Rendimentos: r.rendimento,
+    RetencaoIRS: r.retencao, NifPortugues: r.nifPortugues, Pais: r.pais, NumeroFiscalUE: r.numeroFiscalUE
+  }));
+  const somaIsentosRend = (h.rendimentosIsentos || []).reduce((a, r) => a + (Number(r.rendimento) || 0), 0);
+  const somaIsentosRet = (h.rendimentosIsentos || []).reduce((a, r) => a + (Number(r.retencao) || 0), 0);
+  const quadro04 = isentos.length
+    ? `<Quadro04>` + listaComLinhas("AnexoHq04T01", isentos) +
+      el("AnexoHq04T01SomaC01", somaIsentosRend.toFixed(2)) +
+      el("AnexoHq04T01SomaC02", somaIsentosRet.toFixed(2)) +
+      `</Quadro04>`
+    : `<Quadro04/>`;
+
+  const propInt = (h.propriedadeIntelectual || []).map(p => ({ Titular: p.titular, MontanteRendimento: p.montante }));
+  const somaPropInt = (h.propriedadeIntelectual || []).reduce((a, p) => a + (Number(p.montante) || 0), 0);
+  const quadro05 = propInt.length
+    ? `<Quadro05>` + listaComLinhas("AnexoHq05T01", propInt) + el("AnexoHq05T01SomaC01", somaPropInt.toFixed(2)) + `</Quadro05>`
+    : `<Quadro05/>`;
+
+  const pensoes = (h.pensoesAlimentos || []).map(p => ({ SujeitoPassivo: p.sujeitoPassivo, NifBeneficiario: p.nifBeneficiario, ValorPensao: p.valor }));
+  const somaPensoes = (h.pensoesAlimentos || []).reduce((a, p) => a + (Number(p.valor) || 0), 0);
+  const beneficios = (h.beneficiosDeficiencia || []).map(b => ({
+    CodBeneficio: b.codigo, Titular: b.titular, ImportanciaAplicada: b.importancia,
+    NifPortugues: b.nifPortugues, Pais: b.pais, NumeroFiscalUE: b.numeroFiscalUE
+  }));
+  const somaBeneficios = (h.beneficiosDeficiencia || []).reduce((a, b) => a + (Number(b.importancia) || 0), 0);
+
+  const quadro06CDefeito = `${el("AnexoHq06B01", "N")}<AnexoHq06CT01/><AnexoHq06CT02/>${el("AnexoHq06B03", "N")}<AnexoHq06CT03/><AnexoHq06CT04/>`;
+  const temQuadro06 = pensoes.length > 0 || beneficios.length > 0 || !!pass.Quadro06C;
+  const quadro06 = temQuadro06
+    ? `<Quadro06>` +
+      listaComLinhas("AnexoHq06AT01", pensoes) +
+      el("AnexoHq06AT01SomaC01", somaPensoes.toFixed(2)) +
+      listaComLinhas("AnexoHq06BT01", beneficios) +
+      el("AnexoHq06BT01SomaC01", somaBeneficios.toFixed(2)) +
+      (pass.Quadro06C || quadro06CDefeito) +
+      `</Quadro06>`
+    : `<Quadro06/>`;
+
+  const quadrosRestantes = ["Quadro07", "Quadro08", "Quadro09", "Quadro10"]
+    .map(q => pass[q] || `<${q}/>`).join("");
+
+  return `<AnexoH>` +
+    `<Quadro02>${el("AnexoHq02C01", ano)}</Quadro02>` +
+    quadro03 +
+    quadro04 +
+    quadro05 +
+    quadro06 +
+    quadrosRestantes +
+    `</AnexoH>`;
+}
+
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const campoC02 = tributacaoConjunta ? el("AnexoJq03C02", nifB) : "";
@@ -318,7 +386,7 @@ function buildModelo3XML(model) {
     partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
     partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
-    partes.push(pass.AnexoH || buildAnexoEsqueleto("AnexoH", "AnexoH", model, ["04", "05", "06", "07", "08", "09", "10"], true));
+    partes.push(buildAnexoH(model));
     partes.push(pass.AnexoJ || buildAnexoJ(model));
     partes.push(pass.AnexoL || buildAnexoL(model));
     partes.push(pass.AnexoSS || buildAnexoSS(model));

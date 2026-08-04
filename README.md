@@ -29,14 +29,19 @@ regenerar o `simulador-irs.html`.
   códigos 4A/4B/4C), 5 (regras da categoria A) e 6 (retenções na fonte/pagamentos por
   conta). Quadros 7 a 18 (alienação de imóveis, mais-valias de partes sociais, atividade
   agrícola plurianual, alojamento local, etc.) ainda sem interface própria.
+- Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
+  Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
+  (benefícios fiscais/deficiência — capturado no XML, ainda sem afetar o cálculo, dada a
+  quantidade de códigos de mecenato com regras próprias). Quadro 6C (opção de declarar
+  despesas em alternativa às comunicadas à AT) e Quadros 7-10 ainda sem interface própria.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
   a coeficiente reduzido — validado contra uma Demonstração de Liquidação real da AT),
-  quociente conjugal, escalões de IRS, dedução à coleta por dependente, e deduções à
-  coleta por despesas do e-fatura (art.º 78.º e seguintes do CIRS — gerais e familiares,
-  saúde, educação, imóveis, exigência de fatura), cujos totais declarados também contam
-  para o mínimo de despesas da Categoria B.
+  quociente conjugal, escalões de IRS, dedução à coleta por dependente, dedução por
+  pensões de alimentos (Anexo H), e deduções à coleta por despesas do e-fatura (art.º
+  78.º e seguintes do CIRS — gerais e familiares, saúde, educação, imóveis, exigência de
+  fatura), cujos totais declarados também contam para o mínimo de despesas da Categoria B.
 - Exportação XML validada byte-a-byte contra 4 exemplos reais fornecidos (esqueleto vazio,
   sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta,
   e uma declaração completa com todos os anexos preenchidos).
@@ -48,12 +53,12 @@ regenerar o `simulador-irs.html`.
   Testado com round-trip perfeito (importar e voltar a exportar sem alterar nada dá
   exatamente o mesmo ficheiro) em todos os exemplos fornecidos.
 
-A estrutura XML dos Anexos E, G, G1, H, J, L, SS ainda **não** está mapeada em detalhe
-— são emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se
-aplica aos Quadros 7-18 do Anexo B. Ao **importar** uma declaração que já tenha dados
-nessas secções, esses dados são preservados tal como estavam (mas ainda não podem ser
-vistos/editados na interface) e mantidos ao exportar de novo — para não haver perda de
-informação.
+A estrutura XML dos Anexos E, G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
+emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
+Quadros 7-18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
+declaração que já tenha dados nessas secções, esses dados são preservados tal como
+estavam (mas ainda não podem ser vistos/editados na interface) e mantidos ao exportar de
+novo — para não haver perda de informação.
 
 ## Por confirmar / próximos passos
 
@@ -64,13 +69,17 @@ informação.
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
 3. **Anexo B, Quadros 7-18** — encargos, alienação de imóveis, mais-valias de partes
    sociais, atividade agrícola plurianual, alojamento local, etc.
-4. Cada anexo por implementar (E, G, G1, H, J, L, SS) vai precisar de um exemplo XML
+4. **Anexo H, Quadro 6B** — dezenas de códigos de benefícios fiscais/mecenato, cada um com
+   taxa e regras de elegibilidade próprias; por agora só fica registado no XML, sem entrar
+   no cálculo. Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10
+   também por implementar.
+5. Cada anexo por implementar (E, G, G1, J, L, SS) vai precisar de um exemplo XML
    preenchido + as respetivas instruções de preenchimento, tal como foi feito para os
-   Anexos A e B.
-5. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
+   Anexos A, B e H.
+6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
-6. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — implementadas (despesas gerais
+7. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — implementadas (despesas gerais
    e familiares, saúde, educação, imóveis, exigência de fatura), com taxas e limites em
    `data/parametros_2025.js` (a validar). Falta ainda o limite geral e decrescente por
    escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos

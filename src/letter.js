@@ -78,6 +78,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <table>
     ${linha("Coleta (aplicando os escalões de IRS)", resultado.coletaBruta)}
     ${linha("Dedução à coleta por dependentes", -resultado.deducaoColetaDependentes)}
+    ${resultado.deducaoPensoesAlimentos ? linha("Dedução à coleta — Pensões de alimentos", -resultado.deducaoPensoesAlimentos) : ""}
     ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
       .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}

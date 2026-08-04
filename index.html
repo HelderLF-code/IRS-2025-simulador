@@ -133,6 +133,39 @@
   </div>
 </fieldset>
 
+<h2>Anexo H — Benefícios Fiscais e Deduções</h2>
+
+<h3>Pensões de alimentos pagas (Quadro 6A)</h3>
+<table id="tabelaAnexoHPensoes">
+  <thead><tr><th>Sujeito passivo</th><th>NIF do beneficiário</th><th>Valor da pensão (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoHPensao()">+ Adicionar pensão de alimentos</button>
+
+<h3>Rendimentos isentos (Quadro 4)</h3>
+<table id="tabelaAnexoHIsentos">
+  <thead><tr><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção IRS (€)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoHIsento()">+ Adicionar rendimento isento</button>
+
+<h3>Propriedade intelectual isenta parcialmente (Quadro 5)</h3>
+<table id="tabelaAnexoHPropInt">
+  <thead><tr><th>Titular</th><th>Montante (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoHPropInt()">+ Adicionar</button>
+
+<h3>Benefícios fiscais e despesas com pessoas com deficiência (Quadro 6B)</h3>
+<p><small class="hint">Ainda não incluído no cálculo da estimativa (são dezenas de códigos, cada um com regras
+próprias — PPR, mecenato, reabilitação urbana, etc.). Fica registado no XML exportado, mas não afeta ainda
+o valor calculado.</small></p>
+<table id="tabelaAnexoHBeneficios">
+  <thead><tr><th>Código</th><th>Titular</th><th>Importância aplicada (€)</th><th>NIF entidade (PT)</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoHBeneficio()">+ Adicionar</button>
+
 <div class="acoes">
   <button onclick="calcular()">Calcular estimativa</button>
   <button onclick="exportarXML()">Exportar XML (Modelo 3)</button>
@@ -161,7 +194,7 @@
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
   // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
-  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
+  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoHPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -264,6 +297,91 @@
     };
   }
 
+  window.adicionarLinhaAnexoHPensao = function () {
+    const tbody = document.querySelector("#tabelaAnexoHPensoes tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ah-p-sp"><option value="A">A</option><option value="B">B</option></select></td>
+      <td><input class="ah-p-nif" size="10"></td>
+      <td><input class="ah-p-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoHIsento = function () {
+    const tbody = document.querySelector("#tabelaAnexoHIsentos tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ah-i-codigo" size="4"></td>
+      <td><select class="ah-i-titular"><option value="A">A</option><option value="B">B</option></select></td>
+      <td><input class="ah-i-rendimento" type="number" step="0.01"></td>
+      <td><input class="ah-i-retencao" type="number" step="0.01"></td>
+      <td><input class="ah-i-nif" size="10"></td>
+      <td><input class="ah-i-pais" size="4"></td>
+      <td><input class="ah-i-numfiscal" size="12"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoHPropInt = function () {
+    const tbody = document.querySelector("#tabelaAnexoHPropInt tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ah-pi-titular"><option value="A">A</option><option value="B">B</option></select></td>
+      <td><input class="ah-pi-montante" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoHBeneficio = function () {
+    const tbody = document.querySelector("#tabelaAnexoHBeneficios tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ah-b-codigo" size="4"></td>
+      <td><select class="ah-b-titular"><option value="A">A</option><option value="B">B</option></select></td>
+      <td><input class="ah-b-importancia" type="number" step="0.01"></td>
+      <td><input class="ah-b-nif" size="10"></td>
+      <td><input class="ah-b-pais" size="4"></td>
+      <td><input class="ah-b-numfiscal" size="12"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerAnexoH() {
+    const pensoesAlimentos = [...document.querySelectorAll("#tabelaAnexoHPensoes tbody tr")].map(tr => ({
+      sujeitoPassivo: tr.querySelector(".ah-p-sp").value,
+      nifBeneficiario: tr.querySelector(".ah-p-nif").value,
+      valor: tr.querySelector(".ah-p-valor").value || 0
+    }));
+    const rendimentosIsentos = [...document.querySelectorAll("#tabelaAnexoHIsentos tbody tr")].map(tr => ({
+      codigo: tr.querySelector(".ah-i-codigo").value,
+      titular: tr.querySelector(".ah-i-titular").value,
+      rendimento: tr.querySelector(".ah-i-rendimento").value || 0,
+      retencao: tr.querySelector(".ah-i-retencao").value || 0,
+      nifPortugues: tr.querySelector(".ah-i-nif").value || undefined,
+      pais: tr.querySelector(".ah-i-pais").value || undefined,
+      numeroFiscalUE: tr.querySelector(".ah-i-numfiscal").value || undefined
+    }));
+    const propriedadeIntelectual = [...document.querySelectorAll("#tabelaAnexoHPropInt tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ah-pi-titular").value,
+      montante: tr.querySelector(".ah-pi-montante").value || 0
+    }));
+    const beneficiosDeficiencia = [...document.querySelectorAll("#tabelaAnexoHBeneficios tbody tr")].map(tr => ({
+      codigo: tr.querySelector(".ah-b-codigo").value,
+      titular: tr.querySelector(".ah-b-titular").value,
+      importancia: tr.querySelector(".ah-b-importancia").value || 0,
+      nifPortugues: tr.querySelector(".ah-b-nif").value || undefined,
+      pais: tr.querySelector(".ah-b-pais").value || undefined,
+      numeroFiscalUE: tr.querySelector(".ah-b-numfiscal").value || undefined
+    }));
+
+    return { pensoesAlimentos, rendimentosIsentos, propriedadeIntelectual, beneficiosDeficiencia };
+  }
+
   function lerDespesasEFatura() {
     return {
       geraisFamiliares: document.getElementById("despesaGeraisFamiliares").value || 0,
@@ -312,8 +430,9 @@
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
     const anexoB = lerAnexoB();
+    const anexoH = lerAnexoH();
     const despesasEFatura = lerDespesasEFatura();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, despesasEFatura, parametros });
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoH, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -339,6 +458,7 @@
       <hr>
       <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
       <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>` +
+      (resultado.deducaoPensoesAlimentos ? `<strong>Dedução à coleta (pensões de alimentos):</strong> -${formatarMoeda(resultado.deducaoPensoesAlimentos)} €<br>` : "") +
       linhasDeducoesArt78 +
       `<strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
       <hr>
@@ -367,6 +487,8 @@
       anexoA: lerAnexoA(),
       anexoB: temAtividadeAnexoB(anexoBLido) ? anexoBLido : undefined,
       anexoBPassthrough: dadosPreservados.anexoBPassthrough,
+      anexoH: lerAnexoH(),
+      anexoHPassthrough: dadosPreservados.anexoHPassthrough,
       rostoPassthrough: dadosPreservados.rostoPassthrough,
       anexosPassthrough: dadosPreservados.anexosPassthrough
     };
@@ -443,6 +565,48 @@
       document.getElementById("anexoBPagamentosConta").value = "";
       document.querySelector("#tabelaAnexoBRendimentos tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoBEntidadesRetencao tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoHIsentos tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoHPropInt tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoHBeneficios tbody").innerHTML = "";
+
+      if (dados.anexoH) {
+        const h = dados.anexoH;
+        (h.pensoesAlimentos || []).forEach(p => {
+          adicionarLinhaAnexoHPensao();
+          const tr = document.querySelector("#tabelaAnexoHPensoes tbody tr:last-child");
+          if (p.sujeitoPassivo) tr.querySelector(".ah-p-sp").value = p.sujeitoPassivo;
+          tr.querySelector(".ah-p-nif").value = p.nifBeneficiario || "";
+          tr.querySelector(".ah-p-valor").value = p.valor || "";
+        });
+        (h.rendimentosIsentos || []).forEach(r => {
+          adicionarLinhaAnexoHIsento();
+          const tr = document.querySelector("#tabelaAnexoHIsentos tbody tr:last-child");
+          tr.querySelector(".ah-i-codigo").value = r.codigo || "";
+          if (r.titular) tr.querySelector(".ah-i-titular").value = r.titular;
+          tr.querySelector(".ah-i-rendimento").value = r.rendimento || "";
+          tr.querySelector(".ah-i-retencao").value = r.retencao || "";
+          tr.querySelector(".ah-i-nif").value = r.nifPortugues || "";
+          tr.querySelector(".ah-i-pais").value = r.pais || "";
+          tr.querySelector(".ah-i-numfiscal").value = r.numeroFiscalUE || "";
+        });
+        (h.propriedadeIntelectual || []).forEach(p => {
+          adicionarLinhaAnexoHPropInt();
+          const tr = document.querySelector("#tabelaAnexoHPropInt tbody tr:last-child");
+          if (p.titular) tr.querySelector(".ah-pi-titular").value = p.titular;
+          tr.querySelector(".ah-pi-montante").value = p.montante || "";
+        });
+        (h.beneficiosDeficiencia || []).forEach(b2 => {
+          adicionarLinhaAnexoHBeneficio();
+          const tr = document.querySelector("#tabelaAnexoHBeneficios tbody tr:last-child");
+          tr.querySelector(".ah-b-codigo").value = b2.codigo || "";
+          if (b2.titular) tr.querySelector(".ah-b-titular").value = b2.titular;
+          tr.querySelector(".ah-b-importancia").value = b2.importancia || "";
+          tr.querySelector(".ah-b-nif").value = b2.nifPortugues || "";
+          tr.querySelector(".ah-b-pais").value = b2.pais || "";
+          tr.querySelector(".ah-b-numfiscal").value = b2.numeroFiscalUE || "";
+        });
+      }
 
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
@@ -498,19 +662,26 @@
         anexoBExtrasQ03,
         anexoBAtivo: !!dados.anexoBTemDados,
         anexoBPassthrough: dados.anexoBPassthrough || {},
+        anexoHPassthrough: dados.anexoHPassthrough || {},
         rostoPassthrough: dados.rostoPassthrough || {},
         anexosPassthrough: dados.anexosPassthrough || {}
       };
 
       const secoesPreservadas = Object.keys(dadosPreservados.anexosPassthrough);
       const quadrosBPreservados = Object.keys(dadosPreservados.anexoBPassthrough);
+      const quadrosHPreservados = Object.keys(dadosPreservados.anexoHPassthrough);
       const aviso = document.getElementById("avisoImportacao");
       aviso.style.display = "block";
       aviso.innerHTML = `<strong>Importado.</strong> Ano ${dados.agregado.ano}, NIF ${dados.agregado.nifA}, ` +
         `${dados.agregado.dependentes.length} dependente(s), ${dados.anexoA.linhas.length} linha(s) no Anexo A` +
-        (dados.anexoB ? `, ${(dados.anexoB.rendimentosBrutos || []).length} linha(s) no Anexo B` : "") + `.` +
+        (dados.anexoB ? `, ${(dados.anexoB.rendimentosBrutos || []).length} linha(s) no Anexo B` : "") +
+        (dados.anexoH ? `, ${(dados.anexoH.pensoesAlimentos || []).length} pensão(ões) de alimentos no Anexo H` : "") + `.` +
         (quadrosBPreservados.length
           ? `<br>Nota: os quadros ${quadrosBPreservados.map(q => q.replace("Quadro", "")).join(", ")} do Anexo B ` +
+            `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
+          : "") +
+        (quadrosHPreservados.length
+          ? `<br>Nota: ${quadrosHPreservados.map(q => q.replace("Quadro", "Quadro ")).join(", ")} do Anexo H ` +
             `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
           : "") +
         (secoesPreservadas.length

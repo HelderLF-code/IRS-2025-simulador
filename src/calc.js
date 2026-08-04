@@ -115,6 +115,13 @@
     return { porCategoria, totalDespesas, totalDeducao };
   }
 
+  // Dedução à coleta por pensões de alimentos pagas (art.º 83.º-A do CIRS, Anexo H Quadro 6A):
+  // dedução de 100% do valor pago, sem limite (excluindo beneficiários do agregado familiar,
+  // que já teriam dedução pelo art.º 78.º).
+  function calcularDeducaoPensoesAlimentos(anexoH) {
+    return ((anexoH && anexoH.pensoesAlimentos) || []).reduce((acc, p) => acc + (Number(p.valor) || 0), 0);
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -127,7 +134,7 @@
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, despesasEFatura, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, anexoH, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
@@ -150,7 +157,8 @@
     const coletaBruta = coletaPorQuociente * divisor;
 
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
-    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao;
+    const dedPensoesAlimentos = calcularDeducaoPensoesAlimentos(anexoH);
+    const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos;
     const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
 
     const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
@@ -176,6 +184,7 @@
       coletaBruta,
       deducaoColetaDependentes: dedColetaDependentes,
       deducoesArt78,
+      deducaoPensoesAlimentos: dedPensoesAlimentos,
       deducaoColetaTotal: dedColetaTotal,
       coletaLiquida,
       retencoesFonte,
@@ -192,6 +201,7 @@
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
     calcularDeducoesArt78,
+    calcularDeducaoPensoesAlimentos,
     aplicarEscaloes,
     deducaoPorDependentes,
     calcularEstimativa
