@@ -55,7 +55,15 @@ const PARAMETROS_2025 = {
     457: 0.15, 458: 0.15,
     460: 0
   },
-  coeficienteOmissao: 1.00
+  coeficienteOmissao: 1.00,
+  // Regra do "acréscimo ao rendimento" (mínimo de despesas, regime simplificado): para os
+  // rendimentos sujeitos a estes coeficientes, as despesas comprovadas têm de atingir 15%
+  // desse rendimento; o que faltar acresce ao rendimento tributável.
+  coeficientesComMinimoDespesas: [0.75, 0.35],
+  // Mínimo de despesas com contribuições para a Segurança Social consideradas para efeitos
+  // desta regra, mesmo sem nada declarado (replica o valor visto na Demonstração de
+  // Liquidação da AT, que coincide com o mínimo da dedução específica da categoria A).
+  minimoContribuicoesCategoriaB: 4462.15
 };
 
 if (typeof module !== "undefined" && module.exports) {

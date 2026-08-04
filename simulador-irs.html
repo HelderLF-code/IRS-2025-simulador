@@ -90,6 +90,11 @@
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
 <p><small class="hint">Códigos comuns: 401 vendas, 403 prestação de serviços (atividades da Tabela 151.º), 404 outras prestações de serviços, 410 resultado positivo de rendimentos prediais, 451 vendas agrícolas, 452 prestações de serviços agrícolas. Ver instruções de preenchimento para a lista completa.</small></p>
 
+<div class="row">
+  <div><label>Contribuições para a Segurança Social declaradas (Quadro 7A)</label><input id="anexoBContribuicoesSS" type="number" step="0.01"></div>
+</div>
+<p><small class="hint">Usado para calcular o "acréscimo ao rendimento": em regime simplificado, as despesas comprovadas com contribuições para a Segurança Social têm de atingir 15% dos rendimentos sujeitos aos coeficientes 0,75 e 0,35; o que faltar acresce ao rendimento tributável.</small></p>
+
 <fieldset>
   <div class="row">
     <div><label><input type="checkbox" id="anexoBUnicaEntidade"> Totalidade dos rendimentos de uma única entidade</label></div>
@@ -175,7 +180,15 @@ const PARAMETROS_2025 = {
     457: 0.15, 458: 0.15,
     460: 0
   },
-  coeficienteOmissao: 1.00
+  coeficienteOmissao: 1.00,
+  // Regra do "acréscimo ao rendimento" (mínimo de despesas, regime simplificado): para os
+  // rendimentos sujeitos a estes coeficientes, as despesas comprovadas têm de atingir 15%
+  // desse rendimento; o que faltar acresce ao rendimento tributável.
+  coeficientesComMinimoDespesas: [0.75, 0.35],
+  // Mínimo de despesas com contribuições para a Segurança Social consideradas para efeitos
+  // desta regra, mesmo sem nada declarado (replica o valor visto na Demonstração de
+  // Liquidação da AT, que coincide com o mínimo da dedução específica da categoria A).
+  minimoContribuicoesCategoriaB: 4462.15
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -206,7 +219,12 @@ if (typeof module !== "undefined" && module.exports) {
     }, { rendimentos: 0, retencoes: 0, contribuicoes: 0 });
   }
 
-  function deducaoEspecificaCategoriaA(contribuicoesObrigatorias, parametros) {
+  // A dedução específica só se aplica quando há de facto rendimento de categoria A/H
+  // (sem isso, não faz sentido aplicar o mínimo — reflete o "Rendimento Global: 0,00"
+  // e "Deduções Específicas: 0,00" que aparece na Demonstração de Liquidação da AT
+  // quando não há rendimentos dessa categoria).
+  function deducaoEspecificaCategoriaA(rendimentoBrutoA, contribuicoesObrigatorias, parametros) {
+    if (!rendimentoBrutoA) return 0;
     return Math.max(contribuicoesObrigatorias, parametros.deducaoEspecificaCategoriaA.minimo);
   }
 
@@ -228,21 +246,47 @@ if (typeof module !== "undefined" && module.exports) {
 
   // Regime simplificado (art.º 31.º do CIRS): aplica o coeficiente de cada código de
   // rendimento ao respetivo valor bruto para obter o rendimento tributável da Categoria B.
-  // Não cobre ainda a opção pelas regras da categoria A nem os encargos do quadro 7.
+  //
+  // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas): para os rendimentos
+  // sujeitos aos coeficientes 0,75 e 0,35, as despesas comprovadas (contribuições para a
+  // Segurança Social, no mínimo) têm de atingir 15% desses rendimentos; se ficarem abaixo
+  // desse mínimo, a diferença acresce ao rendimento tributável — replica a secção
+  // "Verificação das despesas da categoria B" da Demonstração de Liquidação da AT.
+  //
+  // Não cobre ainda a opção pelas regras da categoria A nem os restantes encargos do quadro 7.
   function calcularRendimentoCategoriaB(anexoB, parametros) {
     const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
     const coeficientes = parametros.coeficientesCategoriaB || {};
     const coeficienteOmissao = parametros.coeficienteOmissao ?? 1;
+    const coeficientesComMinimoDespesas = parametros.coeficientesComMinimoDespesas || [];
 
     const rendimentoBruto = rendimentos.reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
-    const rendimentoTributavel = rendimentos.reduce((acc, r) => {
+
+    let rendimentoTributavelBase = 0;
+    let rendimentoRelevanteMinimo = 0;
+    rendimentos.forEach(r => {
       const coef = coeficientes[Number(r.codigo)] ?? coeficienteOmissao;
-      return acc + (Number(r.valor) || 0) * coef;
-    }, 0);
+      const valor = Number(r.valor) || 0;
+      rendimentoTributavelBase += valor * coef;
+      if (coeficientesComMinimoDespesas.includes(coef)) {
+        rendimentoRelevanteMinimo += valor;
+      }
+    });
+
+    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0);
+    const despesasCalculadas = Math.max(despesasDeclaradas, parametros.minimoContribuicoesCategoriaB || 0);
+    const valorMinimoDespesas = rendimentoRelevanteMinimo * 0.15;
+    const acrescimoAoRendimento = Math.max(0, valorMinimoDespesas - despesasCalculadas);
+
+    const rendimentoTributavel = rendimentoTributavelBase + acrescimoAoRendimento;
 
     const ret = (anexoB && anexoB.retencoes) || {};
     return {
       rendimentoBruto,
+      rendimentoTributavelBase,
+      despesasCalculadas,
+      valorMinimoDespesas,
+      acrescimoAoRendimento,
       rendimentoTributavel,
       retencoes: Number(ret.retencoesFonte) || 0,
       pagamentosPorConta: Number(ret.pagamentosPorConta) || 0
@@ -263,12 +307,15 @@ if (typeof module !== "undefined" && module.exports) {
 
   function calcularEstimativa({ agregado, anexoA, anexoB, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
-    const dedEspecifica = deducaoEspecificaCategoriaA(somaA.contribuicoes, parametros);
+    const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
 
     const categoriaB = calcularRendimentoCategoriaB(anexoB, parametros);
 
-    const rendimentoLiquido = rendimentoLiquidoA + categoriaB.rendimentoTributavel;
+    // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
+    // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo.
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel;
+    const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
       ? parametros.quocienteConjugal.divisorCasadosConjunta
@@ -282,22 +329,33 @@ if (typeof module !== "undefined" && module.exports) {
     const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
     const coletaLiquida = Math.max(0, coletaBruta - dedColetaDependentes);
 
-    const retencoesTotais = somaA.retencoes + categoriaB.retencoes + categoriaB.pagamentosPorConta;
+    const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
+    const pagamentosPorConta = categoriaB.pagamentosPorConta;
+    const retencoesTotais = retencoesFonte + pagamentosPorConta;
     const resultado = retencoesTotais - coletaLiquida; // positivo = reembolso, negativo = a pagar
+    const taxaEfetiva = rendimentoLiquido > 0 ? coletaLiquida / rendimentoLiquido : 0;
 
     return {
       rendimentoBrutoA: somaA.rendimentos,
       deducaoEspecifica: dedEspecifica,
       rendimentoLiquidoA,
       rendimentoBrutoB: categoriaB.rendimentoBruto,
+      rendimentoTributavelBaseB: categoriaB.rendimentoTributavelBase,
+      acrescimoAoRendimentoB: categoriaB.acrescimoAoRendimento,
+      despesasCalculadasB: categoriaB.despesasCalculadas,
+      valorMinimoDespesasB: categoriaB.valorMinimoDespesas,
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
+      rendimentoGlobal,
       rendimentoLiquido,
       divisorQuociente: divisor,
       coletaBruta,
       deducaoColetaDependentes: dedColetaDependentes,
       coletaLiquida,
+      retencoesFonte,
+      pagamentosPorConta,
       retencoesTotais,
+      taxaEfetiva,
       resultado,
       tipoResultado: resultado >= 0 ? "reembolso" : "a pagar"
     };
@@ -884,6 +942,15 @@ function parseAnexoB(anexoB) {
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
+  // O Quadro07 fica todo em passthrough (ainda não editável), mas extrai-se também o
+  // valor das contribuições para a Segurança Social (campo 701), informativamente, para
+  // o cálculo do "acréscimo ao rendimento" — isto não afeta o que é reexportado no Quadro07.
+  const q07 = filho(anexoB, "Quadro07");
+  if (temConteudo(q07)) {
+    const contribuicoesSS = texto(q07, "AnexoBq07C701");
+    if (contribuicoesSS !== undefined) b.contribuicoesSS = contribuicoesSS;
+  }
+
   // Sinal direto (a partir da estrutura do XML) de que há atividade real de Anexo B,
   // usado para decidir se se deve voltar a emitir os quadros 3B/5/6 ao reexportar
   // sem reduzir tudo a um "Não" implícito quando não há realmente nada preenchido.
@@ -940,6 +1007,10 @@ if (typeof module !== "undefined" && module.exports) {
 <script>
 // Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
 // com duplo-clique, sem servidor. Expõe-se em window.IRSLetter.
+//
+// Estrutura inspirada na Demonstração de Liquidação de IRS da AT (Rendimento Global →
+// Rendimento Coletável → Coleta → Coleta Líquida → Retenções/Pagamentos → Resultado),
+// simplificada e em linguagem mais direta para um cliente.
 
 (function (root) {
 
@@ -952,10 +1023,21 @@ function formatarMoeda(valor) {
   return (negativo ? "-" : "") + comSeparadores + "," + decimal;
 }
 
+function formatarPercentagem(valor) {
+  return (Number(valor) * 100).toLocaleString("pt-PT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/\s/g, "") + "%";
+}
+
+function linha(label, valor, opcoes) {
+  const classe = opcoes && opcoes.destaque ? ' class="destaque"' : "";
+  return `<tr${classe}><td>${label}</td><td>${formatarMoeda(valor)} €</td></tr>`;
+}
+
 function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const nomeAno = agregado.ano;
-  const sinalResultado = resultado.tipoResultado === "reembolso" ? "reembolso estimado" : "valor estimado a pagar";
+  const sinalResultado = resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "Valor estimado a pagar";
   const valorAbs = formatarMoeda(Math.abs(resultado.resultado));
+  const temCategoriaB = !!resultado.rendimentoBrutoB;
+  const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
 
   return `<!doctype html>
 <html lang="pt">
@@ -965,9 +1047,15 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
 <style>
   body { font-family: Georgia, "Times New Roman", serif; max-width: 700px; margin: 40px auto; color: #1a1a1a; line-height: 1.5; }
   h1 { font-size: 1.3rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
-  table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-  td, th { padding: 6px 8px; text-align: left; border-bottom: 1px solid #ddd; }
-  .total { font-weight: bold; font-size: 1.1rem; }
+  h2 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; color: #444; margin: 26px 0 4px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+  td, th { padding: 5px 8px; text-align: left; border-bottom: 1px solid #eee; }
+  td:last-child { text-align: right; }
+  tr.destaque td { font-weight: bold; border-top: 1px solid #999; border-bottom: none; }
+  .resultado-final { margin-top: 24px; padding: 16px; background: #f7f7f5; border-radius: 6px; text-align: center; }
+  .resultado-final .valor { font-size: 1.6rem; font-weight: bold; }
+  .taxa-efetiva { text-align: center; color: #555; font-size: 0.85rem; margin-top: 6px; }
+  .nota { font-size: 0.8rem; color: #666; margin: 4px 0 0; }
   .aviso { margin-top: 30px; padding: 12px; background: #f5f5f0; border-left: 4px solid #999; font-size: 0.85rem; }
   @media print { .no-print { display: none; } }
 </style>
@@ -978,24 +1066,43 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <p>Data de emissão: ${dataGeracao}</p>
   <p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>
 
+  <h2>Rendimentos</h2>
   <table>
-    <tr><td>Rendimento bruto (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoBrutoA)} €</td></tr>
-    <tr><td>Dedução específica (Categoria A)</td><td>${formatarMoeda(resultado.deducaoEspecifica)} €</td></tr>
-    <tr><td>Rendimento líquido (Categoria A)</td><td>${formatarMoeda(resultado.rendimentoLiquidoA)} €</td></tr>
-    ${resultado.rendimentoBrutoB ? `
-    <tr><td>Rendimento bruto (Categoria B)</td><td>${formatarMoeda(resultado.rendimentoBrutoB)} €</td></tr>
-    <tr><td>Rendimento tributável (Categoria B, regime simplificado)</td><td>${formatarMoeda(resultado.rendimentoTributavelB)} €</td></tr>` : ""}
-    <tr><td>Rendimento líquido total</td><td>${formatarMoeda(resultado.rendimentoLiquido)} €</td></tr>
-    <tr><td>Coleta bruta de IRS</td><td>${formatarMoeda(resultado.coletaBruta)} €</td></tr>
-    <tr><td>Dedução à coleta (dependentes)</td><td>${formatarMoeda(resultado.deducaoColetaDependentes)} €</td></tr>
-    <tr><td>Coleta líquida</td><td>${formatarMoeda(resultado.coletaLiquida)} €</td></tr>
-    <tr><td>Retenções na fonte / pagamentos por conta já efetuados</td><td>${formatarMoeda(resultado.retencoesTotais)} €</td></tr>
-    <tr class="total"><td>${sinalResultado.toUpperCase()}</td><td>${valorAbs} €</td></tr>
+    ${resultado.rendimentoBrutoA ? `
+    ${linha("Categoria A — rendimento bruto (trabalho/pensões)", resultado.rendimentoBrutoA)}
+    ${linha("Categoria A — dedução específica", -resultado.deducaoEspecifica)}` : ""}
+    ${temCategoriaB ? `
+    ${linha("Categoria B — rendimento bruto (regime simplificado)", resultado.rendimentoBrutoB)}
+    ${linha("Categoria B — após coeficiente aplicável", resultado.rendimentoTributavelBaseB)}
+    ${temAcrescimo ? linha("Categoria B — acréscimo por despesas insuficientes", resultado.acrescimoAoRendimentoB) : ""}` : ""}
+    ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
+  </table>
+  ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
+  comprovadas (contribuições para a Segurança Social, no mínimo) têm de atingir 15% dos rendimentos
+  sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
+
+  <h2>Apuramento do imposto</h2>
+  <table>
+    ${linha("Coleta (aplicando os escalões de IRS)", resultado.coletaBruta)}
+    ${linha("Dedução à coleta por dependentes", -resultado.deducaoColetaDependentes)}
+    ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}
   </table>
 
-  <p>Esta estimativa foi calculada com base nos dados fornecidos, considerando rendimentos da
-  categoria A (trabalho dependente e/ou pensões)${resultado.rendimentoBrutoB ? " e categoria B em regime simplificado (rendimentos empresariais e profissionais)" : ""}.
-  Não substitui a declaração oficial submetida no Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
+  <h2>Pagamentos já efetuados</h2>
+  <table>
+    ${linha("Retenções na fonte", resultado.retencoesFonte)}
+    ${resultado.pagamentosPorConta ? linha("Pagamentos por conta", resultado.pagamentosPorConta) : ""}
+  </table>
+
+  <div class="resultado-final">
+    <div>${sinalResultado.toUpperCase()}</div>
+    <div class="valor">${valorAbs} €</div>
+  </div>
+  <p class="taxa-efetiva">Taxa efetiva de tributação: ${formatarPercentagem(resultado.taxaEfetiva)}</p>
+
+  <p style="margin-top:24px">Esta estimativa segue a estrutura da Demonstração de Liquidação de IRS emitida
+  pela Autoridade Tributária, mas foi simplificada e não substitui a declaração oficial submetida no
+  Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
 
   <div class="aviso">
     <strong>Aviso:</strong> Estimativa gerada por ferramenta interna de simulação, com base em
@@ -1121,6 +1228,7 @@ if (typeof module !== "undefined" && module.exports) {
       codigoCAEAgricola: document.getElementById("anexoBCaeAgricola").value || undefined,
       estabelecimentoEstavel: document.getElementById("anexoBEstabelecimentoEstavel").checked,
       rendimentosBrutos,
+      contribuicoesSS: document.getElementById("anexoBContribuicoesSS").value || 0,
       categoriaA: {
         unicaEntidade: document.getElementById("anexoBUnicaEntidade").checked,
         optaRegrasCategoriaA: document.getElementById("anexoBOptaCategoriaA").checked
@@ -1178,21 +1286,29 @@ if (typeof module !== "undefined" && module.exports) {
 
     const div = document.getElementById("resultado");
     div.style.display = "block";
-    div.innerHTML = `
-      <strong>Rendimento bruto Categoria A:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
-      <strong>Dedução específica (Cat. A):</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
-      <strong>Rendimento líquido Categoria A:</strong> ${formatarMoeda(resultado.rendimentoLiquidoA)} €<br>` +
-      (resultado.rendimentoBrutoB
-        ? `<strong>Rendimento bruto Categoria B:</strong> ${formatarMoeda(resultado.rendimentoBrutoB)} €<br>
-      <strong>Rendimento tributável Categoria B (regime simplificado):</strong> ${formatarMoeda(resultado.rendimentoTributavelB)} €<br>`
-        : "") +
-      `<strong>Rendimento líquido total:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
-      <strong>Coleta bruta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
-      <strong>Dedução à coleta (dependentes):</strong> ${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
-      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
-      <strong>Retenções/pagamentos por conta efetuados:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
+    const temCategoriaA = !!resultado.rendimentoBrutoA;
+    const temCategoriaB = !!resultado.rendimentoBrutoB;
+    const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+    div.innerHTML =
+      (temCategoriaA ? `
+      <strong>Categoria A — rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
+      <strong>Categoria A — dedução específica:</strong> -${formatarMoeda(resultado.deducaoEspecifica)} €<br>` : "") +
+      (temCategoriaB ? `
+      <strong>Categoria B — rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBrutoB)} €<br>
+      <strong>Categoria B — após coeficiente aplicável:</strong> ${formatarMoeda(resultado.rendimentoTributavelBaseB)} €<br>` +
+      (temAcrescimo ? `<strong>Categoria B — acréscimo por despesas insuficientes:</strong> ${formatarMoeda(resultado.acrescimoAoRendimentoB)} €<br>` : "")
+      : "") +
+      `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>
-      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong>
+      <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
+      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
+      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
+      <hr>
+      <strong>Retenções na fonte:</strong> ${formatarMoeda(resultado.retencoesFonte)} €<br>` +
+      (resultado.pagamentosPorConta ? `<strong>Pagamentos por conta:</strong> ${formatarMoeda(resultado.pagamentosPorConta)} €<br>` : "") +
+      `<hr>
+      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong><br>
+      <small>Taxa efetiva de tributação: ${(resultado.taxaEfetiva * 100).toFixed(2)}%</small>
     `;
   };
 
@@ -1281,6 +1397,7 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("anexoBCaeProf").value = "";
       document.getElementById("anexoBCaeAgricola").value = "";
       document.getElementById("anexoBEstabelecimentoEstavel").checked = false;
+      document.getElementById("anexoBContribuicoesSS").value = "";
       document.getElementById("anexoBUnicaEntidade").checked = false;
       document.getElementById("anexoBOptaCategoriaA").checked = false;
       document.getElementById("anexoBRendimentosSujeitos").value = "";
@@ -1292,7 +1409,7 @@ if (typeof module !== "undefined" && module.exports) {
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
         "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
-        "estabelecimentoEstavel", "rendimentosBrutos", "categoriaA", "retencoes"
+        "estabelecimentoEstavel", "contribuicoesSS", "rendimentosBrutos", "categoriaA", "retencoes"
       ];
       let anexoBExtrasQ03 = {};
 
@@ -1307,6 +1424,7 @@ if (typeof module !== "undefined" && module.exports) {
         document.getElementById("anexoBCaeProf").value = b.codigoCAEProf || "";
         document.getElementById("anexoBCaeAgricola").value = b.codigoCAEAgricola || "";
         document.getElementById("anexoBEstabelecimentoEstavel").checked = !!b.estabelecimentoEstavel;
+        document.getElementById("anexoBContribuicoesSS").value = b.contribuicoesSS || "";
 
         (b.rendimentosBrutos || []).forEach(r => {
           adicionarLinhaAnexoBRendimento();

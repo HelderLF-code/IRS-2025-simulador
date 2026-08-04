@@ -90,6 +90,11 @@
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
 <p><small class="hint">Códigos comuns: 401 vendas, 403 prestação de serviços (atividades da Tabela 151.º), 404 outras prestações de serviços, 410 resultado positivo de rendimentos prediais, 451 vendas agrícolas, 452 prestações de serviços agrícolas. Ver instruções de preenchimento para a lista completa.</small></p>
 
+<div class="row">
+  <div><label>Contribuições para a Segurança Social declaradas (Quadro 7A)</label><input id="anexoBContribuicoesSS" type="number" step="0.01"></div>
+</div>
+<p><small class="hint">Usado para calcular o "acréscimo ao rendimento": em regime simplificado, as despesas comprovadas com contribuições para a Segurança Social têm de atingir 15% dos rendimentos sujeitos aos coeficientes 0,75 e 0,35; o que faltar acresce ao rendimento tributável.</small></p>
+
 <fieldset>
   <div class="row">
     <div><label><input type="checkbox" id="anexoBUnicaEntidade"> Totalidade dos rendimentos de uma única entidade</label></div>
@@ -226,6 +231,7 @@
       codigoCAEAgricola: document.getElementById("anexoBCaeAgricola").value || undefined,
       estabelecimentoEstavel: document.getElementById("anexoBEstabelecimentoEstavel").checked,
       rendimentosBrutos,
+      contribuicoesSS: document.getElementById("anexoBContribuicoesSS").value || 0,
       categoriaA: {
         unicaEntidade: document.getElementById("anexoBUnicaEntidade").checked,
         optaRegrasCategoriaA: document.getElementById("anexoBOptaCategoriaA").checked
@@ -283,21 +289,29 @@
 
     const div = document.getElementById("resultado");
     div.style.display = "block";
-    div.innerHTML = `
-      <strong>Rendimento bruto Categoria A:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
-      <strong>Dedução específica (Cat. A):</strong> ${formatarMoeda(resultado.deducaoEspecifica)} €<br>
-      <strong>Rendimento líquido Categoria A:</strong> ${formatarMoeda(resultado.rendimentoLiquidoA)} €<br>` +
-      (resultado.rendimentoBrutoB
-        ? `<strong>Rendimento bruto Categoria B:</strong> ${formatarMoeda(resultado.rendimentoBrutoB)} €<br>
-      <strong>Rendimento tributável Categoria B (regime simplificado):</strong> ${formatarMoeda(resultado.rendimentoTributavelB)} €<br>`
-        : "") +
-      `<strong>Rendimento líquido total:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
-      <strong>Coleta bruta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
-      <strong>Dedução à coleta (dependentes):</strong> ${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
-      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
-      <strong>Retenções/pagamentos por conta efetuados:</strong> ${formatarMoeda(resultado.retencoesTotais)} €<br>
+    const temCategoriaA = !!resultado.rendimentoBrutoA;
+    const temCategoriaB = !!resultado.rendimentoBrutoB;
+    const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+    div.innerHTML =
+      (temCategoriaA ? `
+      <strong>Categoria A — rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBrutoA)} €<br>
+      <strong>Categoria A — dedução específica:</strong> -${formatarMoeda(resultado.deducaoEspecifica)} €<br>` : "") +
+      (temCategoriaB ? `
+      <strong>Categoria B — rendimento bruto:</strong> ${formatarMoeda(resultado.rendimentoBrutoB)} €<br>
+      <strong>Categoria B — após coeficiente aplicável:</strong> ${formatarMoeda(resultado.rendimentoTributavelBaseB)} €<br>` +
+      (temAcrescimo ? `<strong>Categoria B — acréscimo por despesas insuficientes:</strong> ${formatarMoeda(resultado.acrescimoAoRendimentoB)} €<br>` : "")
+      : "") +
+      `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>
-      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong>
+      <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
+      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes ? "-" : ""}${formatarMoeda(resultado.deducaoColetaDependentes)} €<br>
+      <strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
+      <hr>
+      <strong>Retenções na fonte:</strong> ${formatarMoeda(resultado.retencoesFonte)} €<br>` +
+      (resultado.pagamentosPorConta ? `<strong>Pagamentos por conta:</strong> ${formatarMoeda(resultado.pagamentosPorConta)} €<br>` : "") +
+      `<hr>
+      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${formatarMoeda(Math.abs(resultado.resultado))} €</strong><br>
+      <small>Taxa efetiva de tributação: ${(resultado.taxaEfetiva * 100).toFixed(2)}%</small>
     `;
   };
 
@@ -386,6 +400,7 @@
       document.getElementById("anexoBCaeProf").value = "";
       document.getElementById("anexoBCaeAgricola").value = "";
       document.getElementById("anexoBEstabelecimentoEstavel").checked = false;
+      document.getElementById("anexoBContribuicoesSS").value = "";
       document.getElementById("anexoBUnicaEntidade").checked = false;
       document.getElementById("anexoBOptaCategoriaA").checked = false;
       document.getElementById("anexoBRendimentosSujeitos").value = "";
@@ -397,7 +412,7 @@
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
         "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
-        "estabelecimentoEstavel", "rendimentosBrutos", "categoriaA", "retencoes"
+        "estabelecimentoEstavel", "contribuicoesSS", "rendimentosBrutos", "categoriaA", "retencoes"
       ];
       let anexoBExtrasQ03 = {};
 
@@ -412,6 +427,7 @@
         document.getElementById("anexoBCaeProf").value = b.codigoCAEProf || "";
         document.getElementById("anexoBCaeAgricola").value = b.codigoCAEAgricola || "";
         document.getElementById("anexoBEstabelecimentoEstavel").checked = !!b.estabelecimentoEstavel;
+        document.getElementById("anexoBContribuicoesSS").value = b.contribuicoesSS || "";
 
         (b.rendimentosBrutos || []).forEach(r => {
           adicionarLinhaAnexoBRendimento();

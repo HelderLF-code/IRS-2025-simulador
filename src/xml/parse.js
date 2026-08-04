@@ -218,6 +218,15 @@ function parseAnexoB(anexoB) {
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
+  // O Quadro07 fica todo em passthrough (ainda não editável), mas extrai-se também o
+  // valor das contribuições para a Segurança Social (campo 701), informativamente, para
+  // o cálculo do "acréscimo ao rendimento" — isto não afeta o que é reexportado no Quadro07.
+  const q07 = filho(anexoB, "Quadro07");
+  if (temConteudo(q07)) {
+    const contribuicoesSS = texto(q07, "AnexoBq07C701");
+    if (contribuicoesSS !== undefined) b.contribuicoesSS = contribuicoesSS;
+  }
+
   // Sinal direto (a partir da estrutura do XML) de que há atividade real de Anexo B,
   // usado para decidir se se deve voltar a emitir os quadros 3B/5/6 ao reexportar
   // sem reduzir tudo a um "Não" implícito quando não há realmente nada preenchido.

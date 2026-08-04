@@ -29,13 +29,17 @@ regenerar o `simulador-irs.html`.
   códigos 4A/4B/4C), 5 (regras da categoria A) e 6 (retenções na fonte/pagamentos por
   conta). Quadros 7 a 18 (alienação de imóveis, mais-valias de partes sociais, atividade
   agrícola plurianual, alojamento local, etc.) ainda sem interface própria.
-- Cálculo: Categoria A/H — dedução específica, quociente conjugal, escalões de IRS,
-  dedução à coleta por dependente.
+- Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
+  Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
+  ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
+  a coeficiente reduzido — validado contra uma Demonstração de Liquidação real da AT),
+  quociente conjugal, escalões de IRS, dedução à coleta por dependente.
 - Exportação XML validada byte-a-byte contra 4 exemplos reais fornecidos (esqueleto vazio,
   sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta,
   e uma declaração completa com todos os anexos preenchidos).
-- Geração de carta/estimativa para o cliente (HTML imprimível → PDF via browser),
-  com valores formatados com separador de milhares (100.000,00).
+- Estimativa no ecrã e carta ao cliente estruturadas como a Demonstração de Liquidação de
+  IRS da AT (Rendimento Coletável → Coleta → Coleta Líquida → Retenções/Pagamentos →
+  Resultado), simplificada, com valores formatados com separador de milhares (100.000,00).
 - **Importação de XML**: permite carregar uma declaração já exportada do Portal das
   Finanças e continuar a trabalhar a partir dela, em vez de começar sempre em branco.
   Testado com round-trip perfeito (importar e voltar a exportar sem alterar nada dá
