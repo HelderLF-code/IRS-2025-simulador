@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<title>Simulador de IRS 2025 (offline)</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 900px; margin: 24px auto; padding: 0 16px; color: #1a1a1a; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.1rem; margin-top: 32px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+  fieldset { border: 1px solid #ddd; border-radius: 6px; margin: 12px 0; padding: 12px; }
+  label { display: inline-block; font-size: 0.85rem; margin-bottom: 2px; }
+  input, select { padding: 4px 6px; font-size: 0.9rem; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  th, td { padding: 4px; text-align: left; }
+  th { font-size: 0.8rem; color: #555; }
+  .row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 6px; }
+  .row > div { display: flex; flex-direction: column; }
+  button { padding: 6px 14px; cursor: pointer; }
+  .acoes { margin-top: 24px; display: flex; gap: 10px; }
+  .acoes button { font-size: 1rem; padding: 10px 18px; }
+  #resultado { margin-top: 20px; padding: 14px; background: #f7f7f5; border-radius: 6px; }
+  .aviso-topo { background: #fff3cd; border: 1px solid #ffe08a; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
+  small.hint { color: #777; }
+</style>
+</head>
+<body>
+
+<h1>Simulador de IRS — Rendimentos de 2025</h1>
+<p class="aviso-topo">
+  Fase 1: cobre apenas Categoria A/H (Anexo A), sujeito passivo único ou tributação conjunta,
+  e dependentes. Os parâmetros fiscais (escalões, deduções) usados neste cálculo são uma
+  estimativa e devem ser confirmados antes de qualquer uso com clientes reais.
+</p>
+
+<h2>Agregado Familiar</h2>
+<fieldset>
+  <div class="row">
+    <div><label>Ano dos rendimentos</label><input id="ano" type="number" value="2025"></div>
+    <div><label>NIF Sujeito Passivo A</label><input id="nifA" type="text" placeholder="256675961"></div>
+    <div><label><input id="tributacaoConjunta" type="checkbox"> Tributação conjunta (casado/união de facto)</label></div>
+    <div id="campoNifB" style="display:none"><label>NIF Sujeito Passivo B</label><input id="nifB" type="text"></div>
+    <div><label>IBAN para reembolso</label><input id="iban" type="text" placeholder="PT50..." size="30"></div>
+  </div>
+</fieldset>
+
+<h3>Dependentes <small class="hint">(opcional)</small></h3>
+<table id="tabelaDependentes">
+  <thead><tr><th>NIF</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
+
+<h2>Anexo A — Rendimentos de Trabalho Dependente / Pensões</h2>
+<table id="tabelaAnexoA">
+  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th>Contribuições (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoA()">+ Adicionar rendimento</button>
+
+<div class="acoes">
+  <button onclick="calcular()">Calcular estimativa</button>
+  <button onclick="exportarXML()">Exportar XML (Modelo 3)</button>
+  <button onclick="gerarCarta()">Gerar carta ao cliente</button>
+</div>
+
+<div id="resultado" style="display:none"></div>
+
+<script>
+// Parâmetros fiscais (escalões, deduções, IAS) para os rendimentos de 2025.
+//
+// *** VALORES A VALIDAR antes de qualquer uso com clientes reais ***
+// Estes números refletem a melhor estimativa disponível, mas devem ser confirmados
+// contra a Tabela de Retenção / OE2025 / Portal das Finanças antes de qualquer
+// estimativa ser entregue a um cliente. Só é preciso editar os números abaixo —
+// não é preciso mexer no resto do ficheiro.
+//
+// Ficheiro carregado como <script> normal (não módulo) para poder ser aberto
+// diretamente com duplo-clique, sem servidor. Expõe-se em window.PARAMETROS_2025.
+
+(function (root) {
+
+const PARAMETROS_2025 = {
+  ano: 2025,
+  IAS: 522.50,
+  escaloesIRS: [
+    { ate: 8059,  taxa: 0.13  },
+    { ate: 12160, taxa: 0.165 },
+    { ate: 17233, taxa: 0.22  },
+    { ate: 22306, taxa: 0.25  },
+    { ate: 28400, taxa: 0.32  },
+    { ate: 41629, taxa: 0.355 },
+    { ate: 44987, taxa: 0.435 },
+    { ate: 83696, taxa: 0.45  },
+    { ate: null,  taxa: 0.48  }
+  ],
+  deducaoEspecificaCategoriaA: {
+    minimo: 4462.15,
+    descricao: "Maior valor entre este mínimo e as contribuições obrigatórias efetivamente descontadas (SS/CGA/ADSE)."
+  },
+  deducoesColeta: {
+    porDependente1: 600,
+    porDependenteAdicional: 750,
+    porDependenteAte3Anos: 300,
+    porAscendente: 635
+  },
+  quocienteConjugal: {
+    divisorCasadosConjunta: 2,
+    divisorOutros: 1
+  }
+};
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = PARAMETROS_2025;
+} else {
+  root.PARAMETROS_2025 = PARAMETROS_2025;
+}
+
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+// Motor de cálculo de IRS - Categoria A (trabalho dependente / pensões)
+// Cobre apenas a Fase 1: rendimentos de categoria A, sujeito passivo único ou tributação conjunta,
+// dedução específica e deduções à coleta por dependente. Restantes categorias ainda não incluídas.
+//
+// Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
+// com duplo-clique, sem servidor. Expõe-se em window.IRSCalc.
+
+(function (root) {
+
+  function somaRendimentosCategoriaA(linhasAnexoA) {
+    return linhasAnexoA.reduce((acc, linha) => {
+      acc.rendimentos += Number(linha.rendimentos) || 0;
+      acc.retencoes += Number(linha.retencoes) || 0;
+      acc.contribuicoes += Number(linha.contribuicoes) || 0;
+      return acc;
+    }, { rendimentos: 0, retencoes: 0, contribuicoes: 0 });
+  }
+
+  function deducaoEspecificaCategoriaA(contribuicoesObrigatorias, parametros) {
+    return Math.max(contribuicoesObrigatorias, parametros.deducaoEspecificaCategoriaA.minimo);
+  }
+
+  function aplicarEscaloes(rendimentoColetavel, escaloes) {
+    let imposto = 0;
+    let limiteAnterior = 0;
+    for (const escalao of escaloes) {
+      const limite = escalao.ate === null ? Infinity : escalao.ate;
+      if (rendimentoColetavel > limiteAnterior) {
+        const fatia = Math.min(rendimentoColetavel, limite) - limiteAnterior;
+        imposto += fatia * escalao.taxa;
+        limiteAnterior = limite;
+      } else {
+        break;
+      }
+    }
+    return imposto;
+  }
+
+  function deducaoPorDependentes(dependentes, parametros) {
+    return dependentes.reduce((total, dep, idx) => {
+      let valor = idx === 0
+        ? parametros.deducoesColeta.porDependente1
+        : parametros.deducoesColeta.porDependenteAdicional;
+      if (dep.idadeAte3Anos) {
+        valor += parametros.deducoesColeta.porDependenteAte3Anos;
+      }
+      return total + valor;
+    }, 0);
+  }
+
+  function calcularEstimativa({ agregado, anexoA, parametros }) {
+    const somaA = somaRendimentosCategoriaA(anexoA.linhas);
+    const dedEspecifica = deducaoEspecificaCategoriaA(somaA.contribuicoes, parametros);
+    const rendimentoLiquido = Math.max(0, somaA.rendimentos - dedEspecifica);
+
+    const divisor = agregado.tributacaoConjunta
+      ? parametros.quocienteConjugal.divisorCasadosConjunta
+      : parametros.quocienteConjugal.divisorOutros;
+
+    const rendimentoColetavel = rendimentoLiquido;
+    const quociente = rendimentoColetavel / divisor;
+    const coletaPorQuociente = aplicarEscaloes(quociente, parametros.escaloesIRS);
+    const coletaBruta = coletaPorQuociente * divisor;
+
+    const dedColetaDependentes = deducaoPorDependentes(agregado.dependentes || [], parametros);
+    const coletaLiquida = Math.max(0, coletaBruta - dedColetaDependentes);
+
+    const retencoesTotais = somaA.retencoes;
+    const resultado = retencoesTotais - coletaLiquida; // positivo = reembolso, negativo = a pagar
+
+    return {
+      rendimentoBruto: somaA.rendimentos,
+      deducaoEspecifica: dedEspecifica,
+      rendimentoLiquido,
+      divisorQuociente: divisor,
+      coletaBruta,
+      deducaoColetaDependentes: dedColetaDependentes,
+      coletaLiquida,
+      retencoesTotais,
+      resultado,
+      tipoResultado: resultado >= 0 ? "reembolso" : "a pagar"
+    };
+  }
+
+  const api = {
+    somaRendimentosCategoriaA,
+    deducaoEspecificaCategoriaA,
+    aplicarEscaloes,
+    deducaoPorDependentes,
+    calcularEstimativa
+  };
+
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = api;
+  } else {
+    root.IRSCalc = api;
+  }
+
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+// Gerador do XML Modelo3IRSv2026, a partir do modelo de dados da aplicação.
+// A estrutura foi obtida por engenharia inversa de 3 exemplos reais fornecidos pelo utilizador
+// (um esqueleto vazio, um sujeito passivo único com Anexo A preenchido, e um casal com
+// tributação conjunta + dependente com deficiência em guarda conjunta).
+//
+// Partes ainda não mapeadas (ficam com a estrutura "esqueleto" tal como observada nos exemplos,
+// até serem fornecidos exemplos preenchidos): Rosto Quadro07/08/10/11/13, e os conteúdos dos
+// Anexos B/E/G/G1/H/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
+//
+// Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
+// com duplo-clique, sem servidor. Expõe-se em window.IRSXml.
+
+(function (root) {
+
+function esc(valor) {
+  return String(valor)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function el(nome, conteudo) {
+  if (conteudo === undefined || conteudo === null || conteudo === "") {
+    return `<${nome}/>`;
+  }
+  return `<${nome}>${conteudo}</${nome}>`;
+}
+
+const CAMPOS_MONETARIOS = new Set([
+  "Valor", "MontanteGanho", "ValorUnitario", "ValorTotal",
+  "Rendimentos", "Retencoes", "Contribuicoes", "RetSobretaxa", "Quotizacoes"
+]);
+
+function formatarValor(tag, v) {
+  if (CAMPOS_MONETARIOS.has(tag) && v !== "" && !isNaN(Number(v))) {
+    return Number(v).toFixed(2);
+  }
+  return v;
+}
+
+function linha(container, numero, campos) {
+  const corpo = Object.entries(campos)
+    .filter(([, v]) => v !== undefined && v !== null && v !== "")
+    .map(([tag, v]) => el(tag, esc(formatarValor(tag, v))))
+    .join("");
+  return `<${container}-Linha numero="${numero}">${corpo}</${container}-Linha>`;
+}
+
+function listaComLinhas(container, linhasDados) {
+  if (!linhasDados || linhasDados.length === 0) {
+    return el(container);
+  }
+  const corpo = linhasDados.map((campos, i) => linha(container, i + 1, campos)).join("");
+  return `<${container}>${corpo}</${container}>`;
+}
+
+function buildRosto(model) {
+  const { ano, nifA, nifB, tributacaoConjunta, iban, dependentes = [] } = model.agregado;
+
+  const quadro04 = tributacaoConjunta ? `<Quadro04>${el("Q04B01", 1)}</Quadro04>` : `<Quadro04/>`;
+  const quadro05 = tributacaoConjunta
+    ? `<Quadro05>${el("Q05B01", "S")}${el("Q05C03", nifB)}</Quadro05>`
+    : `<Quadro05/>`;
+
+  const deficientes = dependentes.filter(d => d.deficienteGrau && !d.guardaConjunta).map(d => ({
+    NIF: d.nif,
+    DeficienteGrau: d.deficienteGrau
+  }));
+  const guardaConjunta = dependentes.filter(d => d.guardaConjunta).map(d => ({
+    NIF: d.nif,
+    DeficienteGrau: d.deficienteGrau,
+    RespParentais: d.respParentais,
+    NifProgenitor: d.nifProgenitor,
+    IntegraAgregadoSP: d.integraAgregadoSP,
+    PartilhaDespesas: d.partilhaDespesas,
+    ResidenciaAlternada: d.residenciaAlternada ? "S" : "N"
+  }));
+
+  const quadro06 = `<Quadro06>` +
+    listaComLinhas("Rostoq06BT01", deficientes) +
+    el("Rostoq06BT02") +
+    listaComLinhas("Rostoq06BT03", guardaConjunta) +
+    el("Rostoq06CT01") +
+    `</Quadro06>`;
+
+  return `<Rosto>` +
+    `<QuadroInicio/>` +
+    `<Quadro01>${el("Q01C01", 3697)}</Quadro01>` +
+    `<Quadro02>${el("Q02C01", ano)}</Quadro02>` +
+    `<Quadro03>${el("Q03C01", nifA)}</Quadro03>` +
+    quadro04 +
+    quadro05 +
+    quadro06 +
+    `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>` +
+    `<Quadro08/>` +
+    `<Quadro09>${el("Q09C01", iban)}</Quadro09>` +
+    `<Quadro10/>` +
+    `<Quadro11/>` +
+    `<Quadro13>${el("Rostoq13T01")}</Quadro13>` +
+    `</Rosto>`;
+}
+
+function buildAnexoA(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const a = model.anexoA || {};
+
+  const somaCampo = (campo) =>
+    (a.linhas || []).reduce((acc, l) => acc + (Number(l[campo]) || 0), 0).toFixed(2);
+
+  const quadro03 = tributacaoConjunta
+    ? `<Quadro03>${el("AnexoAq03C01", nifA)}${el("AnexoAq03C02", nifB)}</Quadro03>`
+    : `<Quadro03>${el("AnexoAq03C01", nifA)}</Quadro03>`;
+
+  const linhasAT01 = (a.linhas || []).map(l => ({
+    NIF: l.nifEntidade,
+    CodRendimentos: l.codRendimento,
+    Titular: l.titular,
+    Rendimentos: Number(l.rendimentos || 0).toFixed(2),
+    Retencoes: Number(l.retencoes || 0).toFixed(2),
+    Contribuicoes: Number(l.contribuicoes || 0).toFixed(2),
+    RetSobretaxa: Number(l.retSobretaxa || 0).toFixed(2),
+    Quotizacoes: Number(l.quotizacoes || 0).toFixed(2)
+  }));
+
+  const quadro04 =
+    `<Quadro04>` +
+    listaComLinhas("AnexoAq04AT01", linhasAT01) +
+    el("AnexoAq04AT01SomaC01", somaCampo("rendimentos")) +
+    el("AnexoAq04AT01SomaC02", somaCampo("retencoes")) +
+    el("AnexoAq04AT01SomaC03", somaCampo("contribuicoes")) +
+    el("AnexoAq04AT01SomaC04", somaCampo("retSobretaxa")) +
+    el("AnexoAq04AT01SomaC05", somaCampo("quotizacoes")) +
+    listaComLinhas("AnexoAq04BT01", a.pagamentosPorConta) +
+    listaComLinhas("AnexoAq04CT01", a.outrasDeducoes) +
+    listaComLinhas("AnexoAq04CT02", a.segurosDesgasteRapido) +
+    listaComLinhas("AnexoAq04DT01", a.incentivoParticipacoesSociais) +
+    listaComLinhas("AnexoAq04DT02", a.incentivoStartups) +
+    listaComLinhas("AnexoAq04ET01", a.exResidentes) +
+    listaComLinhas("AnexoAq04FT01", a.irsJovemAntigo) +
+    listaComLinhas("AnexoAq04FT02", a.irsJovem) +
+    listaComLinhas("AnexoAq04GT01", a.estudantesDependentes) +
+    `</Quadro04>`;
+
+  return `<AnexoA>` +
+    `<Quadro02>${el("AnexoAq02C01", ano)}</Quadro02>` +
+    quadro03 +
+    quadro04 +
+    `<Quadro05>${el("AnexoAq05AT01")}${el("AnexoAq05BT01")}</Quadro05>` +
+    `<Quadro06>${el("AnexoAq06T01")}</Quadro06>` +
+    `</AnexoA>`;
+}
+
+// Anexos ainda não mapeados em detalhe (Fase 3+): emite apenas o cabeçalho ano+NIF,
+// tal como observado nos exemplos fornecidos, mantendo o esqueleto vazio nos restantes quadros.
+function buildAnexoEsqueleto(nomeAnexo, prefixo, model, quadrosVazios, temC02) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const camposQ03 = temC02 && tributacaoConjunta
+    ? `${el(`${prefixo}q03C01`, nifA)}${el(`${prefixo}q03C02`, nifB)}`
+    : el(`${prefixo}q03C01`, nifA);
+
+  return `<${nomeAnexo}>` +
+    `<Quadro02>${el(`${prefixo}q02C01`, ano)}</Quadro02>` +
+    `<Quadro03>${camposQ03}</Quadro03>` +
+    quadrosVazios.map(q => `<Quadro${q}/>`).join("") +
+    `</${nomeAnexo}>`;
+}
+
+// AnexoB/J/L/SS têm atributo id=NIF e repetem-se por sujeito passivo quando ambos têm
+// atividade/rendimentos próprios nesse anexo. Nesta fase ainda não temos exemplo preenchido
+// nem confirmação de como fica o segundo anexo repetido, por isso emite-se apenas o esqueleto
+// para o sujeito passivo A, tal como visto nos exemplos.
+function buildAnexoB(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const campoC02 = tributacaoConjunta ? el("AnexoBq03C02", nifB) : "";
+  return `<AnexoB id="${esc(nifA)}">` +
+    `<Quadro00/><Quadro01/>` +
+    `<Quadro02>${el("AnexoBq02C01", ano)}</Quadro02>` +
+    `<Quadro03>${el("AnexoBq03C01", nifA)}${campoC02}${el("AnexoBq03B03", "N")}${el("AnexoBq03C05", nifA)}</Quadro03>` +
+    Array.from({ length: 15 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    `</AnexoB>`;
+}
+
+function buildAnexoJ(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const campoC02 = tributacaoConjunta ? el("AnexoJq03C02", nifB) : "";
+  return `<AnexoJ id="${esc(nifA)}">` +
+    `<Quadro02>${el("AnexoJq02C01", ano)}</Quadro02>` +
+    `<Quadro03>${el("AnexoJq03C01", nifA)}${campoC02}${el("AnexoJq03C03", nifA)}</Quadro03>` +
+    Array.from({ length: 8 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    `</AnexoJ>`;
+}
+
+function buildAnexoL(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const campoC02 = tributacaoConjunta ? el("AnexoLq03C02", nifB) : "";
+  return `<AnexoL id="${esc(nifA)}">` +
+    `<Quadro01/>` +
+    `<Quadro02>${el("AnexoLq02C01", ano)}</Quadro02>` +
+    `<Quadro03>${el("AnexoLq03C01", nifA)}${campoC02}${el("AnexoLq03C03", nifA)}</Quadro03>` +
+    Array.from({ length: 4 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    `</AnexoL>`;
+}
+
+function buildAnexoSS(model) {
+  const { ano, nifA } = model.agregado;
+  return `<AnexoSS id="${esc(nifA)}">` +
+    `<Quadro01/>` +
+    `<Quadro02>${el("AnexoSSq02C04", ano)}</Quadro02>` +
+    `<Quadro03>${el("AnexoSSq03C06", nifA)}</Quadro03>` +
+    `<Quadro04/><Quadro05/><Quadro06/>` +
+    `</AnexoSS>`;
+}
+
+function buildModelo3XML(model) {
+  const partes = [];
+  partes.push(`<?xml version="1.0" encoding="UTF-8"?>`);
+  partes.push(
+    `<Modelo3IRSv2026 xmlns="http://www.dgci.gov.pt/2009/Modelo3IRSv2026" ` +
+    `xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" versao="1" ` +
+    `xsi:schemaLocation="http://www.dgci.gov.pt/2009/Modelo3IRSv2026 Modelo3IRSv2026.xsd">`
+  );
+  partes.push(buildRosto(model));
+  partes.push(buildAnexoA(model));
+
+  if (model.incluirAnexosVazios !== false) {
+    partes.push(buildAnexoB(model));
+    partes.push(buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
+    partes.push(buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
+    partes.push(buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
+    partes.push(buildAnexoEsqueleto("AnexoH", "AnexoH", model, ["04", "05", "06", "07", "08", "09", "10"], true));
+    partes.push(buildAnexoJ(model));
+    partes.push(buildAnexoL(model));
+    partes.push(buildAnexoSS(model));
+  }
+
+  partes.push(`</Modelo3IRSv2026>`);
+  return partes.join("\n");
+}
+
+const api = { buildModelo3XML };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = api;
+} else {
+  root.IRSXml = api;
+}
+
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+// Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
+// com duplo-clique, sem servidor. Expõe-se em window.IRSLetter.
+
+(function (root) {
+
+function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
+  const nomeAno = agregado.ano;
+  const sinalResultado = resultado.tipoResultado === "reembolso" ? "reembolso estimado" : "valor estimado a pagar";
+  const valorAbs = Math.abs(resultado.resultado).toFixed(2);
+
+  return `<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<title>Estimativa de IRS ${nomeAno}</title>
+<style>
+  body { font-family: Georgia, "Times New Roman", serif; max-width: 700px; margin: 40px auto; color: #1a1a1a; line-height: 1.5; }
+  h1 { font-size: 1.3rem; border-bottom: 2px solid #333; padding-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  td, th { padding: 6px 8px; text-align: left; border-bottom: 1px solid #ddd; }
+  .total { font-weight: bold; font-size: 1.1rem; }
+  .aviso { margin-top: 30px; padding: 12px; background: #f5f5f0; border-left: 4px solid #999; font-size: 0.85rem; }
+  @media print { .no-print { display: none; } }
+</style>
+</head>
+<body>
+  <button class="no-print" onclick="window.print()">Imprimir / Guardar como PDF</button>
+  <h1>Estimativa de IRS — Rendimentos de ${nomeAno}</h1>
+  <p>Data de emissão: ${dataGeracao}</p>
+  <p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>
+
+  <table>
+    <tr><td>Rendimento bruto (Categoria A)</td><td>${resultado.rendimentoBruto.toFixed(2)} €</td></tr>
+    <tr><td>Dedução específica</td><td>${resultado.deducaoEspecifica.toFixed(2)} €</td></tr>
+    <tr><td>Rendimento líquido</td><td>${resultado.rendimentoLiquido.toFixed(2)} €</td></tr>
+    <tr><td>Coleta bruta de IRS</td><td>${resultado.coletaBruta.toFixed(2)} €</td></tr>
+    <tr><td>Dedução à coleta (dependentes)</td><td>${resultado.deducaoColetaDependentes.toFixed(2)} €</td></tr>
+    <tr><td>Coleta líquida</td><td>${resultado.coletaLiquida.toFixed(2)} €</td></tr>
+    <tr><td>Retenções na fonte já efetuadas</td><td>${resultado.retencoesTotais.toFixed(2)} €</td></tr>
+    <tr class="total"><td>${sinalResultado.toUpperCase()}</td><td>${valorAbs} €</td></tr>
+  </table>
+
+  <p>Esta estimativa foi calculada com base nos dados fornecidos, considerando apenas rendimentos da
+  categoria A (trabalho dependente e/ou pensões). Não substitui a declaração oficial submetida no
+  Portal das Finanças, nem constitui aconselhamento fiscal definitivo.</p>
+
+  <div class="aviso">
+    <strong>Aviso:</strong> Estimativa gerada por ferramenta interna de simulação, com base em
+    parâmetros fiscais que devem ser confirmados antes de qualquer decisão. Os valores finais podem
+    diferir dos apurados pela Autoridade Tributária.
+  </div>
+</body>
+</html>`;
+}
+
+const api = { gerarCartaHTML };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = api;
+} else {
+  root.IRSLetter = api;
+}
+
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+  const parametros = PARAMETROS_2025;
+
+  document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
+    document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
+  });
+
+  window.adicionarDependente = function () {
+    const tbody = document.querySelector("#tabelaDependentes tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="dep-nif" size="10"></td>
+      <td><input class="dep-grau" type="number" size="4" placeholder="ex: 80"></td>
+      <td><input class="dep-guarda" type="checkbox"></td>
+      <td><select class="dep-resp"><option value="A">A</option><option value="B">B</option></select></td>
+      <td><input class="dep-progenitor" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoA = function () {
+    const tbody = document.querySelector("#tabelaAnexoA tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="a-nif" size="10"></td>
+      <td>
+        <select class="a-codigo">
+          <option value="401">401 - Trabalho dependente</option>
+          <option value="403">403 - Pensões</option>
+          <option value="404">404 - Pensões de sobrevivência</option>
+          <option value="405">405 - Pensões de alimentos</option>
+        </select>
+      </td>
+      <td><select class="a-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="a-rendimento" type="number" step="0.01"></td>
+      <td><input class="a-retencao" type="number" step="0.01"></td>
+      <td><input class="a-contribuicao" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerAgregado() {
+    const dependentes = [...document.querySelectorAll("#tabelaDependentes tbody tr")].map(tr => ({
+      nif: tr.querySelector(".dep-nif").value,
+      deficienteGrau: Number(tr.querySelector(".dep-grau").value) || undefined,
+      guardaConjunta: tr.querySelector(".dep-guarda").checked,
+      respParentais: tr.querySelector(".dep-resp").value,
+      nifProgenitor: tr.querySelector(".dep-progenitor").value || undefined
+    }));
+
+    return {
+      ano: Number(document.getElementById("ano").value),
+      nifA: document.getElementById("nifA").value,
+      nifB: document.getElementById("nifB").value || undefined,
+      tributacaoConjunta: document.getElementById("tributacaoConjunta").checked,
+      iban: document.getElementById("iban").value || undefined,
+      dependentes
+    };
+  }
+
+  function lerAnexoA() {
+    const linhas = [...document.querySelectorAll("#tabelaAnexoA tbody tr")].map(tr => ({
+      nifEntidade: tr.querySelector(".a-nif").value,
+      codRendimento: tr.querySelector(".a-codigo").value,
+      titular: tr.querySelector(".a-titular").value,
+      rendimentos: Number(tr.querySelector(".a-rendimento").value) || 0,
+      retencoes: Number(tr.querySelector(".a-retencao").value) || 0,
+      contribuicoes: Number(tr.querySelector(".a-contribuicao").value) || 0
+    }));
+    return { linhas };
+  }
+
+  window.calcular = function () {
+    const agregado = lerAgregado();
+    const anexoA = lerAnexoA();
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, parametros });
+    window._ultimoResultado = resultado;
+    window._ultimoAgregado = agregado;
+
+    const div = document.getElementById("resultado");
+    div.style.display = "block";
+    div.innerHTML = `
+      <strong>Rendimento bruto:</strong> ${resultado.rendimentoBruto.toFixed(2)} €<br>
+      <strong>Dedução específica:</strong> ${resultado.deducaoEspecifica.toFixed(2)} €<br>
+      <strong>Rendimento líquido:</strong> ${resultado.rendimentoLiquido.toFixed(2)} €<br>
+      <strong>Coleta bruta:</strong> ${resultado.coletaBruta.toFixed(2)} €<br>
+      <strong>Dedução à coleta (dependentes):</strong> ${resultado.deducaoColetaDependentes.toFixed(2)} €<br>
+      <strong>Coleta líquida:</strong> ${resultado.coletaLiquida.toFixed(2)} €<br>
+      <strong>Retenções efetuadas:</strong> ${resultado.retencoesTotais.toFixed(2)} €<br>
+      <hr>
+      <strong style="font-size:1.2rem">${resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "A pagar (estimado)"}: ${Math.abs(resultado.resultado).toFixed(2)} €</strong>
+    `;
+  };
+
+  window.exportarXML = function () {
+    const model = { agregado: lerAgregado(), anexoA: lerAnexoA() };
+    const xml = IRSXml.buildModelo3XML(model);
+    const blob = new Blob([xml], { type: "application/xml" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `declm3irs${model.agregado.ano}${model.agregado.nifA}.xml`;
+    a.click();
+  };
+
+  window.gerarCarta = function () {
+    if (!window._ultimoResultado) { calcular(); }
+    const html = IRSLetter.gerarCartaHTML({
+      agregado: window._ultimoAgregado,
+      resultado: window._ultimoResultado,
+      dataGeracao: new Date().toLocaleDateString("pt-PT")
+    });
+    const janela = window.open("", "_blank");
+    janela.document.write(html);
+    janela.document.close();
+  };
+</script>
+
+</body>
+</html>

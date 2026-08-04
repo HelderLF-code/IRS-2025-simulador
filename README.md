@@ -6,9 +6,17 @@ declaração no formato `Modelo3IRSv2026` usado pelo Portal das Finanças.
 
 ## Como correr
 
-Basta abrir o ficheiro `index.html` com duplo-clique — abre diretamente no browser
-por defeito. Não precisa de instalação de nada (nem Python, nem servidor, nem ligação
-à internet).
+Usa o ficheiro `simulador-irs.html` — é um único ficheiro autónomo (sem pastas, sem
+dependências), gerado a partir dos ficheiros em `src/` e `data/`. Basta abri-lo com
+duplo-clique; abre diretamente no browser por defeito. Não precisa de instalação de
+nada (nem Python, nem servidor, nem ligação à internet).
+
+`index.html` (a versão modular, que carrega `src/*.js` separadamente) é só para
+desenvolvimento — não é o que se distribui ao utilizador final, porque depende dos
+caminhos relativos para as pastas `src/` e `data/` se manterem intactos.
+
+Depois de alterar algo em `src/` ou `data/`, correr `node scripts/build.js` para
+regenerar o `simulador-irs.html`.
 
 ## Estado atual (Fase 1)
 
