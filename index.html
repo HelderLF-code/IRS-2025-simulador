@@ -76,7 +76,27 @@
     <div id="campoNifB" style="display:none"><label>NIF Sujeito Passivo B</label><input id="nifB" type="text"></div>
     <div><label>IBAN para reembolso</label><input id="iban" type="text" placeholder="PT50..." size="30"></div>
   </div>
+  <div class="row">
+    <div><label>Residência fiscal <small class="hint">(Rosto, Quadro 8A)</small></label>
+      <select id="residenciaFiscal">
+        <option value="">(não indicado)</option>
+        <option value="continente">Continente</option>
+        <option value="acores">R. A. Açores</option>
+        <option value="madeira">R. A. Madeira</option>
+      </select>
+    </div>
+    <div><label>Natureza da declaração <small class="hint">(Rosto, Quadro 10)</small></label>
+      <select id="naturezaDeclaracao">
+        <option value="">(não indicado)</option>
+        <option value="primeira">1.ª declaração do ano</option>
+        <option value="substituicao">Declaração de substituição</option>
+      </select>
+    </div>
+  </div>
 </fieldset>
+<p><small class="hint">Os restantes quadros do Rosto (7 — ascendentes/colaterais, 11 — consignação
+do IRS/IVA, 13 — prazos especiais, e o Quadro 8B de não residentes) ainda não têm interface própria;
+ao importar uma declaração com dados nesses quadros, são preservados tal como estavam.</small></p>
 
 <h3>Dependentes <small class="hint">(opcional)</small></h3>
 <table id="tabelaDependentes">
@@ -537,6 +557,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       nifB: document.getElementById("nifB").value || undefined,
       tributacaoConjunta: document.getElementById("tributacaoConjunta").checked,
       iban: document.getElementById("iban").value || undefined,
+      residenciaFiscal: document.getElementById("residenciaFiscal").value || undefined,
+      naturezaDeclaracao: document.getElementById("naturezaDeclaracao").value || undefined,
       dependentes
     };
   }
@@ -652,6 +674,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("tributacaoConjunta").checked = dados.agregado.tributacaoConjunta;
       document.getElementById("campoNifB").style.display = dados.agregado.tributacaoConjunta ? "flex" : "none";
       document.getElementById("nifB").value = dados.agregado.nifB || "";
+      document.getElementById("residenciaFiscal").value = dados.agregado.residenciaFiscal || "";
+      document.getElementById("naturezaDeclaracao").value = dados.agregado.naturezaDeclaracao || "";
 
       document.querySelector("#tabelaDependentes tbody").innerHTML = "";
       dados.agregado.dependentes.forEach(dep => {

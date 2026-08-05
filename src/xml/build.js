@@ -55,8 +55,11 @@ function listaComLinhas(container, linhasDados) {
   return `<${container}>${corpo}</${container}>`;
 }
 
+const COD_RESIDENCIA_FISCAL = { continente: 1, acores: 2, madeira: 3 };
+const COD_NATUREZA_DECLARACAO = { primeira: 1, substituicao: 2 };
+
 function buildRosto(model) {
-  const { ano, nifA, nifB, tributacaoConjunta, iban, dependentes = [] } = model.agregado;
+  const { ano, nifA, nifB, tributacaoConjunta, iban, residenciaFiscal, naturezaDeclaracao, dependentes = [] } = model.agregado;
   const passthrough = model.rostoPassthrough || {};
 
   const quadro04 = tributacaoConjunta ? `<Quadro04>${el("Q04B01", 1)}</Quadro04>` : `<Quadro04/>`;
@@ -85,6 +88,22 @@ function buildRosto(model) {
     el("Rostoq06CT01") +
     `</Quadro06>`;
 
+  // Quadro08 (residência fiscal) e Quadro10 (natureza da declaração): nomes de campo
+  // (Q08B01/Q10B01) inferidos por analogia com o padrão observado no Quadro04 (um único
+  // campo cujo valor é o número do campo do papel assinalado) — ainda não confirmados
+  // contra um exemplo real com estes quadros preenchidos. Só cobrem os casos mais comuns
+  // (residente, Continente/Açores/Madeira; 1.ª declaração/substituição); os restantes casos
+  // (não residente, prazos especiais, etc.) mantêm-se em passthrough tal como antes.
+  const codResidencia = COD_RESIDENCIA_FISCAL[residenciaFiscal];
+  const quadro08 = codResidencia
+    ? `<Quadro08>${el("Q08B01", codResidencia)}</Quadro08>`
+    : (passthrough.Quadro08 || `<Quadro08/>`);
+
+  const codNatureza = COD_NATUREZA_DECLARACAO[naturezaDeclaracao];
+  const quadro10 = codNatureza
+    ? `<Quadro10>${el("Q10B01", codNatureza)}</Quadro10>`
+    : (passthrough.Quadro10 || `<Quadro10/>`);
+
   return `<Rosto>` +
     `<QuadroInicio/>` +
     `<Quadro01>${el("Q01C01", 3697)}</Quadro01>` +
@@ -94,9 +113,9 @@ function buildRosto(model) {
     quadro05 +
     quadro06 +
     (passthrough.Quadro07 || `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>`) +
-    (passthrough.Quadro08 || `<Quadro08/>`) +
+    quadro08 +
     `<Quadro09>${el("Q09C01", iban)}</Quadro09>` +
-    (passthrough.Quadro10 || `<Quadro10/>`) +
+    quadro10 +
     (passthrough.Quadro11 || `<Quadro11/>`) +
     (passthrough.Quadro13 || `<Quadro13>${el("Rostoq13T01")}</Quadro13>`) +
     `</Rosto>`;

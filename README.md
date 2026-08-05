@@ -21,7 +21,15 @@ regenerar o `simulador-irs.html`.
 ## Estado atual
 
 - Rosto: Quadros 1, 2, 3 (ano/NIF), 4/5 (tributação conjunta), 6 (dependentes,
-  incluindo deficiência e guarda conjunta), 9 (IBAN).
+  incluindo deficiência e guarda conjunta), 8A (residência fiscal — Continente/Açores/
+  Madeira), 9 (IBAN), 10 (natureza da declaração — 1.ª declaração/substituição). Os
+  nomes dos campos do Quadro 8/10 (`Q08B01`/`Q10B01`) foram inferidos por analogia com o
+  padrão confirmado no Quadro 4 (um único campo cujo valor é o número do campo do papel
+  assinalado) — **ainda não confirmados** contra um exemplo real com estes quadros
+  preenchidos (o único exemplo completo disponível tem-nos vazios). Se não reconhecidos
+  ao importar, os dados originais são preservados tal como estavam. Quadro 7 (ascendentes/
+  colaterais), Quadro 8B (não residentes), 11 (consignação do IRS/IVA) e 13 (prazos
+  especiais) ainda sem interface própria.
 - Anexo A: Quadro 4 completo (rendimentos/retenções/contribuições, pagamentos por
   conta, outras deduções, seguros de desgaste rápido, incentivos fiscais, ex-residentes,
   IRS Jovem, estudantes dependentes).
@@ -72,9 +80,12 @@ novo — para não haver perda de informação.
 
 ## Por confirmar / próximos passos
 
-1. **Rosto Quadros 7, 8, 10, 11, 13** — apareceram sempre vazios nos exemplos dados;
-   significado ainda desconhecido (possivelmente residência fiscal, opções de tributação,
-   assinatura). Preciso de um exemplo preenchido ou das instruções do Rosto.
+1. **Rosto Quadro 8/10** — implementados com base no significado das instruções de
+   preenchimento, mas os nomes exatos dos campos XML (`Q08B01`/`Q10B01`) ainda não foram
+   confirmados contra um exemplo real preenchido (por analogia com o Quadro 4, já
+   validado). **Rosto Quadros 7, 11, 13** e **Quadro 8B** (não residentes) — significado já
+   conhecido (instruções recebidas), mas sem interface própria; precisam de um exemplo XML
+   preenchido para confirmar os nomes dos campos antes de implementar.
 2. **Anexo B/J/L/SS com 2 sujeitos passivos** — confirmar como o segundo anexo se repete
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
 3. **Anexo B, Quadros 7-18** — encargos, alienação de imóveis, mais-valias de partes

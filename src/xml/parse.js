@@ -68,12 +68,17 @@ function parseDependentes(quadro06) {
   return [...deficientes, ...guardaConjunta];
 }
 
+const RESIDENCIA_FISCAL_POR_COD = { "1": "continente", "2": "acores", "3": "madeira" };
+const NATUREZA_DECLARACAO_POR_COD = { "1": "primeira", "2": "substituicao" };
+
 function parseRosto(rosto) {
   const q02 = filho(rosto, "Quadro02");
   const q03 = filho(rosto, "Quadro03");
   const q05 = filho(rosto, "Quadro05");
   const q06 = filho(rosto, "Quadro06");
+  const q08 = filho(rosto, "Quadro08");
   const q09 = filho(rosto, "Quadro09");
+  const q10 = filho(rosto, "Quadro10");
 
   const tributacaoConjunta = texto(q05, "Q05B01") === "S";
 
@@ -83,10 +88,16 @@ function parseRosto(rosto) {
     nifB: tributacaoConjunta ? texto(q05, "Q05C03") : undefined,
     tributacaoConjunta,
     iban: texto(q09, "Q09C01"),
+    // Ver nota em build.js: nomes de campo Q08B01/Q10B01 ainda não confirmados contra um
+    // exemplo real. Se não reconhecido (ficheiro de outra origem, não residente, etc.),
+    // fica undefined e o quadro original é preservado tal como veio (passthrough abaixo).
+    residenciaFiscal: RESIDENCIA_FISCAL_POR_COD[texto(q08, "Q08B01")],
+    naturezaDeclaracao: NATUREZA_DECLARACAO_POR_COD[texto(q10, "Q10B01")],
     dependentes: parseDependentes(q06)
   };
 
-  // Guarda tal como veio, para não perder dados nos quadros que a app ainda não edita.
+  // Guarda tal como veio, para não perder dados nos quadros que a app ainda não edita
+  // (ou não reconhece, no caso do Quadro08/10 — ver nota acima).
   const passthrough = {};
   ["Quadro07", "Quadro08", "Quadro10", "Quadro11", "Quadro13"].forEach(nome => {
     const el = filho(rosto, nome);
