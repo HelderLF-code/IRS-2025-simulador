@@ -185,6 +185,49 @@ function temConteudo(el) {
   return !!(el && Array.from(el.childNodes).some(n => n.nodeType === 1));
 }
 
+const ANEXOB_Q07_TODOS = [701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722];
+
+// Ver nota em build.js: nomes de campo do Quadro07 e Quadro17A/17B confirmados contra um
+// exemplo real; Quadro17C (campos 17051-17054) e 17D extrapolados do mesmo padrão, por
+// confirmar.
+function parseQuadro07(q07) {
+  if (!temConteudo(q07)) return undefined;
+  const despesas = {};
+  ANEXOB_Q07_TODOS.forEach(c => {
+    const v = texto(q07, `AnexoBq07C${c}`);
+    if (v !== undefined) despesas[c] = v;
+  });
+  return {
+    despesas,
+    entidadesSS: parseLinhasGenerico(filho(q07, "AnexoBq07BT01")).map(l => ({ nif: l.NIFEntidades, valor: l.Valor })),
+    segurosDesgasteRapido: parseLinhasGenerico(filho(q07, "AnexoBq07CT01")).map(l => ({
+      profissaoCodigo: l.ProfissaoCodigo, valor: l.Valor, nifPortugues: l.NIFPortugues, pais: l.Pais, numeroFiscalUE: l.NumeroFiscalUE
+    })),
+    prediosArt41: parseLinhasGenerico(filho(q07, "AnexoBq07DT01")).map(l => ({
+      freguesia: l.Freguesia, tipo: l.Tipo, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte,
+      valorPCI: l.ValorRendimentoPCI, valorASP: l.ValorRendimentoASP
+    })),
+    anosSilvicolasPlurianual: texto(q07, "AnexoBq07C781")
+  };
+}
+
+function parseQuadro17(q17) {
+  if (!temConteudo(q17)) return undefined;
+  return {
+    contribuicoesSS: texto(q17, "AnexoBq17C17001"),
+    importacoesIntracomunitarias: texto(q17, "AnexoBq17C17002"),
+    entidadesSS: parseLinhasGenerico(filho(q17, "AnexoBq17BT01")).map(l => ({ nif: l.NIF, valor: l.Valor })),
+    optaDespesasAlternativa: texto(q17, "AnexoBq17B01") === "S",
+    despesasPessoal: texto(q17, "AnexoBq17C17051"),
+    rendasImoveis: texto(q17, "AnexoBq17C17052"),
+    outrasDespesasParcial: texto(q17, "AnexoBq17C17053"),
+    outrasDespesasTotal: texto(q17, "AnexoBq17C17054"),
+    rendasImoveisAfetas: parseLinhasGenerico(filho(q17, "AnexoBq17DT01")).map(l => ({
+      nif: l.NIF, valor: l.Valor, afetacaoParcial: l.AfetacaoParcial === "true", afetacaoTotal: l.AfetacaoTotal === "true"
+    }))
+  };
+}
+
 function parseAnexoB(anexoB) {
   if (!anexoB) return { anexoB: undefined, anexoBPassthrough: {}, anexoBTemDados: false };
 
@@ -248,27 +291,23 @@ function parseAnexoB(anexoB) {
     };
   }
 
+  const q07 = filho(anexoB, "Quadro07");
+  const q17 = filho(anexoB, "Quadro17");
+  b.quadro07 = parseQuadro07(q07);
+  b.quadro17 = parseQuadro17(q17);
+
   const passthrough = {};
-  for (let i = 7; i <= 18; i++) {
+  [8, 9, 10, 11, 12, 13, 14, 15, 16, 18].forEach(i => {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoB, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
-  }
-
-  // O Quadro07 fica todo em passthrough (ainda não editável), mas extrai-se também o
-  // valor das contribuições para a Segurança Social (campo 701), informativamente, para
-  // o cálculo do "acréscimo ao rendimento" — isto não afeta o que é reexportado no Quadro07.
-  const q07 = filho(anexoB, "Quadro07");
-  if (temConteudo(q07)) {
-    const contribuicoesSS = texto(q07, "AnexoBq07C701");
-    if (contribuicoesSS !== undefined) b.contribuicoesSS = contribuicoesSS;
-  }
+  });
 
   // Sinal direto (a partir da estrutura do XML) de que há atividade real de Anexo B,
   // usado para decidir se se deve voltar a emitir os quadros 3B/5/6 ao reexportar
   // sem reduzir tudo a um "Não" implícito quando não há realmente nada preenchido.
   const anexoBTemDados = temConteudo(q01) || temConteudo(q04) || temConteudo(q05) || temConteudo(q06) ||
-    Object.keys(passthrough).length > 0;
+    temConteudo(q07) || temConteudo(q17) || Object.keys(passthrough).length > 0;
 
   return { anexoB: b, anexoBPassthrough: passthrough, anexoBTemDados };
 }

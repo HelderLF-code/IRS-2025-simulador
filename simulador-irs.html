@@ -204,11 +204,6 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
 
-<div class="row">
-  <div><label>Contribuições para a Segurança Social declaradas (Quadro 7A)</label><input id="anexoBContribuicoesSS" type="number" step="0.01"></div>
-</div>
-<p><small class="hint">Usado para calcular o "acréscimo ao rendimento": em regime simplificado, as despesas comprovadas com contribuições para a Segurança Social têm de atingir 15% dos rendimentos sujeitos aos coeficientes 0,75 e 0,35; o que faltar acresce ao rendimento tributável.</small></p>
-
 <fieldset>
   <div class="row">
     <div><label><input type="checkbox" id="anexoBUnicaEntidade"> Totalidade dos rendimentos de uma única entidade</label></div>
@@ -227,6 +222,90 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
+
+<h3>Despesas e encargos — mínimo de despesas (Quadro 17)</h3>
+<p class="aviso-topo">
+  Usado para calcular o "acréscimo ao rendimento": em regime simplificado, as despesas
+  comprovadas têm de atingir 15% dos rendimentos sujeitos aos coeficientes 0,75 e 0,35 — o
+  que faltar acresce ao rendimento tributável.
+</p>
+<div class="row">
+  <div><label>Contribuições SS conexas com a atividade (€) <small class="hint">(17001)</small></label><input id="anexoB17001" type="number" step="0.01"></div>
+  <div><label>Importações/aquisições intracomunitárias (€) <small class="hint">(17002)</small></label><input id="anexoB17002" type="number" step="0.01"></div>
+</div>
+<table id="tabelaAnexoB17Entidades">
+  <thead><tr><th>NIF da entidade (contribuições SS)</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB17Entidade()">+ Adicionar entidade</button>
+
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB17OptaAlternativa"> Declarar despesas com pessoal/rendas/outras em alternativa ao comunicado pela AT (Quadro 17C)</label></div>
+</div>
+<div class="row">
+  <div><label>Despesas com pessoal (€) <small class="hint">(17051)</small></label><input id="anexoB17051" type="number" step="0.01"></div>
+  <div><label>Rendas de imóveis afetas à atividade (€) <small class="hint">(17052)</small></label><input id="anexoB17052" type="number" step="0.01"></div>
+  <div><label>Outras despesas — afetas parcialmente (€) <small class="hint">(17053)</small></label><input id="anexoB17053" type="number" step="0.01"></div>
+  <div><label>Outras despesas — afetas totalmente (€) <small class="hint">(17054)</small></label><input id="anexoB17054" type="number" step="0.01"></div>
+</div>
+<p><small class="hint">Só entram no cálculo se a opção acima estiver marcada — nesse caso substituem (não se somam a) as despesas gerais do e-fatura. Nomes de campo do Quadro 17C/17D não confirmados contra um exemplo real (ver README) — os valores ficam guardados e exportados, mas os nomes das tags XML podem não estar 100% certos.</small></p>
+<table id="tabelaAnexoB17Rendas">
+  <thead><tr><th>NIF do senhorio (17D)</th><th>Valor (€)</th><th>Afetação parcial?</th><th>Afetação total?</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB17Renda()">+ Adicionar</button>
+
+<h3>Encargos em caso de opção pela categoria A / ato isolado &gt; €200.000 (Quadro 7)</h3>
+<p class="aviso-topo">
+  Só se aplica se optou pela tributação segundo as regras da categoria A (acima) ou se
+  este anexo respeita a um ato isolado de valor superior a €200.000. <strong>O efeito no
+  cálculo da estimativa ainda não está implementado</strong> — os valores ficam guardados
+  e exportados no XML, mas a estimativa continua a aplicar sempre os coeficientes do
+  regime simplificado.
+</p>
+<table id="tabelaAnexoB07Despesas">
+  <thead><tr><th>Natureza</th><th>Rend. profiss./comerciais/industriais (€)</th><th>Rend. agrícolas/silvícolas/pecuários (€)</th></tr></thead>
+  <tbody>
+    <tr><td>Contribuições obrigatórias para regimes de proteção social</td><td><input class="ab7-desp" data-campo="701" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="702" type="number" step="0.01"></td></tr>
+    <tr><td>Quotizações para ordens profissionais</td><td><input class="ab7-desp" data-campo="703" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="704" type="number" step="0.01"></td></tr>
+    <tr><td>Despesas de valorização profissional</td><td><input class="ab7-desp" data-campo="705" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="706" type="number" step="0.01"></td></tr>
+    <tr><td>Quotizações sindicais</td><td><input class="ab7-desp" data-campo="707" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="708" type="number" step="0.01"></td></tr>
+    <tr><td>Seguros de profissões de desgaste rápido (art.º 27.º)</td><td><input class="ab7-desp" data-campo="709" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="710" type="number" step="0.01"></td></tr>
+    <tr><td>Custo das mercadorias vendidas e matérias consumidas</td><td><input class="ab7-desp" data-campo="711" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="712" type="number" step="0.01"></td></tr>
+    <tr><td>Gastos art.º 41.º CIRS — rendimentos prediais (2015-2017)</td><td><input class="ab7-desp" data-campo="713" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="714" type="number" step="0.01"></td></tr>
+    <tr><td>Encargos com viaturas, motos e motociclos</td><td><input class="ab7-desp" data-campo="715" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="716" type="number" step="0.01"></td></tr>
+    <tr><td>Deslocações, viagens e estadas</td><td><input class="ab7-desp" data-campo="717" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="718" type="number" step="0.01"></td></tr>
+    <tr><td>Despesas de representação</td><td><input class="ab7-desp" data-campo="719" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="720" type="number" step="0.01"></td></tr>
+    <tr><td>Outras despesas indispensáveis à formação do rendimento</td><td><input class="ab7-desp" data-campo="721" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="722" type="number" step="0.01"></td></tr>
+  </tbody>
+</table>
+
+<table id="tabelaAnexoB07EntidadesSS">
+  <thead><tr><th>NIF entidade (contribuições SS — 7B)</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB07EntidadeSS()">+ Adicionar entidade</button>
+
+<datalist id="listaProfissoesDesgasteRapido">
+  <option value="1">1 — Praticantes desportivos</option>
+  <option value="2">2 — Mineiros</option>
+  <option value="3">3 — Pescadores</option>
+</datalist>
+<table id="tabelaAnexoB07Seguros">
+  <thead><tr><th>Profissão (código)</th><th>Valor (€)</th><th>NIF português</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB07Seguro()">+ Adicionar seguro (7C — desgaste rápido)</button>
+
+<table id="tabelaAnexoB07Predios">
+  <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota parte (%)</th><th>Valor rend. profiss./comerciais (€)</th><th>Valor rend. agrícolas (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB07Predio()">+ Adicionar prédio (7D — art.º 41.º)</button>
+
+<div class="row">
+  <div><label>N.º de anos/fração — explorações silvícolas plurianuais (7E)</label><input id="anexoB07C781" type="number" step="1"></div>
+</div>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -498,14 +577,20 @@ if (typeof module !== "undefined" && module.exports) {
   // Regime simplificado (art.º 31.º do CIRS): aplica o coeficiente de cada código de
   // rendimento ao respetivo valor bruto para obter o rendimento tributável da Categoria B.
   //
-  // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas): para os rendimentos
-  // sujeitos aos coeficientes 0,75 e 0,35, as despesas comprovadas (contribuições para a
-  // Segurança Social + despesas gerais registadas no e-fatura) têm de atingir 15% desses
-  // rendimentos; se ficarem abaixo desse mínimo, a diferença acresce ao rendimento
-  // tributável — replica a secção "Verificação das despesas da categoria B" da
-  // Demonstração de Liquidação da AT.
+  // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas, art.º 31.º n.ºs 2 e
+  // 13 do CIRS): para os rendimentos sujeitos aos coeficientes 0,75 e 0,35, as despesas
+  // comprovadas têm de atingir 15% desses rendimentos; se ficarem abaixo desse mínimo, a
+  // diferença acresce ao rendimento tributável — replica a secção "Verificação das
+  // despesas da categoria B" da Demonstração de Liquidação da AT.
   //
-  // Não cobre ainda a opção pelas regras da categoria A nem os restantes encargos do quadro 7.
+  // As despesas comprovadas somam: contribuições para a Segurança Social conexas com a
+  // atividade + importações/aquisições intracomunitárias relacionadas (Anexo B, Quadro
+  // 17A, campos 17001/17002) e, por regra, as despesas gerais e familiares comunicadas à
+  // AT via e-fatura — a não ser que o titular tenha optado (Quadro 17C) por declarar em
+  // alternativa as despesas com pessoal/rendas de imóveis/outras despesas relacionadas
+  // com a atividade, caso em que só essas contam (não se somam ao e-fatura).
+  //
+  // Não cobre ainda a opção pelas regras da categoria A (Quadro 7A).
   function calcularRendimentoCategoriaB(anexoB, despesasEFaturaTotal, parametros) {
     const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
     const coeficientes = parametros.coeficientesCategoriaB || {};
@@ -525,7 +610,14 @@ if (typeof module !== "undefined" && module.exports) {
       }
     });
 
-    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0) + Number(despesasEFaturaTotal || 0);
+    const q17 = (anexoB && anexoB.quadro17) || {};
+    const contribuicoesSS = Number(q17.contribuicoesSS) || 0;
+    const importacoes = Number(q17.importacoesIntracomunitarias) || 0;
+    const despesasBase = q17.optaDespesasAlternativa
+      ? (Number(q17.despesasPessoal) || 0) + (Number(q17.rendasImoveis) || 0) +
+        (Number(q17.outrasDespesasParcial) || 0) + (Number(q17.outrasDespesasTotal) || 0)
+      : Number(despesasEFaturaTotal || 0);
+    const despesasDeclaradas = contribuicoesSS + importacoes + despesasBase;
     const despesasCalculadas = Math.max(despesasDeclaradas, parametros.minimoContribuicoesCategoriaB || 0);
     const valorMinimoDespesas = rendimentoRelevanteMinimo * 0.15;
     const acrescimoAoRendimento = Math.max(0, valorMinimoDespesas - despesasCalculadas);
@@ -711,8 +803,8 @@ if (typeof module !== "undefined" && module.exports) {
 // tributação conjunta + dependente com deficiência em guarda conjunta).
 //
 // Partes ainda não mapeadas (ficam com a estrutura "esqueleto" tal como observada nos exemplos,
-// até serem fornecidos exemplos preenchidos): Rosto Quadro07/08/10/11/13, e os conteúdos dos
-// Anexos B/E/G/G1/H/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
+// até serem fornecidos exemplos preenchidos): Rosto Quadro07/08B/11/13, Anexo B Quadros
+// 8-16/18, e os conteúdos dos Anexos E/G/G1/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
 //
 // Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
 // com duplo-clique, sem servidor. Expõe-se em window.IRSXml.
@@ -912,6 +1004,113 @@ const ANEXOB_CODIGOS_4A = [401, 419, 420, 421, 402, 415, 416, 417, 403, 404, 422
 const ANEXOB_CODIGOS_4B = [451, 452, 459, 453, 454, 455, 456, 457, 460, 458];
 const ANEXOB_CODIGOS_4C = [481, 482];
 
+// Quadro 7A do Anexo B (encargos em caso de opção pela categoria A, ou ato isolado
+// > €200.000): coluna esquerda = rendimentos profissionais/comerciais/industriais
+// (soma em SomaC01), coluna direita = rendimentos agrícolas/silvícolas/pecuários
+// (soma em SomaC02). Nomes de campo e ordem confirmados contra um exemplo real.
+const ANEXOB_Q07_CAMPOS_PROF = [701, 703, 705, 707, 709, 711, 713, 715, 717, 719, 721];
+const ANEXOB_Q07_CAMPOS_AGRICOLA = [702, 704, 706, 708, 710, 712, 714, 716, 718, 720, 722];
+const ANEXOB_Q07_TODOS = [701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722];
+
+function moeda(v) {
+  return Number(v || 0).toFixed(2);
+}
+
+// Nomes de campo confirmados contra um exemplo real (todos os campos 701-722, mesmo a
+// 0,00, são emitidos assim que o quadro está "ativo" — não há omissão condicional como
+// no quadro 4).
+function buildQuadro07(q07) {
+  if (!q07) return `<Quadro07/>`;
+  const despesas = q07.despesas || {};
+  const somaProf = ANEXOB_Q07_CAMPOS_PROF.reduce((acc, c) => acc + (Number(despesas[c]) || 0), 0);
+  const somaAgricola = ANEXOB_Q07_CAMPOS_AGRICOLA.reduce((acc, c) => acc + (Number(despesas[c]) || 0), 0);
+
+  const entidadesSS = listaComLinhas("AnexoBq07BT01", (q07.entidadesSS || []).map(e => ({
+    NIFEntidades: e.nif, Valor: moeda(e.valor)
+  })));
+  const seguros = listaComLinhas("AnexoBq07CT01", (q07.segurosDesgasteRapido || []).map(s => ({
+    ProfissaoCodigo: s.profissaoCodigo, Valor: moeda(s.valor), NIFPortugues: s.nifPortugues,
+    Pais: s.pais, NumeroFiscalUE: s.numeroFiscalUE
+  })));
+  const predios = listaComLinhas("AnexoBq07DT01", (q07.prediosArt41 || []).map(p => ({
+    Freguesia: p.freguesia, Tipo: p.tipo, Artigo: p.artigo, Fraccao: p.fraccao, QuotaParte: p.quotaParte,
+    ValorRendimentoPCI: moeda(p.valorPCI), ValorRendimentoASP: moeda(p.valorASP)
+  })));
+
+  return `<Quadro07>` +
+    ANEXOB_Q07_TODOS.map(c => el(`AnexoBq07C${c}`, moeda(despesas[c]))).join("") +
+    el("AnexoBq07SomaC01", moeda(somaProf)) +
+    el("AnexoBq07SomaC02", moeda(somaAgricola)) +
+    entidadesSS + seguros + predios +
+    (q07.anosSilvicolasPlurianual ? el("AnexoBq07C781", q07.anosSilvicolasPlurianual) : "") +
+    `</Quadro07>`;
+}
+
+// Quadro 17 do Anexo B (despesas e encargos, art.º 31.º n.ºs 2 e 13 do CIRS): 17A/17B
+// confirmados contra um exemplo real. 17C (declarar despesas com pessoal/rendas/outras em
+// alternativa aos valores comunicados à AT, campos 17051-17054 e respetiva SOMA) e 17D
+// (rendas de imóveis afetas à atividade) não apareciam preenchidos nesse exemplo (a opção
+// 17C estava em "Não") — nomes de campo extrapolados do mesmo padrão do 17A/17B, por
+// confirmar quando se tiver um exemplo com a opção "Sim".
+function buildQuadro17(q17) {
+  if (!q17) return `<Quadro17/>`;
+
+  const temA = q17.contribuicoesSS !== undefined && q17.contribuicoesSS !== "";
+  const temB = q17.importacoesIntracomunitarias !== undefined && q17.importacoesIntracomunitarias !== "";
+  const soma17A = (temA ? Number(q17.contribuicoesSS) : 0) + (temB ? Number(q17.importacoesIntracomunitarias) : 0);
+
+  const entidadesSS = listaComLinhas("AnexoBq17BT01", (q17.entidadesSS || []).map(e => ({
+    CampoQ17A: "17001", NIF: e.nif, Valor: moeda(e.valor)
+  })));
+
+  const optaAlternativa = !!q17.optaDespesasAlternativa;
+  const camposAlternativa = optaAlternativa
+    ? el("AnexoBq17C17051", moeda(q17.despesasPessoal)) +
+      el("AnexoBq17C17052", moeda(q17.rendasImoveis)) +
+      el("AnexoBq17C17053", moeda(q17.outrasDespesasParcial)) +
+      el("AnexoBq17C17054", moeda(q17.outrasDespesasTotal)) +
+      el("AnexoBq17SomaC02", moeda(
+        (Number(q17.despesasPessoal) || 0) + (Number(q17.rendasImoveis) || 0) +
+        (Number(q17.outrasDespesasParcial) || 0) + (Number(q17.outrasDespesasTotal) || 0)
+      ))
+    : "";
+
+  const rendasAfetas = listaComLinhas("AnexoBq17DT01", (q17.rendasImoveisAfetas || []).map(r => ({
+    NIF: r.nif, Valor: moeda(r.valor),
+    AfetacaoParcial: r.afetacaoParcial ? "true" : undefined,
+    AfetacaoTotal: r.afetacaoTotal ? "true" : undefined
+  })));
+
+  return `<Quadro17>` +
+    (temA ? el("AnexoBq17C17001", moeda(q17.contribuicoesSS)) : "") +
+    (temB ? el("AnexoBq17C17002", moeda(q17.importacoesIntracomunitarias)) : "") +
+    el("AnexoBq17SomaC01", moeda(soma17A)) +
+    entidadesSS +
+    el("AnexoBq17B01", optaAlternativa ? "S" : "N") +
+    camposAlternativa +
+    rendasAfetas +
+    `</Quadro17>`;
+}
+
+function temDadosQuadro07(q07) {
+  if (!q07) return false;
+  const despesas = q07.despesas || {};
+  return Object.values(despesas).some(v => Number(v) > 0) ||
+    (q07.entidadesSS && q07.entidadesSS.length > 0) ||
+    (q07.segurosDesgasteRapido && q07.segurosDesgasteRapido.length > 0) ||
+    (q07.prediosArt41 && q07.prediosArt41.length > 0) ||
+    !!q07.anosSilvicolasPlurianual;
+}
+
+function temDadosQuadro17(q17) {
+  if (!q17) return false;
+  return q17.contribuicoesSS !== undefined && q17.contribuicoesSS !== "" ||
+    q17.importacoesIntracomunitarias !== undefined && q17.importacoesIntracomunitarias !== "" ||
+    (q17.entidadesSS && q17.entidadesSS.length > 0) ||
+    !!q17.optaDespesasAlternativa ||
+    (q17.rendasImoveisAfetas && q17.rendasImoveisAfetas.length > 0);
+}
+
 // AnexoB/J/L/SS têm atributo id=NIF e repetem-se por sujeito passivo quando ambos têm
 // atividade/rendimentos próprios nesse anexo. Nesta fase ainda não temos exemplo preenchido
 // nem confirmação de como fica o segundo anexo repetido, por isso emite-se apenas o esqueleto
@@ -993,10 +1192,18 @@ function buildAnexoB(model) {
       `</Quadro06>`
     : `<Quadro06/>`;
 
-  const quadrosRaros = Array.from({ length: 12 }, (_, i) => {
-    const numero = String(i + 7).padStart(2, "0");
+  const quadro07 = temDadosQuadro07(b.quadro07)
+    ? buildQuadro07(b.quadro07)
+    : (pass.Quadro07 || `<Quadro07/>`);
+  const quadro17 = temDadosQuadro17(b.quadro17)
+    ? buildQuadro17(b.quadro17)
+    : (pass.Quadro17 || `<Quadro17/>`);
+
+  const quadros08a16 = [8, 9, 10, 11, 12, 13, 14, 15, 16].map(i => {
+    const numero = String(i).padStart(2, "0");
     return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
   }).join("");
+  const quadro18 = pass.Quadro18 || `<Quadro18/>`;
 
   return `<AnexoB id="${esc(nifA)}">` +
     `<Quadro00/>` +
@@ -1006,7 +1213,10 @@ function buildAnexoB(model) {
     quadro04 +
     quadro05 +
     quadro06 +
-    quadrosRaros +
+    quadro07 +
+    quadros08a16 +
+    quadro17 +
+    quadro18 +
     `</AnexoB>`;
 }
 
@@ -1334,6 +1544,49 @@ function temConteudo(el) {
   return !!(el && Array.from(el.childNodes).some(n => n.nodeType === 1));
 }
 
+const ANEXOB_Q07_TODOS = [701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722];
+
+// Ver nota em build.js: nomes de campo do Quadro07 e Quadro17A/17B confirmados contra um
+// exemplo real; Quadro17C (campos 17051-17054) e 17D extrapolados do mesmo padrão, por
+// confirmar.
+function parseQuadro07(q07) {
+  if (!temConteudo(q07)) return undefined;
+  const despesas = {};
+  ANEXOB_Q07_TODOS.forEach(c => {
+    const v = texto(q07, `AnexoBq07C${c}`);
+    if (v !== undefined) despesas[c] = v;
+  });
+  return {
+    despesas,
+    entidadesSS: parseLinhasGenerico(filho(q07, "AnexoBq07BT01")).map(l => ({ nif: l.NIFEntidades, valor: l.Valor })),
+    segurosDesgasteRapido: parseLinhasGenerico(filho(q07, "AnexoBq07CT01")).map(l => ({
+      profissaoCodigo: l.ProfissaoCodigo, valor: l.Valor, nifPortugues: l.NIFPortugues, pais: l.Pais, numeroFiscalUE: l.NumeroFiscalUE
+    })),
+    prediosArt41: parseLinhasGenerico(filho(q07, "AnexoBq07DT01")).map(l => ({
+      freguesia: l.Freguesia, tipo: l.Tipo, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte,
+      valorPCI: l.ValorRendimentoPCI, valorASP: l.ValorRendimentoASP
+    })),
+    anosSilvicolasPlurianual: texto(q07, "AnexoBq07C781")
+  };
+}
+
+function parseQuadro17(q17) {
+  if (!temConteudo(q17)) return undefined;
+  return {
+    contribuicoesSS: texto(q17, "AnexoBq17C17001"),
+    importacoesIntracomunitarias: texto(q17, "AnexoBq17C17002"),
+    entidadesSS: parseLinhasGenerico(filho(q17, "AnexoBq17BT01")).map(l => ({ nif: l.NIF, valor: l.Valor })),
+    optaDespesasAlternativa: texto(q17, "AnexoBq17B01") === "S",
+    despesasPessoal: texto(q17, "AnexoBq17C17051"),
+    rendasImoveis: texto(q17, "AnexoBq17C17052"),
+    outrasDespesasParcial: texto(q17, "AnexoBq17C17053"),
+    outrasDespesasTotal: texto(q17, "AnexoBq17C17054"),
+    rendasImoveisAfetas: parseLinhasGenerico(filho(q17, "AnexoBq17DT01")).map(l => ({
+      nif: l.NIF, valor: l.Valor, afetacaoParcial: l.AfetacaoParcial === "true", afetacaoTotal: l.AfetacaoTotal === "true"
+    }))
+  };
+}
+
 function parseAnexoB(anexoB) {
   if (!anexoB) return { anexoB: undefined, anexoBPassthrough: {}, anexoBTemDados: false };
 
@@ -1397,27 +1650,23 @@ function parseAnexoB(anexoB) {
     };
   }
 
+  const q07 = filho(anexoB, "Quadro07");
+  const q17 = filho(anexoB, "Quadro17");
+  b.quadro07 = parseQuadro07(q07);
+  b.quadro17 = parseQuadro17(q17);
+
   const passthrough = {};
-  for (let i = 7; i <= 18; i++) {
+  [8, 9, 10, 11, 12, 13, 14, 15, 16, 18].forEach(i => {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoB, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
-  }
-
-  // O Quadro07 fica todo em passthrough (ainda não editável), mas extrai-se também o
-  // valor das contribuições para a Segurança Social (campo 701), informativamente, para
-  // o cálculo do "acréscimo ao rendimento" — isto não afeta o que é reexportado no Quadro07.
-  const q07 = filho(anexoB, "Quadro07");
-  if (temConteudo(q07)) {
-    const contribuicoesSS = texto(q07, "AnexoBq07C701");
-    if (contribuicoesSS !== undefined) b.contribuicoesSS = contribuicoesSS;
-  }
+  });
 
   // Sinal direto (a partir da estrutura do XML) de que há atividade real de Anexo B,
   // usado para decidir se se deve voltar a emitir os quadros 3B/5/6 ao reexportar
   // sem reduzir tudo a um "Não" implícito quando não há realmente nada preenchido.
   const anexoBTemDados = temConteudo(q01) || temConteudo(q04) || temConteudo(q05) || temConteudo(q06) ||
-    Object.keys(passthrough).length > 0;
+    temConteudo(q07) || temConteudo(q17) || Object.keys(passthrough).length > 0;
 
   return { anexoB: b, anexoBPassthrough: passthrough, anexoBTemDados };
 }
@@ -1722,6 +1971,133 @@ if (typeof module !== "undefined" && module.exports) {
     tbody.appendChild(tr);
   };
 
+  window.adicionarLinhaAnexoB17Entidade = function () {
+    const tbody = document.querySelector("#tabelaAnexoB17Entidades tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab17-e-nif" size="10"></td>
+      <td><input class="ab17-e-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB17Renda = function () {
+    const tbody = document.querySelector("#tabelaAnexoB17Rendas tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab17d-nif" size="10"></td>
+      <td><input class="ab17d-valor" type="number" step="0.01"></td>
+      <td><input class="ab17d-parcial" type="checkbox"></td>
+      <td><input class="ab17d-total" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB07EntidadeSS = function () {
+    const tbody = document.querySelector("#tabelaAnexoB07EntidadesSS tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab07b-nif" size="10"></td>
+      <td><input class="ab07b-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB07Seguro = function () {
+    const tbody = document.querySelector("#tabelaAnexoB07Seguros tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab07c-profissao" size="4" list="listaProfissoesDesgasteRapido"></td>
+      <td><input class="ab07c-valor" type="number" step="0.01"></td>
+      <td><input class="ab07c-nifpt" size="10"></td>
+      <td><input class="ab07c-pais" size="4"></td>
+      <td><input class="ab07c-numfiscal" size="14"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB07Predio = function () {
+    const tbody = document.querySelector("#tabelaAnexoB07Predios tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab07d-freguesia" size="8"></td>
+      <td><select class="ab07d-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ab07d-artigo" size="8"></td>
+      <td><input class="ab07d-fraccao" size="6"></td>
+      <td><input class="ab07d-quota" type="number" step="0.01"></td>
+      <td><input class="ab07d-valorpci" type="number" step="0.01"></td>
+      <td><input class="ab07d-valorasp" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro07AnexoB() {
+    const despesas = {};
+    document.querySelectorAll(".ab7-desp").forEach(input => {
+      if (input.value !== "") despesas[input.dataset.campo] = input.value;
+    });
+    const entidadesSS = [...document.querySelectorAll("#tabelaAnexoB07EntidadesSS tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab07b-nif").value,
+      valor: tr.querySelector(".ab07b-valor").value || 0
+    }));
+    const segurosDesgasteRapido = [...document.querySelectorAll("#tabelaAnexoB07Seguros tbody tr")].map(tr => ({
+      profissaoCodigo: tr.querySelector(".ab07c-profissao").value,
+      valor: tr.querySelector(".ab07c-valor").value || 0,
+      nifPortugues: tr.querySelector(".ab07c-nifpt").value || undefined,
+      pais: tr.querySelector(".ab07c-pais").value || undefined,
+      numeroFiscalUE: tr.querySelector(".ab07c-numfiscal").value || undefined
+    }));
+    const prediosArt41 = [...document.querySelectorAll("#tabelaAnexoB07Predios tbody tr")].map(tr => ({
+      freguesia: tr.querySelector(".ab07d-freguesia").value,
+      tipo: tr.querySelector(".ab07d-tipo").value,
+      artigo: tr.querySelector(".ab07d-artigo").value,
+      fraccao: tr.querySelector(".ab07d-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ab07d-quota").value || undefined,
+      valorPCI: tr.querySelector(".ab07d-valorpci").value || 0,
+      valorASP: tr.querySelector(".ab07d-valorasp").value || 0
+    }));
+    const anosSilvicolasPlurianual = document.getElementById("anexoB07C781").value || undefined;
+
+    const temDados = Object.keys(despesas).length || entidadesSS.length || segurosDesgasteRapido.length ||
+      prediosArt41.length || anosSilvicolasPlurianual;
+    return temDados ? { despesas, entidadesSS, segurosDesgasteRapido, prediosArt41, anosSilvicolasPlurianual } : undefined;
+  }
+
+  function lerQuadro17AnexoB() {
+    const entidadesSS = [...document.querySelectorAll("#tabelaAnexoB17Entidades tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab17-e-nif").value,
+      valor: tr.querySelector(".ab17-e-valor").value || 0
+    }));
+    const rendasImoveisAfetas = [...document.querySelectorAll("#tabelaAnexoB17Rendas tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab17d-nif").value,
+      valor: tr.querySelector(".ab17d-valor").value || 0,
+      afetacaoParcial: tr.querySelector(".ab17d-parcial").checked,
+      afetacaoTotal: tr.querySelector(".ab17d-total").checked
+    }));
+    const contribuicoesSS = document.getElementById("anexoB17001").value || undefined;
+    const importacoesIntracomunitarias = document.getElementById("anexoB17002").value || undefined;
+    const optaDespesasAlternativa = document.getElementById("anexoB17OptaAlternativa").checked;
+    const despesasPessoal = document.getElementById("anexoB17051").value || undefined;
+    const rendasImoveis = document.getElementById("anexoB17052").value || undefined;
+    const outrasDespesasParcial = document.getElementById("anexoB17053").value || undefined;
+    const outrasDespesasTotal = document.getElementById("anexoB17054").value || undefined;
+
+    const temDados = contribuicoesSS || importacoesIntracomunitarias || entidadesSS.length ||
+      optaDespesasAlternativa || despesasPessoal || rendasImoveis || outrasDespesasParcial ||
+      outrasDespesasTotal || rendasImoveisAfetas.length;
+    if (!temDados) return undefined;
+
+    return {
+      contribuicoesSS, importacoesIntracomunitarias, entidadesSS, optaDespesasAlternativa,
+      despesasPessoal, rendasImoveis, outrasDespesasParcial, outrasDespesasTotal, rendasImoveisAfetas
+    };
+  }
+
   function lerAnexoB() {
     const rendimentosBrutos = [...document.querySelectorAll("#tabelaAnexoBRendimentos tbody tr")].map(tr => ({
       codigo: tr.querySelector(".ab-r-codigo").value,
@@ -1744,7 +2120,8 @@ if (typeof module !== "undefined" && module.exports) {
       codigoCAEAgricola: document.getElementById("anexoBCaeAgricola").value || undefined,
       estabelecimentoEstavel: document.getElementById("anexoBEstabelecimentoEstavel").checked,
       rendimentosBrutos,
-      contribuicoesSS: document.getElementById("anexoBContribuicoesSS").value || 0,
+      quadro07: lerQuadro07AnexoB(),
+      quadro17: lerQuadro17AnexoB(),
       categoriaA: {
         unicaEntidade: document.getElementById("anexoBUnicaEntidade").checked,
         optaRegrasCategoriaA: document.getElementById("anexoBOptaCategoriaA").checked
@@ -1947,6 +2324,7 @@ if (typeof module !== "undefined" && module.exports) {
   function temAtividadeAnexoB(anexoB) {
     return !!(dadosPreservados.anexoBAtivo || anexoB.regimeSimplificado || anexoB.atoIsolado ||
       anexoB.naturezaProfComInd || anexoB.naturezaAgricola || anexoB.rendimentosBrutos.length ||
+      anexoB.quadro07 || anexoB.quadro17 ||
       Object.keys(dadosPreservados.anexoBPassthrough || {}).length);
   }
 
@@ -2030,7 +2408,6 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("anexoBCaeProf").value = "";
       document.getElementById("anexoBCaeAgricola").value = "";
       document.getElementById("anexoBEstabelecimentoEstavel").checked = false;
-      document.getElementById("anexoBContribuicoesSS").value = "";
       document.getElementById("anexoBUnicaEntidade").checked = false;
       document.getElementById("anexoBOptaCategoriaA").checked = false;
       document.getElementById("anexoBRendimentosSujeitos").value = "";
@@ -2038,6 +2415,20 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("anexoBPagamentosConta").value = "";
       document.querySelector("#tabelaAnexoBRendimentos tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoBEntidadesRetencao tbody").innerHTML = "";
+      document.querySelectorAll(".ab7-desp").forEach(input => { input.value = ""; });
+      document.querySelector("#tabelaAnexoB07EntidadesSS tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoB07Seguros tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoB07Predios tbody").innerHTML = "";
+      document.getElementById("anexoB07C781").value = "";
+      document.getElementById("anexoB17001").value = "";
+      document.getElementById("anexoB17002").value = "";
+      document.querySelector("#tabelaAnexoB17Entidades tbody").innerHTML = "";
+      document.getElementById("anexoB17OptaAlternativa").checked = false;
+      document.getElementById("anexoB17051").value = "";
+      document.getElementById("anexoB17052").value = "";
+      document.getElementById("anexoB17053").value = "";
+      document.getElementById("anexoB17054").value = "";
+      document.querySelector("#tabelaAnexoB17Rendas tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHIsentos tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHPropInt tbody").innerHTML = "";
@@ -2084,7 +2475,8 @@ if (typeof module !== "undefined" && module.exports) {
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
         "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
-        "estabelecimentoEstavel", "contribuicoesSS", "rendimentosBrutos", "categoriaA", "retencoes"
+        "estabelecimentoEstavel", "rendimentosBrutos", "categoriaA", "retencoes",
+        "quadro07", "quadro17"
       ];
       let anexoBExtrasQ03 = {};
 
@@ -2099,7 +2491,6 @@ if (typeof module !== "undefined" && module.exports) {
         document.getElementById("anexoBCaeProf").value = b.codigoCAEProf || "";
         document.getElementById("anexoBCaeAgricola").value = b.codigoCAEAgricola || "";
         document.getElementById("anexoBEstabelecimentoEstavel").checked = !!b.estabelecimentoEstavel;
-        document.getElementById("anexoBContribuicoesSS").value = b.contribuicoesSS || "";
 
         (b.rendimentosBrutos || []).forEach(r => {
           adicionarLinhaAnexoBRendimento();
@@ -2107,6 +2498,66 @@ if (typeof module !== "undefined" && module.exports) {
           tr.querySelector(".ab-r-codigo").value = r.codigo;
           tr.querySelector(".ab-r-valor").value = r.valor;
         });
+
+        if (b.quadro07) {
+          const q7 = b.quadro07;
+          Object.entries(q7.despesas || {}).forEach(([campo, valor]) => {
+            const input = document.querySelector(`.ab7-desp[data-campo="${campo}"]`);
+            if (input) input.value = valor;
+          });
+          (q7.entidadesSS || []).forEach(e => {
+            adicionarLinhaAnexoB07EntidadeSS();
+            const tr = document.querySelector("#tabelaAnexoB07EntidadesSS tbody tr:last-child");
+            tr.querySelector(".ab07b-nif").value = e.nif || "";
+            tr.querySelector(".ab07b-valor").value = e.valor || "";
+          });
+          (q7.segurosDesgasteRapido || []).forEach(s => {
+            adicionarLinhaAnexoB07Seguro();
+            const tr = document.querySelector("#tabelaAnexoB07Seguros tbody tr:last-child");
+            tr.querySelector(".ab07c-profissao").value = s.profissaoCodigo || "";
+            tr.querySelector(".ab07c-valor").value = s.valor || "";
+            tr.querySelector(".ab07c-nifpt").value = s.nifPortugues || "";
+            tr.querySelector(".ab07c-pais").value = s.pais || "";
+            tr.querySelector(".ab07c-numfiscal").value = s.numeroFiscalUE || "";
+          });
+          (q7.prediosArt41 || []).forEach(p => {
+            adicionarLinhaAnexoB07Predio();
+            const tr = document.querySelector("#tabelaAnexoB07Predios tbody tr:last-child");
+            tr.querySelector(".ab07d-freguesia").value = p.freguesia || "";
+            if (p.tipo) tr.querySelector(".ab07d-tipo").value = p.tipo;
+            tr.querySelector(".ab07d-artigo").value = p.artigo || "";
+            tr.querySelector(".ab07d-fraccao").value = p.fraccao || "";
+            tr.querySelector(".ab07d-quota").value = p.quotaParte || "";
+            tr.querySelector(".ab07d-valorpci").value = p.valorPCI || "";
+            tr.querySelector(".ab07d-valorasp").value = p.valorASP || "";
+          });
+          document.getElementById("anexoB07C781").value = q7.anosSilvicolasPlurianual || "";
+        }
+
+        if (b.quadro17) {
+          const q17 = b.quadro17;
+          document.getElementById("anexoB17001").value = q17.contribuicoesSS || "";
+          document.getElementById("anexoB17002").value = q17.importacoesIntracomunitarias || "";
+          (q17.entidadesSS || []).forEach(e => {
+            adicionarLinhaAnexoB17Entidade();
+            const tr = document.querySelector("#tabelaAnexoB17Entidades tbody tr:last-child");
+            tr.querySelector(".ab17-e-nif").value = e.nif || "";
+            tr.querySelector(".ab17-e-valor").value = e.valor || "";
+          });
+          document.getElementById("anexoB17OptaAlternativa").checked = !!q17.optaDespesasAlternativa;
+          document.getElementById("anexoB17051").value = q17.despesasPessoal || "";
+          document.getElementById("anexoB17052").value = q17.rendasImoveis || "";
+          document.getElementById("anexoB17053").value = q17.outrasDespesasParcial || "";
+          document.getElementById("anexoB17054").value = q17.outrasDespesasTotal || "";
+          (q17.rendasImoveisAfetas || []).forEach(r => {
+            adicionarLinhaAnexoB17Renda();
+            const tr = document.querySelector("#tabelaAnexoB17Rendas tbody tr:last-child");
+            tr.querySelector(".ab17d-nif").value = r.nif || "";
+            tr.querySelector(".ab17d-valor").value = r.valor || "";
+            tr.querySelector(".ab17d-parcial").checked = !!r.afetacaoParcial;
+            tr.querySelector(".ab17d-total").checked = !!r.afetacaoTotal;
+          });
+        }
 
         if (b.categoriaA) {
           document.getElementById("anexoBUnicaEntidade").checked = !!b.categoriaA.unicaEntidade;

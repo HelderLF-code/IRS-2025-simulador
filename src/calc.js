@@ -44,14 +44,20 @@
   // Regime simplificado (art.º 31.º do CIRS): aplica o coeficiente de cada código de
   // rendimento ao respetivo valor bruto para obter o rendimento tributável da Categoria B.
   //
-  // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas): para os rendimentos
-  // sujeitos aos coeficientes 0,75 e 0,35, as despesas comprovadas (contribuições para a
-  // Segurança Social + despesas gerais registadas no e-fatura) têm de atingir 15% desses
-  // rendimentos; se ficarem abaixo desse mínimo, a diferença acresce ao rendimento
-  // tributável — replica a secção "Verificação das despesas da categoria B" da
-  // Demonstração de Liquidação da AT.
+  // Inclui a regra do "acréscimo ao rendimento" (mínimo de despesas, art.º 31.º n.ºs 2 e
+  // 13 do CIRS): para os rendimentos sujeitos aos coeficientes 0,75 e 0,35, as despesas
+  // comprovadas têm de atingir 15% desses rendimentos; se ficarem abaixo desse mínimo, a
+  // diferença acresce ao rendimento tributável — replica a secção "Verificação das
+  // despesas da categoria B" da Demonstração de Liquidação da AT.
   //
-  // Não cobre ainda a opção pelas regras da categoria A nem os restantes encargos do quadro 7.
+  // As despesas comprovadas somam: contribuições para a Segurança Social conexas com a
+  // atividade + importações/aquisições intracomunitárias relacionadas (Anexo B, Quadro
+  // 17A, campos 17001/17002) e, por regra, as despesas gerais e familiares comunicadas à
+  // AT via e-fatura — a não ser que o titular tenha optado (Quadro 17C) por declarar em
+  // alternativa as despesas com pessoal/rendas de imóveis/outras despesas relacionadas
+  // com a atividade, caso em que só essas contam (não se somam ao e-fatura).
+  //
+  // Não cobre ainda a opção pelas regras da categoria A (Quadro 7A).
   function calcularRendimentoCategoriaB(anexoB, despesasEFaturaTotal, parametros) {
     const rendimentos = (anexoB && anexoB.rendimentosBrutos) || [];
     const coeficientes = parametros.coeficientesCategoriaB || {};
@@ -71,7 +77,14 @@
       }
     });
 
-    const despesasDeclaradas = Number((anexoB && anexoB.contribuicoesSS) || 0) + Number(despesasEFaturaTotal || 0);
+    const q17 = (anexoB && anexoB.quadro17) || {};
+    const contribuicoesSS = Number(q17.contribuicoesSS) || 0;
+    const importacoes = Number(q17.importacoesIntracomunitarias) || 0;
+    const despesasBase = q17.optaDespesasAlternativa
+      ? (Number(q17.despesasPessoal) || 0) + (Number(q17.rendasImoveis) || 0) +
+        (Number(q17.outrasDespesasParcial) || 0) + (Number(q17.outrasDespesasTotal) || 0)
+      : Number(despesasEFaturaTotal || 0);
+    const despesasDeclaradas = contribuicoesSS + importacoes + despesasBase;
     const despesasCalculadas = Math.max(despesasDeclaradas, parametros.minimoContribuicoesCategoriaB || 0);
     const valorMinimoDespesas = rendimentoRelevanteMinimo * 0.15;
     const acrescimoAoRendimento = Math.max(0, valorMinimoDespesas - despesasCalculadas);

@@ -204,11 +204,6 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
 
-<div class="row">
-  <div><label>Contribuições para a Segurança Social declaradas (Quadro 7A)</label><input id="anexoBContribuicoesSS" type="number" step="0.01"></div>
-</div>
-<p><small class="hint">Usado para calcular o "acréscimo ao rendimento": em regime simplificado, as despesas comprovadas com contribuições para a Segurança Social têm de atingir 15% dos rendimentos sujeitos aos coeficientes 0,75 e 0,35; o que faltar acresce ao rendimento tributável.</small></p>
-
 <fieldset>
   <div class="row">
     <div><label><input type="checkbox" id="anexoBUnicaEntidade"> Totalidade dos rendimentos de uma única entidade</label></div>
@@ -227,6 +222,90 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
+
+<h3>Despesas e encargos — mínimo de despesas (Quadro 17)</h3>
+<p class="aviso-topo">
+  Usado para calcular o "acréscimo ao rendimento": em regime simplificado, as despesas
+  comprovadas têm de atingir 15% dos rendimentos sujeitos aos coeficientes 0,75 e 0,35 — o
+  que faltar acresce ao rendimento tributável.
+</p>
+<div class="row">
+  <div><label>Contribuições SS conexas com a atividade (€) <small class="hint">(17001)</small></label><input id="anexoB17001" type="number" step="0.01"></div>
+  <div><label>Importações/aquisições intracomunitárias (€) <small class="hint">(17002)</small></label><input id="anexoB17002" type="number" step="0.01"></div>
+</div>
+<table id="tabelaAnexoB17Entidades">
+  <thead><tr><th>NIF da entidade (contribuições SS)</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB17Entidade()">+ Adicionar entidade</button>
+
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB17OptaAlternativa"> Declarar despesas com pessoal/rendas/outras em alternativa ao comunicado pela AT (Quadro 17C)</label></div>
+</div>
+<div class="row">
+  <div><label>Despesas com pessoal (€) <small class="hint">(17051)</small></label><input id="anexoB17051" type="number" step="0.01"></div>
+  <div><label>Rendas de imóveis afetas à atividade (€) <small class="hint">(17052)</small></label><input id="anexoB17052" type="number" step="0.01"></div>
+  <div><label>Outras despesas — afetas parcialmente (€) <small class="hint">(17053)</small></label><input id="anexoB17053" type="number" step="0.01"></div>
+  <div><label>Outras despesas — afetas totalmente (€) <small class="hint">(17054)</small></label><input id="anexoB17054" type="number" step="0.01"></div>
+</div>
+<p><small class="hint">Só entram no cálculo se a opção acima estiver marcada — nesse caso substituem (não se somam a) as despesas gerais do e-fatura. Nomes de campo do Quadro 17C/17D não confirmados contra um exemplo real (ver README) — os valores ficam guardados e exportados, mas os nomes das tags XML podem não estar 100% certos.</small></p>
+<table id="tabelaAnexoB17Rendas">
+  <thead><tr><th>NIF do senhorio (17D)</th><th>Valor (€)</th><th>Afetação parcial?</th><th>Afetação total?</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB17Renda()">+ Adicionar</button>
+
+<h3>Encargos em caso de opção pela categoria A / ato isolado &gt; €200.000 (Quadro 7)</h3>
+<p class="aviso-topo">
+  Só se aplica se optou pela tributação segundo as regras da categoria A (acima) ou se
+  este anexo respeita a um ato isolado de valor superior a €200.000. <strong>O efeito no
+  cálculo da estimativa ainda não está implementado</strong> — os valores ficam guardados
+  e exportados no XML, mas a estimativa continua a aplicar sempre os coeficientes do
+  regime simplificado.
+</p>
+<table id="tabelaAnexoB07Despesas">
+  <thead><tr><th>Natureza</th><th>Rend. profiss./comerciais/industriais (€)</th><th>Rend. agrícolas/silvícolas/pecuários (€)</th></tr></thead>
+  <tbody>
+    <tr><td>Contribuições obrigatórias para regimes de proteção social</td><td><input class="ab7-desp" data-campo="701" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="702" type="number" step="0.01"></td></tr>
+    <tr><td>Quotizações para ordens profissionais</td><td><input class="ab7-desp" data-campo="703" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="704" type="number" step="0.01"></td></tr>
+    <tr><td>Despesas de valorização profissional</td><td><input class="ab7-desp" data-campo="705" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="706" type="number" step="0.01"></td></tr>
+    <tr><td>Quotizações sindicais</td><td><input class="ab7-desp" data-campo="707" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="708" type="number" step="0.01"></td></tr>
+    <tr><td>Seguros de profissões de desgaste rápido (art.º 27.º)</td><td><input class="ab7-desp" data-campo="709" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="710" type="number" step="0.01"></td></tr>
+    <tr><td>Custo das mercadorias vendidas e matérias consumidas</td><td><input class="ab7-desp" data-campo="711" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="712" type="number" step="0.01"></td></tr>
+    <tr><td>Gastos art.º 41.º CIRS — rendimentos prediais (2015-2017)</td><td><input class="ab7-desp" data-campo="713" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="714" type="number" step="0.01"></td></tr>
+    <tr><td>Encargos com viaturas, motos e motociclos</td><td><input class="ab7-desp" data-campo="715" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="716" type="number" step="0.01"></td></tr>
+    <tr><td>Deslocações, viagens e estadas</td><td><input class="ab7-desp" data-campo="717" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="718" type="number" step="0.01"></td></tr>
+    <tr><td>Despesas de representação</td><td><input class="ab7-desp" data-campo="719" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="720" type="number" step="0.01"></td></tr>
+    <tr><td>Outras despesas indispensáveis à formação do rendimento</td><td><input class="ab7-desp" data-campo="721" type="number" step="0.01"></td><td><input class="ab7-desp" data-campo="722" type="number" step="0.01"></td></tr>
+  </tbody>
+</table>
+
+<table id="tabelaAnexoB07EntidadesSS">
+  <thead><tr><th>NIF entidade (contribuições SS — 7B)</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB07EntidadeSS()">+ Adicionar entidade</button>
+
+<datalist id="listaProfissoesDesgasteRapido">
+  <option value="1">1 — Praticantes desportivos</option>
+  <option value="2">2 — Mineiros</option>
+  <option value="3">3 — Pescadores</option>
+</datalist>
+<table id="tabelaAnexoB07Seguros">
+  <thead><tr><th>Profissão (código)</th><th>Valor (€)</th><th>NIF português</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB07Seguro()">+ Adicionar seguro (7C — desgaste rápido)</button>
+
+<table id="tabelaAnexoB07Predios">
+  <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota parte (%)</th><th>Valor rend. profiss./comerciais (€)</th><th>Valor rend. agrícolas (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB07Predio()">+ Adicionar prédio (7D — art.º 41.º)</button>
+
+<div class="row">
+  <div><label>N.º de anos/fração — explorações silvícolas plurianuais (7E)</label><input id="anexoB07C781" type="number" step="1"></div>
+</div>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -413,6 +492,133 @@ indicares, assume-se o escalão mais baixo.</small></p>
     tbody.appendChild(tr);
   };
 
+  window.adicionarLinhaAnexoB17Entidade = function () {
+    const tbody = document.querySelector("#tabelaAnexoB17Entidades tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab17-e-nif" size="10"></td>
+      <td><input class="ab17-e-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB17Renda = function () {
+    const tbody = document.querySelector("#tabelaAnexoB17Rendas tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab17d-nif" size="10"></td>
+      <td><input class="ab17d-valor" type="number" step="0.01"></td>
+      <td><input class="ab17d-parcial" type="checkbox"></td>
+      <td><input class="ab17d-total" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB07EntidadeSS = function () {
+    const tbody = document.querySelector("#tabelaAnexoB07EntidadesSS tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab07b-nif" size="10"></td>
+      <td><input class="ab07b-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB07Seguro = function () {
+    const tbody = document.querySelector("#tabelaAnexoB07Seguros tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab07c-profissao" size="4" list="listaProfissoesDesgasteRapido"></td>
+      <td><input class="ab07c-valor" type="number" step="0.01"></td>
+      <td><input class="ab07c-nifpt" size="10"></td>
+      <td><input class="ab07c-pais" size="4"></td>
+      <td><input class="ab07c-numfiscal" size="14"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB07Predio = function () {
+    const tbody = document.querySelector("#tabelaAnexoB07Predios tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab07d-freguesia" size="8"></td>
+      <td><select class="ab07d-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ab07d-artigo" size="8"></td>
+      <td><input class="ab07d-fraccao" size="6"></td>
+      <td><input class="ab07d-quota" type="number" step="0.01"></td>
+      <td><input class="ab07d-valorpci" type="number" step="0.01"></td>
+      <td><input class="ab07d-valorasp" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro07AnexoB() {
+    const despesas = {};
+    document.querySelectorAll(".ab7-desp").forEach(input => {
+      if (input.value !== "") despesas[input.dataset.campo] = input.value;
+    });
+    const entidadesSS = [...document.querySelectorAll("#tabelaAnexoB07EntidadesSS tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab07b-nif").value,
+      valor: tr.querySelector(".ab07b-valor").value || 0
+    }));
+    const segurosDesgasteRapido = [...document.querySelectorAll("#tabelaAnexoB07Seguros tbody tr")].map(tr => ({
+      profissaoCodigo: tr.querySelector(".ab07c-profissao").value,
+      valor: tr.querySelector(".ab07c-valor").value || 0,
+      nifPortugues: tr.querySelector(".ab07c-nifpt").value || undefined,
+      pais: tr.querySelector(".ab07c-pais").value || undefined,
+      numeroFiscalUE: tr.querySelector(".ab07c-numfiscal").value || undefined
+    }));
+    const prediosArt41 = [...document.querySelectorAll("#tabelaAnexoB07Predios tbody tr")].map(tr => ({
+      freguesia: tr.querySelector(".ab07d-freguesia").value,
+      tipo: tr.querySelector(".ab07d-tipo").value,
+      artigo: tr.querySelector(".ab07d-artigo").value,
+      fraccao: tr.querySelector(".ab07d-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ab07d-quota").value || undefined,
+      valorPCI: tr.querySelector(".ab07d-valorpci").value || 0,
+      valorASP: tr.querySelector(".ab07d-valorasp").value || 0
+    }));
+    const anosSilvicolasPlurianual = document.getElementById("anexoB07C781").value || undefined;
+
+    const temDados = Object.keys(despesas).length || entidadesSS.length || segurosDesgasteRapido.length ||
+      prediosArt41.length || anosSilvicolasPlurianual;
+    return temDados ? { despesas, entidadesSS, segurosDesgasteRapido, prediosArt41, anosSilvicolasPlurianual } : undefined;
+  }
+
+  function lerQuadro17AnexoB() {
+    const entidadesSS = [...document.querySelectorAll("#tabelaAnexoB17Entidades tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab17-e-nif").value,
+      valor: tr.querySelector(".ab17-e-valor").value || 0
+    }));
+    const rendasImoveisAfetas = [...document.querySelectorAll("#tabelaAnexoB17Rendas tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ab17d-nif").value,
+      valor: tr.querySelector(".ab17d-valor").value || 0,
+      afetacaoParcial: tr.querySelector(".ab17d-parcial").checked,
+      afetacaoTotal: tr.querySelector(".ab17d-total").checked
+    }));
+    const contribuicoesSS = document.getElementById("anexoB17001").value || undefined;
+    const importacoesIntracomunitarias = document.getElementById("anexoB17002").value || undefined;
+    const optaDespesasAlternativa = document.getElementById("anexoB17OptaAlternativa").checked;
+    const despesasPessoal = document.getElementById("anexoB17051").value || undefined;
+    const rendasImoveis = document.getElementById("anexoB17052").value || undefined;
+    const outrasDespesasParcial = document.getElementById("anexoB17053").value || undefined;
+    const outrasDespesasTotal = document.getElementById("anexoB17054").value || undefined;
+
+    const temDados = contribuicoesSS || importacoesIntracomunitarias || entidadesSS.length ||
+      optaDespesasAlternativa || despesasPessoal || rendasImoveis || outrasDespesasParcial ||
+      outrasDespesasTotal || rendasImoveisAfetas.length;
+    if (!temDados) return undefined;
+
+    return {
+      contribuicoesSS, importacoesIntracomunitarias, entidadesSS, optaDespesasAlternativa,
+      despesasPessoal, rendasImoveis, outrasDespesasParcial, outrasDespesasTotal, rendasImoveisAfetas
+    };
+  }
+
   function lerAnexoB() {
     const rendimentosBrutos = [...document.querySelectorAll("#tabelaAnexoBRendimentos tbody tr")].map(tr => ({
       codigo: tr.querySelector(".ab-r-codigo").value,
@@ -435,7 +641,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       codigoCAEAgricola: document.getElementById("anexoBCaeAgricola").value || undefined,
       estabelecimentoEstavel: document.getElementById("anexoBEstabelecimentoEstavel").checked,
       rendimentosBrutos,
-      contribuicoesSS: document.getElementById("anexoBContribuicoesSS").value || 0,
+      quadro07: lerQuadro07AnexoB(),
+      quadro17: lerQuadro17AnexoB(),
       categoriaA: {
         unicaEntidade: document.getElementById("anexoBUnicaEntidade").checked,
         optaRegrasCategoriaA: document.getElementById("anexoBOptaCategoriaA").checked
@@ -638,6 +845,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   function temAtividadeAnexoB(anexoB) {
     return !!(dadosPreservados.anexoBAtivo || anexoB.regimeSimplificado || anexoB.atoIsolado ||
       anexoB.naturezaProfComInd || anexoB.naturezaAgricola || anexoB.rendimentosBrutos.length ||
+      anexoB.quadro07 || anexoB.quadro17 ||
       Object.keys(dadosPreservados.anexoBPassthrough || {}).length);
   }
 
@@ -721,7 +929,6 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("anexoBCaeProf").value = "";
       document.getElementById("anexoBCaeAgricola").value = "";
       document.getElementById("anexoBEstabelecimentoEstavel").checked = false;
-      document.getElementById("anexoBContribuicoesSS").value = "";
       document.getElementById("anexoBUnicaEntidade").checked = false;
       document.getElementById("anexoBOptaCategoriaA").checked = false;
       document.getElementById("anexoBRendimentosSujeitos").value = "";
@@ -729,6 +936,20 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("anexoBPagamentosConta").value = "";
       document.querySelector("#tabelaAnexoBRendimentos tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoBEntidadesRetencao tbody").innerHTML = "";
+      document.querySelectorAll(".ab7-desp").forEach(input => { input.value = ""; });
+      document.querySelector("#tabelaAnexoB07EntidadesSS tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoB07Seguros tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoB07Predios tbody").innerHTML = "";
+      document.getElementById("anexoB07C781").value = "";
+      document.getElementById("anexoB17001").value = "";
+      document.getElementById("anexoB17002").value = "";
+      document.querySelector("#tabelaAnexoB17Entidades tbody").innerHTML = "";
+      document.getElementById("anexoB17OptaAlternativa").checked = false;
+      document.getElementById("anexoB17051").value = "";
+      document.getElementById("anexoB17052").value = "";
+      document.getElementById("anexoB17053").value = "";
+      document.getElementById("anexoB17054").value = "";
+      document.querySelector("#tabelaAnexoB17Rendas tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHIsentos tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHPropInt tbody").innerHTML = "";
@@ -775,7 +996,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
         "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
-        "estabelecimentoEstavel", "contribuicoesSS", "rendimentosBrutos", "categoriaA", "retencoes"
+        "estabelecimentoEstavel", "rendimentosBrutos", "categoriaA", "retencoes",
+        "quadro07", "quadro17"
       ];
       let anexoBExtrasQ03 = {};
 
@@ -790,7 +1012,6 @@ indicares, assume-se o escalão mais baixo.</small></p>
         document.getElementById("anexoBCaeProf").value = b.codigoCAEProf || "";
         document.getElementById("anexoBCaeAgricola").value = b.codigoCAEAgricola || "";
         document.getElementById("anexoBEstabelecimentoEstavel").checked = !!b.estabelecimentoEstavel;
-        document.getElementById("anexoBContribuicoesSS").value = b.contribuicoesSS || "";
 
         (b.rendimentosBrutos || []).forEach(r => {
           adicionarLinhaAnexoBRendimento();
@@ -798,6 +1019,66 @@ indicares, assume-se o escalão mais baixo.</small></p>
           tr.querySelector(".ab-r-codigo").value = r.codigo;
           tr.querySelector(".ab-r-valor").value = r.valor;
         });
+
+        if (b.quadro07) {
+          const q7 = b.quadro07;
+          Object.entries(q7.despesas || {}).forEach(([campo, valor]) => {
+            const input = document.querySelector(`.ab7-desp[data-campo="${campo}"]`);
+            if (input) input.value = valor;
+          });
+          (q7.entidadesSS || []).forEach(e => {
+            adicionarLinhaAnexoB07EntidadeSS();
+            const tr = document.querySelector("#tabelaAnexoB07EntidadesSS tbody tr:last-child");
+            tr.querySelector(".ab07b-nif").value = e.nif || "";
+            tr.querySelector(".ab07b-valor").value = e.valor || "";
+          });
+          (q7.segurosDesgasteRapido || []).forEach(s => {
+            adicionarLinhaAnexoB07Seguro();
+            const tr = document.querySelector("#tabelaAnexoB07Seguros tbody tr:last-child");
+            tr.querySelector(".ab07c-profissao").value = s.profissaoCodigo || "";
+            tr.querySelector(".ab07c-valor").value = s.valor || "";
+            tr.querySelector(".ab07c-nifpt").value = s.nifPortugues || "";
+            tr.querySelector(".ab07c-pais").value = s.pais || "";
+            tr.querySelector(".ab07c-numfiscal").value = s.numeroFiscalUE || "";
+          });
+          (q7.prediosArt41 || []).forEach(p => {
+            adicionarLinhaAnexoB07Predio();
+            const tr = document.querySelector("#tabelaAnexoB07Predios tbody tr:last-child");
+            tr.querySelector(".ab07d-freguesia").value = p.freguesia || "";
+            if (p.tipo) tr.querySelector(".ab07d-tipo").value = p.tipo;
+            tr.querySelector(".ab07d-artigo").value = p.artigo || "";
+            tr.querySelector(".ab07d-fraccao").value = p.fraccao || "";
+            tr.querySelector(".ab07d-quota").value = p.quotaParte || "";
+            tr.querySelector(".ab07d-valorpci").value = p.valorPCI || "";
+            tr.querySelector(".ab07d-valorasp").value = p.valorASP || "";
+          });
+          document.getElementById("anexoB07C781").value = q7.anosSilvicolasPlurianual || "";
+        }
+
+        if (b.quadro17) {
+          const q17 = b.quadro17;
+          document.getElementById("anexoB17001").value = q17.contribuicoesSS || "";
+          document.getElementById("anexoB17002").value = q17.importacoesIntracomunitarias || "";
+          (q17.entidadesSS || []).forEach(e => {
+            adicionarLinhaAnexoB17Entidade();
+            const tr = document.querySelector("#tabelaAnexoB17Entidades tbody tr:last-child");
+            tr.querySelector(".ab17-e-nif").value = e.nif || "";
+            tr.querySelector(".ab17-e-valor").value = e.valor || "";
+          });
+          document.getElementById("anexoB17OptaAlternativa").checked = !!q17.optaDespesasAlternativa;
+          document.getElementById("anexoB17051").value = q17.despesasPessoal || "";
+          document.getElementById("anexoB17052").value = q17.rendasImoveis || "";
+          document.getElementById("anexoB17053").value = q17.outrasDespesasParcial || "";
+          document.getElementById("anexoB17054").value = q17.outrasDespesasTotal || "";
+          (q17.rendasImoveisAfetas || []).forEach(r => {
+            adicionarLinhaAnexoB17Renda();
+            const tr = document.querySelector("#tabelaAnexoB17Rendas tbody tr:last-child");
+            tr.querySelector(".ab17d-nif").value = r.nif || "";
+            tr.querySelector(".ab17d-valor").value = r.valor || "";
+            tr.querySelector(".ab17d-parcial").checked = !!r.afetacaoParcial;
+            tr.querySelector(".ab17d-total").checked = !!r.afetacaoTotal;
+          });
+        }
 
         if (b.categoriaA) {
           document.getElementById("anexoBUnicaEntidade").checked = !!b.categoriaA.unicaEntidade;

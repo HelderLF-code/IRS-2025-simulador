@@ -4,8 +4,8 @@
 // tributação conjunta + dependente com deficiência em guarda conjunta).
 //
 // Partes ainda não mapeadas (ficam com a estrutura "esqueleto" tal como observada nos exemplos,
-// até serem fornecidos exemplos preenchidos): Rosto Quadro07/08/10/11/13, e os conteúdos dos
-// Anexos B/E/G/G1/H/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
+// até serem fornecidos exemplos preenchidos): Rosto Quadro07/08B/11/13, Anexo B Quadros
+// 8-16/18, e os conteúdos dos Anexos E/G/G1/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
 //
 // Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
 // com duplo-clique, sem servidor. Expõe-se em window.IRSXml.
@@ -205,6 +205,113 @@ const ANEXOB_CODIGOS_4A = [401, 419, 420, 421, 402, 415, 416, 417, 403, 404, 422
 const ANEXOB_CODIGOS_4B = [451, 452, 459, 453, 454, 455, 456, 457, 460, 458];
 const ANEXOB_CODIGOS_4C = [481, 482];
 
+// Quadro 7A do Anexo B (encargos em caso de opção pela categoria A, ou ato isolado
+// > €200.000): coluna esquerda = rendimentos profissionais/comerciais/industriais
+// (soma em SomaC01), coluna direita = rendimentos agrícolas/silvícolas/pecuários
+// (soma em SomaC02). Nomes de campo e ordem confirmados contra um exemplo real.
+const ANEXOB_Q07_CAMPOS_PROF = [701, 703, 705, 707, 709, 711, 713, 715, 717, 719, 721];
+const ANEXOB_Q07_CAMPOS_AGRICOLA = [702, 704, 706, 708, 710, 712, 714, 716, 718, 720, 722];
+const ANEXOB_Q07_TODOS = [701, 702, 703, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722];
+
+function moeda(v) {
+  return Number(v || 0).toFixed(2);
+}
+
+// Nomes de campo confirmados contra um exemplo real (todos os campos 701-722, mesmo a
+// 0,00, são emitidos assim que o quadro está "ativo" — não há omissão condicional como
+// no quadro 4).
+function buildQuadro07(q07) {
+  if (!q07) return `<Quadro07/>`;
+  const despesas = q07.despesas || {};
+  const somaProf = ANEXOB_Q07_CAMPOS_PROF.reduce((acc, c) => acc + (Number(despesas[c]) || 0), 0);
+  const somaAgricola = ANEXOB_Q07_CAMPOS_AGRICOLA.reduce((acc, c) => acc + (Number(despesas[c]) || 0), 0);
+
+  const entidadesSS = listaComLinhas("AnexoBq07BT01", (q07.entidadesSS || []).map(e => ({
+    NIFEntidades: e.nif, Valor: moeda(e.valor)
+  })));
+  const seguros = listaComLinhas("AnexoBq07CT01", (q07.segurosDesgasteRapido || []).map(s => ({
+    ProfissaoCodigo: s.profissaoCodigo, Valor: moeda(s.valor), NIFPortugues: s.nifPortugues,
+    Pais: s.pais, NumeroFiscalUE: s.numeroFiscalUE
+  })));
+  const predios = listaComLinhas("AnexoBq07DT01", (q07.prediosArt41 || []).map(p => ({
+    Freguesia: p.freguesia, Tipo: p.tipo, Artigo: p.artigo, Fraccao: p.fraccao, QuotaParte: p.quotaParte,
+    ValorRendimentoPCI: moeda(p.valorPCI), ValorRendimentoASP: moeda(p.valorASP)
+  })));
+
+  return `<Quadro07>` +
+    ANEXOB_Q07_TODOS.map(c => el(`AnexoBq07C${c}`, moeda(despesas[c]))).join("") +
+    el("AnexoBq07SomaC01", moeda(somaProf)) +
+    el("AnexoBq07SomaC02", moeda(somaAgricola)) +
+    entidadesSS + seguros + predios +
+    (q07.anosSilvicolasPlurianual ? el("AnexoBq07C781", q07.anosSilvicolasPlurianual) : "") +
+    `</Quadro07>`;
+}
+
+// Quadro 17 do Anexo B (despesas e encargos, art.º 31.º n.ºs 2 e 13 do CIRS): 17A/17B
+// confirmados contra um exemplo real. 17C (declarar despesas com pessoal/rendas/outras em
+// alternativa aos valores comunicados à AT, campos 17051-17054 e respetiva SOMA) e 17D
+// (rendas de imóveis afetas à atividade) não apareciam preenchidos nesse exemplo (a opção
+// 17C estava em "Não") — nomes de campo extrapolados do mesmo padrão do 17A/17B, por
+// confirmar quando se tiver um exemplo com a opção "Sim".
+function buildQuadro17(q17) {
+  if (!q17) return `<Quadro17/>`;
+
+  const temA = q17.contribuicoesSS !== undefined && q17.contribuicoesSS !== "";
+  const temB = q17.importacoesIntracomunitarias !== undefined && q17.importacoesIntracomunitarias !== "";
+  const soma17A = (temA ? Number(q17.contribuicoesSS) : 0) + (temB ? Number(q17.importacoesIntracomunitarias) : 0);
+
+  const entidadesSS = listaComLinhas("AnexoBq17BT01", (q17.entidadesSS || []).map(e => ({
+    CampoQ17A: "17001", NIF: e.nif, Valor: moeda(e.valor)
+  })));
+
+  const optaAlternativa = !!q17.optaDespesasAlternativa;
+  const camposAlternativa = optaAlternativa
+    ? el("AnexoBq17C17051", moeda(q17.despesasPessoal)) +
+      el("AnexoBq17C17052", moeda(q17.rendasImoveis)) +
+      el("AnexoBq17C17053", moeda(q17.outrasDespesasParcial)) +
+      el("AnexoBq17C17054", moeda(q17.outrasDespesasTotal)) +
+      el("AnexoBq17SomaC02", moeda(
+        (Number(q17.despesasPessoal) || 0) + (Number(q17.rendasImoveis) || 0) +
+        (Number(q17.outrasDespesasParcial) || 0) + (Number(q17.outrasDespesasTotal) || 0)
+      ))
+    : "";
+
+  const rendasAfetas = listaComLinhas("AnexoBq17DT01", (q17.rendasImoveisAfetas || []).map(r => ({
+    NIF: r.nif, Valor: moeda(r.valor),
+    AfetacaoParcial: r.afetacaoParcial ? "true" : undefined,
+    AfetacaoTotal: r.afetacaoTotal ? "true" : undefined
+  })));
+
+  return `<Quadro17>` +
+    (temA ? el("AnexoBq17C17001", moeda(q17.contribuicoesSS)) : "") +
+    (temB ? el("AnexoBq17C17002", moeda(q17.importacoesIntracomunitarias)) : "") +
+    el("AnexoBq17SomaC01", moeda(soma17A)) +
+    entidadesSS +
+    el("AnexoBq17B01", optaAlternativa ? "S" : "N") +
+    camposAlternativa +
+    rendasAfetas +
+    `</Quadro17>`;
+}
+
+function temDadosQuadro07(q07) {
+  if (!q07) return false;
+  const despesas = q07.despesas || {};
+  return Object.values(despesas).some(v => Number(v) > 0) ||
+    (q07.entidadesSS && q07.entidadesSS.length > 0) ||
+    (q07.segurosDesgasteRapido && q07.segurosDesgasteRapido.length > 0) ||
+    (q07.prediosArt41 && q07.prediosArt41.length > 0) ||
+    !!q07.anosSilvicolasPlurianual;
+}
+
+function temDadosQuadro17(q17) {
+  if (!q17) return false;
+  return q17.contribuicoesSS !== undefined && q17.contribuicoesSS !== "" ||
+    q17.importacoesIntracomunitarias !== undefined && q17.importacoesIntracomunitarias !== "" ||
+    (q17.entidadesSS && q17.entidadesSS.length > 0) ||
+    !!q17.optaDespesasAlternativa ||
+    (q17.rendasImoveisAfetas && q17.rendasImoveisAfetas.length > 0);
+}
+
 // AnexoB/J/L/SS têm atributo id=NIF e repetem-se por sujeito passivo quando ambos têm
 // atividade/rendimentos próprios nesse anexo. Nesta fase ainda não temos exemplo preenchido
 // nem confirmação de como fica o segundo anexo repetido, por isso emite-se apenas o esqueleto
@@ -286,10 +393,18 @@ function buildAnexoB(model) {
       `</Quadro06>`
     : `<Quadro06/>`;
 
-  const quadrosRaros = Array.from({ length: 12 }, (_, i) => {
-    const numero = String(i + 7).padStart(2, "0");
+  const quadro07 = temDadosQuadro07(b.quadro07)
+    ? buildQuadro07(b.quadro07)
+    : (pass.Quadro07 || `<Quadro07/>`);
+  const quadro17 = temDadosQuadro17(b.quadro17)
+    ? buildQuadro17(b.quadro17)
+    : (pass.Quadro17 || `<Quadro17/>`);
+
+  const quadros08a16 = [8, 9, 10, 11, 12, 13, 14, 15, 16].map(i => {
+    const numero = String(i).padStart(2, "0");
     return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
   }).join("");
+  const quadro18 = pass.Quadro18 || `<Quadro18/>`;
 
   return `<AnexoB id="${esc(nifA)}">` +
     `<Quadro00/>` +
@@ -299,7 +414,10 @@ function buildAnexoB(model) {
     quadro04 +
     quadro05 +
     quadro06 +
-    quadrosRaros +
+    quadro07 +
+    quadros08a16 +
+    quadro17 +
+    quadro18 +
     `</AnexoB>`;
 }
 

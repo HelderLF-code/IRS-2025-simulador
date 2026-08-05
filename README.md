@@ -40,9 +40,14 @@ regenerar o `simulador-irs.html`.
   conta, outras deduções, seguros de desgaste rápido, incentivos fiscais, ex-residentes,
   IRS Jovem, estudantes dependentes).
 - Anexo B: Quadros 1 (regime), 3 (titular/atividade), 4 (rendimentos brutos, todos os
-  códigos 4A/4B/4C), 5 (regras da categoria A) e 6 (retenções na fonte/pagamentos por
-  conta). Quadros 7 a 18 (alienação de imóveis, mais-valias de partes sociais, atividade
-  agrícola plurianual, alojamento local, etc.) ainda sem interface própria.
+  códigos 4A/4B/4C), 5 (regras da categoria A), 6 (retenções na fonte/pagamentos por
+  conta), 7 (encargos em caso de opção pela categoria A ou ato isolado > €200.000 — nomes
+  de campo confirmados num exemplo real; o efeito no cálculo da estimativa **ainda não
+  está implementado**, só a captura/exportação dos dados) e 17 (despesas e encargos para
+  efeitos do mínimo de despesas da categoria B — 17A/17B confirmados num exemplo real,
+  17C/17D extrapolados do mesmo padrão, por confirmar). Quadros 8 a 16 e 18 (alienação de
+  imóveis, mais-valias de partes sociais, atividade agrícola plurianual, alojamento local,
+  incêndios florestais, etc.) ainda sem interface própria.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -58,9 +63,15 @@ regenerar o `simulador-irs.html`.
   (deficiência) e 607 (reabilitação urbana), com limites por idade nos códigos 601/602 —
   e deduções à coleta por despesas do e-fatura (art.º 78.º e seguintes do CIRS — gerais e
   familiares, saúde, educação, imóveis, exigência de fatura), cujos totais declarados
-  também contam para o mínimo de despesas da Categoria B. Os restantes códigos do Quadro
-  6B (mecenato científico/social/cultural/ambiental, donativos a igrejas, etc.) ficam
-  registados no XML mas fora do cálculo.
+  também contam para o mínimo de despesas da Categoria B. As despesas comprovadas para
+  esse mínimo somam ainda as contribuições para a Segurança Social e as importações/
+  aquisições intracomunitárias relacionadas com a atividade (Anexo B, Quadro 17A); se o
+  titular optar por declarar despesas com pessoal/rendas de imóveis/outras despesas em
+  alternativa ao e-fatura (Quadro 17C), só essas contam (não se somam ao e-fatura). Os
+  restantes códigos do Quadro 6B do Anexo H (mecenato científico/social/cultural/
+  ambiental, donativos a igrejas, etc.) ficam registados no XML mas fora do cálculo — tal
+  como a opção pelas regras da categoria A no Anexo B (Quadro 5/7), cujos dados já são
+  capturados e exportados mas ainda não têm efeito na estimativa calculada.
 - Exportação XML validada byte-a-byte contra 4 exemplos reais fornecidos (esqueleto vazio,
   sujeito passivo único, casal com tributação conjunta e dependente em guarda conjunta,
   e uma declaração completa com todos os anexos preenchidos).
@@ -79,23 +90,26 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos E, G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
-Quadros 7-18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
+Quadros 8-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
 declaração que já tenha dados nessas secções, esses dados são preservados tal como
 estavam (mas ainda não podem ser vistos/editados na interface) e mantidos ao exportar de
 novo — para não haver perda de informação.
 
 ## Por confirmar / próximos passos
 
-1. **Rosto Quadro 8/10** — implementados com base no significado das instruções de
-   preenchimento, mas os nomes exatos dos campos XML (`Q08B01`/`Q10B01`) ainda não foram
-   confirmados contra um exemplo real preenchido (por analogia com o Quadro 4, já
-   validado). **Rosto Quadros 7, 11, 13** e **Quadro 8B** (não residentes) — significado já
-   conhecido (instruções recebidas), mas sem interface própria; precisam de um exemplo XML
-   preenchido para confirmar os nomes dos campos antes de implementar.
+1. **Rosto Quadros 7, 8B, 11, 13** — significado e nomes de campo já confirmados num
+   exemplo real (ver comentários em `src/xml/parse.js`), mas ainda sem interface própria.
 2. **Anexo B/J/L/SS com 2 sujeitos passivos** — confirmar como o segundo anexo se repete
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
-3. **Anexo B, Quadros 7-18** — encargos, alienação de imóveis, mais-valias de partes
-   sociais, atividade agrícola plurianual, alojamento local, etc.
+3. **Anexo B, Quadro 17C/17D** — nomes de campo (`AnexoBq17C17051-17054`, `AnexoBq17DT01`)
+   extrapolados do padrão confirmado no 17A/17B, não validados contra um exemplo com a
+   opção "declarar despesas em alternativa" preenchida. **Anexo B, Quadro 7 → efeito no
+   cálculo**: os dados da opção pelas regras da categoria A (despesas do Quadro 7A, limites
+   dos artigos 25.º/27.º do CIRS) já são capturados e exportados, mas a estimativa continua
+   sempre a aplicar os coeficientes do regime simplificado — falta implementar este cálculo
+   alternativo. **Anexo B, Quadros 8-16 e 18** — alienação de imóveis, mais-valias de
+   partes sociais, atividade agrícola plurianual, alojamento local, incêndios florestais,
+   etc. — ainda sem interface própria.
 4. **Anexo H, Quadro 6B** — calculados os códigos 601 a 607; os de mecenato (609 em
    diante — científico/social/cultural/ambiental/donativos, dezenas de códigos com
    condições de elegibilidade próprias) continuam só registados no XML, sem entrar no
