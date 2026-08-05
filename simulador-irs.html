@@ -61,6 +61,7 @@
     <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Rosto</button>
     <button type="button" data-secao="anexoA" onclick="mostrarSecao('anexoA')">Anexo A</button>
     <button type="button" data-secao="anexoB" onclick="mostrarSecao('anexoB')">Anexo B</button>
+    <button type="button" data-secao="anexoE" onclick="mostrarSecao('anexoE')">Anexo E</button>
     <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
     <button type="button" data-secao="anexoH" onclick="mostrarSecao('anexoH')">Anexo H</button>
   </nav>
@@ -388,6 +389,62 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
     </select>
   </div>
 </div>
+</div>
+
+<div class="painel" id="painel-anexoE">
+<h2>Anexo E — Rendimentos de Capitais</h2>
+<p class="aviso-topo">
+  Nomes de campo confirmados contra um exemplo real. Não afeta ainda o cálculo da
+  estimativa — o motor de cálculo atual cobre as Categorias A e B, não a Categoria E.
+</p>
+<datalist id="listaCodigosAnexoE">
+  <option value="E01">E01 — Uso/cedência de equipamento; propriedade intelectual/industrial não isenta</option>
+  <option value="E10">E10 — Lucros e reservas colocados à disposição, adiantamentos por conta de lucros</option>
+  <option value="E20">E20 — Juros (depósitos, títulos de dívida, suprimentos, etc.)</option>
+  <option value="E21">E21 — Rendimentos de operações com criptoativos</option>
+  <option value="E30">E30 — Rendimentos distribuídos de fundos/sociedades de investimento (regime pré-2015)</option>
+  <option value="E31">E31 — Rendimentos distribuídos de OICVM (regime pós-2015)</option>
+  <option value="E32">E32 — Rendimentos distribuídos de fundos de investimento alternativo/imobiliário</option>
+  <option value="E33">E33 — Lucros brutos — sociedades com entradas de capital em dinheiro</option>
+  <option value="E34">E34 — Rendimentos de gestão florestal (EGF/UGF)</option>
+  <option value="E40">E40 — Rendimentos dos baldios</option>
+</datalist>
+
+<h3>Rendimentos sujeitos a taxas especiais — art.º 72.º CIRS (Quadro 4A)</h3>
+<table id="tabelaAnexoE4A">
+  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoE4A()">+ Adicionar rendimento</button>
+
+<div class="row">
+  <div><label><input type="checkbox" id="anexoEOptaEnglobamento"> Opta pelo englobamento dos rendimentos do Quadro 4A</label></div>
+</div>
+
+<h3>Rendimentos sujeitos a taxas liberatórias — art.º 71.º CIRS (Quadro 4B)</h3>
+<p class="aviso-topo">Só relevante se optou pelo englobamento acima.</p>
+<table id="tabelaAnexoE4B">
+  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoE4B()">+ Adicionar rendimento</button>
+
+<h3>Rendimentos de anos anteriores incluídos nos Quadros 4A/4B (Quadro 5)</h3>
+<p class="aviso-topo">
+  Referem-se a uma linha do Quadro 4A ou 4B já preenchida acima (indica-se "Q4A" ou "Q4B" e
+  o número da linha nesse quadro).
+</p>
+<table id="tabelaAnexoE5A">
+  <thead><tr><th>Quadro (Q4A/Q4B)</th><th>N.º linha</th><th>Ano rendimento</th><th>Rendimento (€)</th><th>N.º anos</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoE5A()">+ Adicionar (5A — regime n.º 1 art.º 74.º)</button>
+
+<table id="tabelaAnexoE5B">
+  <thead><tr><th>Quadro (Q4A/Q4B)</th><th>N.º linha</th><th>Ano rendimento</th><th>Rendimento (€)</th><th>Retenções na fonte (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoE5B()">+ Adicionar (5B — opção regime n.º 3 art.º 74.º)</button>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -886,7 +943,7 @@ if (typeof module !== "undefined" && module.exports) {
 //
 // Partes ainda não mapeadas (ficam com a estrutura "esqueleto" tal como observada nos exemplos,
 // até serem fornecidos exemplos preenchidos): Rosto Quadro07/08B/11/13, Anexo B Quadros
-// 8-16/18, e os conteúdos dos Anexos E/G/G1/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
+// 11-16/18, e os conteúdos dos Anexos G/G1/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
 //
 // Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
 // com duplo-clique, sem servidor. Expõe-se em window.IRSXml.
@@ -1063,6 +1120,62 @@ function buildAnexoA(model) {
     `<Quadro05>${el("AnexoAq05AT01")}${el("AnexoAq05BT01")}</Quadro05>` +
     `<Quadro06>${el("AnexoAq06T01")}</Quadro06>` +
     `</AnexoA>`;
+}
+
+// Anexo E (rendimentos de capitais — categoria E): nomes de campo confirmados contra um
+// exemplo real. Quadro4A (taxas especiais, art.º 72.º CIRS), Quadro4B (taxas liberatórias,
+// art.º 71.º CIRS, só relevante se optar pelo englobamento) e Quadro5A/5B (rendimentos de
+// anos anteriores, art.º 74.º CIRS). Não afeta ainda o cálculo da estimativa (rendimentos
+// de capitais não estão cobertos pelo motor de cálculo atual, focado nas Categorias A/B).
+function buildAnexoE(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const e = model.anexoE || {};
+  const quadro03 = tributacaoConjunta
+    ? `<Quadro03>${el("AnexoEq03C01", nifA)}${el("AnexoEq03C02", nifB)}</Quadro03>`
+    : `<Quadro03>${el("AnexoEq03C01", nifA)}</Quadro03>`;
+
+  const taxasEspeciais = e.rendimentosTaxasEspeciais || [];
+  const taxasLiberatorias = e.rendimentosTaxasLiberatorias || [];
+  const somaTaxasEspeciais = taxasEspeciais.reduce((a, r) => a + (Number(r.rendimento) || 0), 0);
+  const somaTaxasLiberatoriasRend = taxasLiberatorias.reduce((a, r) => a + (Number(r.rendimento) || 0), 0);
+  const somaTaxasLiberatoriasRet = taxasLiberatorias.reduce((a, r) => a + (Number(r.retencao) || 0), 0);
+
+  const temQuadro04 = taxasEspeciais.length || taxasLiberatorias.length || !!e.optaEnglobamento;
+  const quadro04 = temQuadro04
+    ? `<Quadro04>` +
+      listaComLinhas("AnexoEq04AT01", taxasEspeciais.map((r, i) => ({
+        NLinha: r.nlinha || (401 + i), NIF: r.nif, CodRendimentos: r.codigo, Titular: r.titular,
+        Rendimentos: moeda(r.rendimento)
+      }))) +
+      (taxasEspeciais.length ? el("AnexoEq04AT01SomaC01", moeda(somaTaxasEspeciais)) : "") +
+      el("AnexoEq04B01", e.optaEnglobamento ? "S" : "N") +
+      listaComLinhas("AnexoEq04BT01", taxasLiberatorias.map((r, i) => ({
+        NLinha: r.nlinha || (451 + i), NIF: r.nif, CodRendimentos: r.codigo, Titular: r.titular,
+        Rendimentos: moeda(r.rendimento), Retencoes: moeda(r.retencao)
+      }))) +
+      (taxasLiberatorias.length ? el("AnexoEq04BT01SomaC01", moeda(somaTaxasLiberatoriasRend)) + el("AnexoEq04BT01SomaC02", moeda(somaTaxasLiberatoriasRet)) : "") +
+      `</Quadro04>`
+    : `<Quadro04/>`;
+
+  const anosAnteriores5A = e.rendimentosAnosAnteriores5A || [];
+  const anosAnteriores5B = e.rendimentosAnosAnteriores5B || [];
+  const quadro05 = (anosAnteriores5A.length || anosAnteriores5B.length)
+    ? `<Quadro05>` +
+      listaComLinhas("AnexoEq05AT01", anosAnteriores5A.map(r => ({
+        Quadro: r.quadro, NLinha: r.nlinha, AnoRendimentos: r.anoRendimentos, Rendimento: moeda(r.rendimento), Nanos: r.nanos
+      }))) +
+      listaComLinhas("AnexoEq05BT01", anosAnteriores5B.map(r => ({
+        Quadro: r.quadro, NLinha: r.nlinha, AnoRendimentos: r.anoRendimentos, Rendimento: moeda(r.rendimento), RetencoesFonte: moeda(r.retencoesFonte)
+      }))) +
+      `</Quadro05>`
+    : `<Quadro05/>`;
+
+  return `<AnexoE>` +
+    `<Quadro02>${el("AnexoEq02C01", ano)}</Quadro02>` +
+    quadro03 +
+    quadro04 +
+    quadro05 +
+    `</AnexoE>`;
 }
 
 // Anexos ainda não mapeados em detalhe (Fase 3+): emite apenas o cabeçalho ano+NIF,
@@ -1542,7 +1655,7 @@ function buildModelo3XML(model) {
   if (model.incluirAnexosVazios !== false) {
     const pass = model.anexosPassthrough || {};
     partes.push(buildAnexoB(model));
-    partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
+    partes.push(buildAnexoE(model));
     partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
     partes.push(buildAnexoH(model));
@@ -1736,13 +1849,39 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoE", "AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
     if (el) passthrough[nome] = serializar(el);
   });
   return passthrough;
+}
+
+// Anexo E (rendimentos de capitais): nomes de campo confirmados contra um exemplo real.
+function parseAnexoE(anexoE) {
+  if (!anexoE) return { anexoE: undefined };
+
+  const q04 = filho(anexoE, "Quadro04");
+  const q05 = filho(anexoE, "Quadro05");
+
+  const e = {};
+  e.rendimentosTaxasEspeciais = parseLinhasGenerico(filho(q04, "AnexoEq04AT01")).map(l => ({
+    nlinha: l.NLinha, nif: l.NIF, codigo: l.CodRendimentos, titular: l.Titular, rendimento: l.Rendimentos
+  }));
+  e.optaEnglobamento = texto(q04, "AnexoEq04B01") === "S";
+  e.rendimentosTaxasLiberatorias = parseLinhasGenerico(filho(q04, "AnexoEq04BT01")).map(l => ({
+    nlinha: l.NLinha, nif: l.NIF, codigo: l.CodRendimentos, titular: l.Titular, rendimento: l.Rendimentos, retencao: l.Retencoes
+  }));
+
+  e.rendimentosAnosAnteriores5A = parseLinhasGenerico(filho(q05, "AnexoEq05AT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, nanos: l.Nanos
+  }));
+  e.rendimentosAnosAnteriores5B = parseLinhasGenerico(filho(q05, "AnexoEq05BT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, retencoesFonte: l.RetencoesFonte
+  }));
+
+  return { anexoE: e };
 }
 
 // Códigos dos quadros 4A/4B/4C do Anexo B, pela ordem em que aparecem no formulário em papel.
@@ -2007,11 +2146,13 @@ function parseModelo3XML(xmlTexto) {
   const rosto = filho(raiz, "Rosto");
   const anexoA = filho(raiz, "AnexoA");
   const anexoB = filho(raiz, "AnexoB");
+  const anexoE = filho(raiz, "AnexoE");
   const anexoH = filho(raiz, "AnexoH");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
   const { anexoB: anexoBModel, anexoBPassthrough, anexoBTemDados } = parseAnexoB(anexoB);
+  const { anexoE: anexoEModel } = parseAnexoE(anexoE);
   const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
@@ -2022,6 +2163,7 @@ function parseModelo3XML(xmlTexto) {
     anexoB: anexoBModel,
     anexoBPassthrough,
     anexoBTemDados,
+    anexoE: anexoEModel,
     anexoH: anexoHModel,
     anexoHPassthrough,
     rostoPassthrough,
@@ -2685,6 +2827,94 @@ if (typeof module !== "undefined" && module.exports) {
     tbody.appendChild(tr);
   };
 
+  window.adicionarLinhaAnexoE4A = function () {
+    const tbody = document.querySelector("#tabelaAnexoE4A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ae4a-nif" size="10"></td>
+      <td><input class="ae4a-codigo" size="5" list="listaCodigosAnexoE"></td>
+      <td><select class="ae4a-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ae4a-rendimento" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoE4B = function () {
+    const tbody = document.querySelector("#tabelaAnexoE4B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ae4b-nif" size="10"></td>
+      <td><input class="ae4b-codigo" size="5" list="listaCodigosAnexoE"></td>
+      <td><select class="ae4b-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ae4b-rendimento" type="number" step="0.01"></td>
+      <td><input class="ae4b-retencao" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoE5A = function () {
+    const tbody = document.querySelector("#tabelaAnexoE5A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ae5a-quadro"><option value="Q4A">Q4A</option><option value="Q4B">Q4B</option></select></td>
+      <td><input class="ae5a-nlinha" size="6"></td>
+      <td><input class="ae5a-ano" type="number" size="6"></td>
+      <td><input class="ae5a-rendimento" type="number" step="0.01"></td>
+      <td><input class="ae5a-nanos" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoE5B = function () {
+    const tbody = document.querySelector("#tabelaAnexoE5B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ae5b-quadro"><option value="Q4A">Q4A</option><option value="Q4B">Q4B</option></select></td>
+      <td><input class="ae5b-nlinha" size="6"></td>
+      <td><input class="ae5b-ano" type="number" size="6"></td>
+      <td><input class="ae5b-rendimento" type="number" step="0.01"></td>
+      <td><input class="ae5b-retencoes" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerAnexoE() {
+    const rendimentosTaxasEspeciais = [...document.querySelectorAll("#tabelaAnexoE4A tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ae4a-nif").value,
+      codigo: tr.querySelector(".ae4a-codigo").value,
+      titular: tr.querySelector(".ae4a-titular").value,
+      rendimento: tr.querySelector(".ae4a-rendimento").value || 0
+    }));
+    const rendimentosTaxasLiberatorias = [...document.querySelectorAll("#tabelaAnexoE4B tbody tr")].map(tr => ({
+      nif: tr.querySelector(".ae4b-nif").value,
+      codigo: tr.querySelector(".ae4b-codigo").value,
+      titular: tr.querySelector(".ae4b-titular").value,
+      rendimento: tr.querySelector(".ae4b-rendimento").value || 0,
+      retencao: tr.querySelector(".ae4b-retencao").value || 0
+    }));
+    const rendimentosAnosAnteriores5A = [...document.querySelectorAll("#tabelaAnexoE5A tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".ae5a-quadro").value,
+      nlinha: tr.querySelector(".ae5a-nlinha").value,
+      anoRendimentos: tr.querySelector(".ae5a-ano").value,
+      rendimento: tr.querySelector(".ae5a-rendimento").value || 0,
+      nanos: tr.querySelector(".ae5a-nanos").value || undefined
+    }));
+    const rendimentosAnosAnteriores5B = [...document.querySelectorAll("#tabelaAnexoE5B tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".ae5b-quadro").value,
+      nlinha: tr.querySelector(".ae5b-nlinha").value,
+      anoRendimentos: tr.querySelector(".ae5b-ano").value,
+      rendimento: tr.querySelector(".ae5b-rendimento").value || 0,
+      retencoesFonte: tr.querySelector(".ae5b-retencoes").value || 0
+    }));
+    const optaEnglobamento = document.getElementById("anexoEOptaEnglobamento").checked;
+
+    return { rendimentosTaxasEspeciais, optaEnglobamento, rendimentosTaxasLiberatorias, rendimentosAnosAnteriores5A, rendimentosAnosAnteriores5B };
+  }
+
   function lerAnexoH() {
     const pensoesAlimentos = [...document.querySelectorAll("#tabelaAnexoHPensoes tbody tr")].map(tr => ({
       sujeitoPassivo: tr.querySelector(".ah-p-sp").value,
@@ -2830,6 +3060,7 @@ if (typeof module !== "undefined" && module.exports) {
       anexoA: lerAnexoA(),
       anexoB: temAtividadeAnexoB(anexoBLido) ? anexoBLido : undefined,
       anexoBPassthrough: dadosPreservados.anexoBPassthrough,
+      anexoE: lerAnexoE(),
       anexoH: lerAnexoH(),
       anexoHPassthrough: dadosPreservados.anexoHPassthrough,
       rostoPassthrough: dadosPreservados.rostoPassthrough,
@@ -2942,6 +3173,52 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("anexoB17053").value = "";
       document.getElementById("anexoB17054").value = "";
       document.querySelector("#tabelaAnexoB17Rendas tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoE4A tbody").innerHTML = "";
+      document.getElementById("anexoEOptaEnglobamento").checked = false;
+      document.querySelector("#tabelaAnexoE4B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoE5A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoE5B tbody").innerHTML = "";
+
+      if (dados.anexoE) {
+        const e = dados.anexoE;
+        (e.rendimentosTaxasEspeciais || []).forEach(r => {
+          adicionarLinhaAnexoE4A();
+          const tr = document.querySelector("#tabelaAnexoE4A tbody tr:last-child");
+          tr.querySelector(".ae4a-nif").value = r.nif || "";
+          tr.querySelector(".ae4a-codigo").value = r.codigo || "";
+          if (r.titular) tr.querySelector(".ae4a-titular").value = r.titular;
+          tr.querySelector(".ae4a-rendimento").value = r.rendimento || "";
+        });
+        document.getElementById("anexoEOptaEnglobamento").checked = !!e.optaEnglobamento;
+        (e.rendimentosTaxasLiberatorias || []).forEach(r => {
+          adicionarLinhaAnexoE4B();
+          const tr = document.querySelector("#tabelaAnexoE4B tbody tr:last-child");
+          tr.querySelector(".ae4b-nif").value = r.nif || "";
+          tr.querySelector(".ae4b-codigo").value = r.codigo || "";
+          if (r.titular) tr.querySelector(".ae4b-titular").value = r.titular;
+          tr.querySelector(".ae4b-rendimento").value = r.rendimento || "";
+          tr.querySelector(".ae4b-retencao").value = r.retencao || "";
+        });
+        (e.rendimentosAnosAnteriores5A || []).forEach(r => {
+          adicionarLinhaAnexoE5A();
+          const tr = document.querySelector("#tabelaAnexoE5A tbody tr:last-child");
+          if (r.quadro) tr.querySelector(".ae5a-quadro").value = r.quadro;
+          tr.querySelector(".ae5a-nlinha").value = r.nlinha || "";
+          tr.querySelector(".ae5a-ano").value = r.anoRendimentos || "";
+          tr.querySelector(".ae5a-rendimento").value = r.rendimento || "";
+          tr.querySelector(".ae5a-nanos").value = r.nanos || "";
+        });
+        (e.rendimentosAnosAnteriores5B || []).forEach(r => {
+          adicionarLinhaAnexoE5B();
+          const tr = document.querySelector("#tabelaAnexoE5B tbody tr:last-child");
+          if (r.quadro) tr.querySelector(".ae5b-quadro").value = r.quadro;
+          tr.querySelector(".ae5b-nlinha").value = r.nlinha || "";
+          tr.querySelector(".ae5b-ano").value = r.anoRendimentos || "";
+          tr.querySelector(".ae5b-rendimento").value = r.rendimento || "";
+          tr.querySelector(".ae5b-retencoes").value = r.retencoesFonte || "";
+        });
+      }
+
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHIsentos tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHPropInt tbody").innerHTML = "";

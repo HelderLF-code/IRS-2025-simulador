@@ -167,13 +167,39 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoE", "AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
     if (el) passthrough[nome] = serializar(el);
   });
   return passthrough;
+}
+
+// Anexo E (rendimentos de capitais): nomes de campo confirmados contra um exemplo real.
+function parseAnexoE(anexoE) {
+  if (!anexoE) return { anexoE: undefined };
+
+  const q04 = filho(anexoE, "Quadro04");
+  const q05 = filho(anexoE, "Quadro05");
+
+  const e = {};
+  e.rendimentosTaxasEspeciais = parseLinhasGenerico(filho(q04, "AnexoEq04AT01")).map(l => ({
+    nlinha: l.NLinha, nif: l.NIF, codigo: l.CodRendimentos, titular: l.Titular, rendimento: l.Rendimentos
+  }));
+  e.optaEnglobamento = texto(q04, "AnexoEq04B01") === "S";
+  e.rendimentosTaxasLiberatorias = parseLinhasGenerico(filho(q04, "AnexoEq04BT01")).map(l => ({
+    nlinha: l.NLinha, nif: l.NIF, codigo: l.CodRendimentos, titular: l.Titular, rendimento: l.Rendimentos, retencao: l.Retencoes
+  }));
+
+  e.rendimentosAnosAnteriores5A = parseLinhasGenerico(filho(q05, "AnexoEq05AT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, nanos: l.Nanos
+  }));
+  e.rendimentosAnosAnteriores5B = parseLinhasGenerico(filho(q05, "AnexoEq05BT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, retencoesFonte: l.RetencoesFonte
+  }));
+
+  return { anexoE: e };
 }
 
 // Códigos dos quadros 4A/4B/4C do Anexo B, pela ordem em que aparecem no formulário em papel.
@@ -438,11 +464,13 @@ function parseModelo3XML(xmlTexto) {
   const rosto = filho(raiz, "Rosto");
   const anexoA = filho(raiz, "AnexoA");
   const anexoB = filho(raiz, "AnexoB");
+  const anexoE = filho(raiz, "AnexoE");
   const anexoH = filho(raiz, "AnexoH");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
   const { anexoB: anexoBModel, anexoBPassthrough, anexoBTemDados } = parseAnexoB(anexoB);
+  const { anexoE: anexoEModel } = parseAnexoE(anexoE);
   const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
@@ -453,6 +481,7 @@ function parseModelo3XML(xmlTexto) {
     anexoB: anexoBModel,
     anexoBPassthrough,
     anexoBTemDados,
+    anexoE: anexoEModel,
     anexoH: anexoHModel,
     anexoHPassthrough,
     rostoPassthrough,

@@ -5,7 +5,7 @@
 //
 // Partes ainda não mapeadas (ficam com a estrutura "esqueleto" tal como observada nos exemplos,
 // até serem fornecidos exemplos preenchidos): Rosto Quadro07/08B/11/13, Anexo B Quadros
-// 8-16/18, e os conteúdos dos Anexos E/G/G1/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
+// 11-16/18, e os conteúdos dos Anexos G/G1/J/L/SS (apenas o cabeçalho ano+NIF é preenchido).
 //
 // Ficheiro carregado como <script> normal (não módulo) para poder ser aberto diretamente
 // com duplo-clique, sem servidor. Expõe-se em window.IRSXml.
@@ -182,6 +182,62 @@ function buildAnexoA(model) {
     `<Quadro05>${el("AnexoAq05AT01")}${el("AnexoAq05BT01")}</Quadro05>` +
     `<Quadro06>${el("AnexoAq06T01")}</Quadro06>` +
     `</AnexoA>`;
+}
+
+// Anexo E (rendimentos de capitais — categoria E): nomes de campo confirmados contra um
+// exemplo real. Quadro4A (taxas especiais, art.º 72.º CIRS), Quadro4B (taxas liberatórias,
+// art.º 71.º CIRS, só relevante se optar pelo englobamento) e Quadro5A/5B (rendimentos de
+// anos anteriores, art.º 74.º CIRS). Não afeta ainda o cálculo da estimativa (rendimentos
+// de capitais não estão cobertos pelo motor de cálculo atual, focado nas Categorias A/B).
+function buildAnexoE(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const e = model.anexoE || {};
+  const quadro03 = tributacaoConjunta
+    ? `<Quadro03>${el("AnexoEq03C01", nifA)}${el("AnexoEq03C02", nifB)}</Quadro03>`
+    : `<Quadro03>${el("AnexoEq03C01", nifA)}</Quadro03>`;
+
+  const taxasEspeciais = e.rendimentosTaxasEspeciais || [];
+  const taxasLiberatorias = e.rendimentosTaxasLiberatorias || [];
+  const somaTaxasEspeciais = taxasEspeciais.reduce((a, r) => a + (Number(r.rendimento) || 0), 0);
+  const somaTaxasLiberatoriasRend = taxasLiberatorias.reduce((a, r) => a + (Number(r.rendimento) || 0), 0);
+  const somaTaxasLiberatoriasRet = taxasLiberatorias.reduce((a, r) => a + (Number(r.retencao) || 0), 0);
+
+  const temQuadro04 = taxasEspeciais.length || taxasLiberatorias.length || !!e.optaEnglobamento;
+  const quadro04 = temQuadro04
+    ? `<Quadro04>` +
+      listaComLinhas("AnexoEq04AT01", taxasEspeciais.map((r, i) => ({
+        NLinha: r.nlinha || (401 + i), NIF: r.nif, CodRendimentos: r.codigo, Titular: r.titular,
+        Rendimentos: moeda(r.rendimento)
+      }))) +
+      (taxasEspeciais.length ? el("AnexoEq04AT01SomaC01", moeda(somaTaxasEspeciais)) : "") +
+      el("AnexoEq04B01", e.optaEnglobamento ? "S" : "N") +
+      listaComLinhas("AnexoEq04BT01", taxasLiberatorias.map((r, i) => ({
+        NLinha: r.nlinha || (451 + i), NIF: r.nif, CodRendimentos: r.codigo, Titular: r.titular,
+        Rendimentos: moeda(r.rendimento), Retencoes: moeda(r.retencao)
+      }))) +
+      (taxasLiberatorias.length ? el("AnexoEq04BT01SomaC01", moeda(somaTaxasLiberatoriasRend)) + el("AnexoEq04BT01SomaC02", moeda(somaTaxasLiberatoriasRet)) : "") +
+      `</Quadro04>`
+    : `<Quadro04/>`;
+
+  const anosAnteriores5A = e.rendimentosAnosAnteriores5A || [];
+  const anosAnteriores5B = e.rendimentosAnosAnteriores5B || [];
+  const quadro05 = (anosAnteriores5A.length || anosAnteriores5B.length)
+    ? `<Quadro05>` +
+      listaComLinhas("AnexoEq05AT01", anosAnteriores5A.map(r => ({
+        Quadro: r.quadro, NLinha: r.nlinha, AnoRendimentos: r.anoRendimentos, Rendimento: moeda(r.rendimento), Nanos: r.nanos
+      }))) +
+      listaComLinhas("AnexoEq05BT01", anosAnteriores5B.map(r => ({
+        Quadro: r.quadro, NLinha: r.nlinha, AnoRendimentos: r.anoRendimentos, Rendimento: moeda(r.rendimento), RetencoesFonte: moeda(r.retencoesFonte)
+      }))) +
+      `</Quadro05>`
+    : `<Quadro05/>`;
+
+  return `<AnexoE>` +
+    `<Quadro02>${el("AnexoEq02C01", ano)}</Quadro02>` +
+    quadro03 +
+    quadro04 +
+    quadro05 +
+    `</AnexoE>`;
 }
 
 // Anexos ainda não mapeados em detalhe (Fase 3+): emite apenas o cabeçalho ano+NIF,
@@ -661,7 +717,7 @@ function buildModelo3XML(model) {
   if (model.incluirAnexosVazios !== false) {
     const pass = model.anexosPassthrough || {};
     partes.push(buildAnexoB(model));
-    partes.push(pass.AnexoE || buildAnexoEsqueleto("AnexoE", "AnexoE", model, ["04", "05"], true));
+    partes.push(buildAnexoE(model));
     partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
     partes.push(buildAnexoH(model));

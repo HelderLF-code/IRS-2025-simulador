@@ -55,6 +55,12 @@ regenerar o `simulador-irs.html`.
   sucessão, tributação autónoma, subsídios/alojamento local/RNH/floresta, alienação de
   imóveis dos AIMI, despesas do art.º 31.º-A, mais-valias por incêndios florestais) ainda
   sem interface própria.
+- Anexo E (rendimentos de capitais): Quadro 4A (rendimentos sujeitos a taxas especiais,
+  art.º 72.º CIRS), opção pelo englobamento, Quadro 4B (rendimentos sujeitos a taxas
+  liberatórias, art.º 71.º CIRS — só relevante com englobamento) e Quadro 5A/5B
+  (rendimentos de anos anteriores, art.º 74.º CIRS). Nomes de campo confirmados contra um
+  exemplo real. Não afeta o cálculo da estimativa — o motor de cálculo cobre as
+  Categorias A e B, não a Categoria E.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -95,7 +101,7 @@ regenerar o `simulador-irs.html`.
   Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
   fora dos separadores.
 
-A estrutura XML dos Anexos E, G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
+A estrutura XML dos Anexos G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
 Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
 declaração que já tenha dados nessas secções, esses dados são preservados tal como
@@ -130,9 +136,9 @@ novo — para não haver perda de informação.
    Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
    Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
    implementar.
-5. Cada anexo por implementar (E, G, G1, J, L, SS) vai precisar de um exemplo XML
-   preenchido + as respetivas instruções de preenchimento, tal como foi feito para os
-   Anexos A, B e H.
+5. Cada anexo por implementar (G, G1, J, L, SS) vai precisar de um exemplo XML preenchido
+   + as respetivas instruções de preenchimento, tal como foi feito para os Anexos A, B, E
+   e H.
 6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
