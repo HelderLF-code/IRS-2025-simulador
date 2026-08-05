@@ -21,6 +21,22 @@
   #resultado { margin-top: 20px; padding: 14px; background: #f7f7f5; border-radius: 6px; }
   .aviso-topo { background: #fff3cd; border: 1px solid #ffe08a; padding: 10px; border-radius: 6px; font-size: 0.85rem; }
   small.hint { color: #777; }
+
+  .layout { display: flex; gap: 24px; align-items: flex-start; margin-top: 20px; }
+  .barra-secoes { width: 190px; flex-shrink: 0; position: sticky; top: 16px; display: flex; flex-direction: column; gap: 4px; }
+  .barra-secoes button {
+    text-align: left; background: #f0f0ee; border: 1px solid #e0e0dc; border-radius: 6px;
+    padding: 9px 12px; font-size: 0.88rem; color: #333;
+  }
+  .barra-secoes button.ativo { background: #2c2c2c; border-color: #2c2c2c; color: #fff; font-weight: 600; }
+  .conteudo-secoes { flex: 1; min-width: 0; }
+  .painel { display: none; }
+  .painel.ativo { display: block; }
+  .painel > h2:first-child { margin-top: 0; }
+  @media (max-width: 720px) {
+    .layout { flex-direction: column; }
+    .barra-secoes { width: 100%; flex-direction: row; flex-wrap: wrap; position: static; }
+  }
 </style>
 </head>
 <body>
@@ -40,6 +56,17 @@
   <div id="avisoImportacao" style="display:none; margin-top:10px; font-size:0.85rem;"></div>
 </fieldset>
 
+<div class="layout">
+  <nav class="barra-secoes">
+    <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Agregado Familiar</button>
+    <button type="button" data-secao="anexoA" onclick="mostrarSecao('anexoA')">Anexo A</button>
+    <button type="button" data-secao="anexoB" onclick="mostrarSecao('anexoB')">Anexo B</button>
+    <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
+    <button type="button" data-secao="anexoH" onclick="mostrarSecao('anexoH')">Anexo H</button>
+  </nav>
+  <div class="conteudo-secoes">
+
+<div class="painel ativo" id="painel-agregado">
 <h2>Agregado Familiar</h2>
 <fieldset>
   <div class="row">
@@ -57,7 +84,9 @@
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
+</div>
 
+<div class="painel" id="painel-anexoA">
 <h2>Anexo A — Rendimentos de Trabalho Dependente / Pensões</h2>
 <datalist id="listaCodigosAnexoA">
   <option value="401">401 — Trabalho dependente (rendimento bruto)</option>
@@ -85,7 +114,9 @@
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoA()">+ Adicionar rendimento</button>
+</div>
 
+<div class="painel" id="painel-anexoB">
 <h2>Anexo B — Rendimentos Empresariais e Profissionais (Regime Simplificado / Ato Isolado)</h2>
 <fieldset>
   <div class="row">
@@ -169,7 +200,9 @@
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
+</div>
 
+<div class="painel" id="painel-efatura">
 <h2>Despesas (e-Fatura) — Deduções à Coleta</h2>
 <p class="aviso-topo">
   Totais anuais por categoria, tal como aparecem na consulta de despesas do e-fatura no
@@ -188,7 +221,9 @@
     <div><label>Base para exigência de fatura / IVA dedutível (€)</label><input id="despesaExigenciaFatura" type="number" step="0.01"></div>
   </div>
 </fieldset>
+</div>
 
+<div class="painel" id="painel-anexoH">
 <h2>Anexo H — Benefícios Fiscais e Deduções</h2>
 
 <h3>Pensões de alimentos pagas (Quadro 6A)</h3>
@@ -249,6 +284,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHBeneficio()">+ Adicionar</button>
+</div>
+
+  </div>
+</div>
 
 <div class="acoes">
   <button onclick="calcular()">Calcular estimativa</button>
@@ -1514,6 +1553,15 @@ if (typeof module !== "undefined" && module.exports) {
     const comSeparadores = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     return (negativo ? "-" : "") + comSeparadores + "," + decimal;
   }
+
+  window.mostrarSecao = function (nome) {
+    document.querySelectorAll(".painel").forEach(p => p.classList.remove("ativo"));
+    document.querySelectorAll(".barra-secoes button").forEach(b => b.classList.remove("ativo"));
+    const painel = document.getElementById("painel-" + nome);
+    if (painel) painel.classList.add("ativo");
+    const botao = document.querySelector(`.barra-secoes button[data-secao="${nome}"]`);
+    if (botao) botao.classList.add("ativo");
+  };
 
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções

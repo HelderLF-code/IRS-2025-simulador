@@ -57,6 +57,11 @@ regenerar o `simulador-irs.html`.
   Finanças e continuar a trabalhar a partir dela, em vez de começar sempre em branco.
   Testado com round-trip perfeito (importar e voltar a exportar sem alterar nada dá
   exatamente o mesmo ficheiro) em todos os exemplos fornecidos.
+- **Navegação por separadores**: o formulário está organizado em separadores (Agregado
+  Familiar, Anexo A, Anexo B, Despesas e-Fatura, Anexo H) com uma barra lateral de
+  navegação, para não ficar uma página só a crescer à medida que se adicionam anexos.
+  Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
+  fora dos separadores.
 
 A estrutura XML dos Anexos E, G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
