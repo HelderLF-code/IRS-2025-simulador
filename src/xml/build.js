@@ -312,6 +312,122 @@ function temDadosQuadro17(q17) {
     (q17.rendasImoveisAfetas && q17.rendasImoveisAfetas.length > 0);
 }
 
+// Quadro 8 do Anexo B (alienação/desafetação/afetação de direitos reais sobre bens
+// imóveis): nomes de campo confirmados contra um exemplo real. Só cobre a captura/
+// exportação dos dados — não afeta o cálculo de mais-valias na estimativa (regras
+// próprias e complexas do art.º 44.º e seguintes do CIRS, ainda por implementar).
+function buildQuadro08AnexoB(q08) {
+  if (!q08) return `<Quadro08/>`;
+
+  const at01 = listaComLinhas("AnexoBq08AT01", (q08.imoveisAlienados || []).map(p => ({
+    Freguesia: p.freguesia, Tipo: p.tipo, Artigo: p.artigo, Fraccao: p.fraccao, QuotaParte: p.quotaParte,
+    Codigo: p.codigo, AnoVendaDesafetacaoAfetacao: p.ano, MesVendaDesafetacaoAfetacao: p.mes,
+    DiaVendaDesafetacaoAfetacao: p.dia, ValorVendaDesafetacaoAfetacao: moeda(p.valor),
+    CampoQ4: p.campoQ4, ValorDefinitivo: p.valorDefinitivo !== undefined && p.valorDefinitivo !== "" ? moeda(p.valorDefinitivo) : undefined,
+    Art139CIRC: p.art139circ ? "true" : undefined
+  })));
+  const somaAT01C01 = (q08.imoveisAlienados || []).reduce((a, p) => a + (Number(p.valor) || 0), 0);
+  const somaAT01C02 = (q08.imoveisAlienados || []).reduce((a, p) => a + (Number(p.valorDefinitivo) || 0), 0);
+
+  const bt01 = listaComLinhas("AnexoBq08BT01", (q08.imoveisRegimeTransitorio || []).map(p => ({
+    Freguesia: p.freguesia, Tipo: p.tipo, Artigo: p.artigo, Fracao: p.fracao, QuotaParte: p.quotaParte,
+    Codigo: p.codigo, AnoAfetacao: p.ano, MesAfetacao: p.mes, DiaAfetacao: p.dia
+  })));
+
+  const ct01 = listaComLinhas("AnexoBq08CT01", (q08.imoveisAlienados2021 || []).map(p => ({
+    Freguesia: p.freguesia, Tipo: p.tipo, Artigo: p.artigo, Fracao: p.fracao, QuotaParte: p.quotaParte,
+    AnoVenda: p.ano, MesVenda: p.mes, DiaVenda: p.dia, ValorVenda: moeda(p.valor),
+    CampoQ4: p.campoQ4, ValorDefinitivo: p.valorDefinitivo !== undefined && p.valorDefinitivo !== "" ? moeda(p.valorDefinitivo) : undefined,
+    Art139CIRC: p.art139circ ? "true" : undefined
+  })));
+  const somaCT01C01 = (q08.imoveisAlienados2021 || []).reduce((a, p) => a + (Number(p.valor) || 0), 0);
+  const somaCT01C02 = (q08.imoveisAlienados2021 || []).reduce((a, p) => a + (Number(p.valorDefinitivo) || 0), 0);
+
+  const ct02 = listaComLinhas("AnexoBq08CT02", (q08.imoveisDesafetadosAfetados2021 || []).map(p => ({
+    Freguesia: p.freguesia, Tipo: p.tipo, Artigo: p.artigo, Fracao: p.fracao, QuotaParte: p.quotaParte,
+    Codigo: p.codigo, AnoDesafetacaoAfetacao: p.ano, MesDesafetacaoAfetacao: p.mes, DiaDesafetacaoAfetacao: p.dia
+  })));
+
+  return `<Quadro08>` +
+    el("AnexoBq08B01", q08.houveAlienacaoImoveis ? "S" : "N") +
+    el("AnexoBq08B03", q08.houveAfetacaoImoveis ? "S" : "N") +
+    at01 +
+    ((q08.imoveisAlienados || []).length ? el("AnexoBq08AT01SomaC01", moeda(somaAT01C01)) + el("AnexoBq08AT01SomaC02", moeda(somaAT01C02)) : "") +
+    el("AnexoBq08B05", q08.imoveisAfetos2021 ? "S" : "N") +
+    el("AnexoBq08B07", q08.optaRegimeTransitorio ? "S" : "N") +
+    bt01 +
+    el("AnexoBq08B09", q08.houveAlienacao2021 ? "S" : "N") +
+    ct01 +
+    ((q08.imoveisAlienados2021 || []).length ? el("AnexoBq08CT01SomaC01", moeda(somaCT01C01)) + el("AnexoBq08CT01SomaC02", moeda(somaCT01C02)) : "") +
+    el("AnexoBq08B11", q08.houveDesafetacao2021 ? "S" : "N") +
+    el("AnexoBq08B13", q08.houveAfetacao2021 ? "S" : "N") +
+    ct02 +
+    `</Quadro08>`;
+}
+
+function temDadosQuadro08AnexoB(q08) {
+  if (!q08) return false;
+  return !!q08.houveAlienacaoImoveis || !!q08.houveAfetacaoImoveis || !!q08.imoveisAfetos2021 ||
+    !!q08.optaRegimeTransitorio || !!q08.houveAlienacao2021 || !!q08.houveDesafetacao2021 || !!q08.houveAfetacao2021 ||
+    (q08.imoveisAlienados && q08.imoveisAlienados.length > 0) ||
+    (q08.imoveisRegimeTransitorio && q08.imoveisRegimeTransitorio.length > 0) ||
+    (q08.imoveisAlienados2021 && q08.imoveisAlienados2021.length > 0) ||
+    (q08.imoveisDesafetadosAfetados2021 && q08.imoveisDesafetadosAfetados2021.length > 0);
+}
+
+// Quadro 9 do Anexo B (mais-valias — concretização do reinvestimento do valor de
+// realização): nomes de campo confirmados contra um exemplo real.
+function buildQuadro09AnexoB(q09) {
+  if (!q09 || !(q09.linhas || []).length) return `<Quadro09/>`;
+  return `<Quadro09>` +
+    listaComLinhas("AnexoBq09T01", q09.linhas.map(l => ({
+      AtivosFixosTangiveis: moeda(l.ativosFixosTangiveis), AtivosIntangiveis: moeda(l.ativosIntangiveis),
+      AtivosBiologicosNaoConsumiveis: moeda(l.ativosBiologicosNaoConsumiveis)
+    }))) +
+    `</Quadro09>`;
+}
+
+function temDadosQuadro09AnexoB(q09) {
+  return !!(q09 && q09.linhas && q09.linhas.length > 0);
+}
+
+// Quadro 10 do Anexo B (partes sociais adquiridas ao abrigo do regime de neutralidade
+// fiscal): nomes de campo confirmados contra um exemplo real, exceto o mapeamento
+// completo de "modalidade de pagamento" (10C) — só se confirmou o valor 1 = imediato
+// (campo07 do papel); 2 = diferido e 3 = fracionado são extrapolados por analogia (a
+// ordem em que aparecem no formulário), não confirmados.
+const ANEXOB_Q10_MODALIDADE = { imediato: 1, diferido: 2, fracionado: 3 };
+
+function buildQuadro10AnexoB(q10) {
+  if (!q10) return `<Quadro10/>`;
+  const partesSociais = q10.partesSociais || [];
+  const somaC01 = partesSociais.reduce((a, p) => a + (Number(p.valorRealizacao) || 0), 0);
+  const somaC02 = partesSociais.reduce((a, p) => a + (Number(p.valorAquisicao) || 0), 0);
+  const somaC03 = partesSociais.reduce((a, p) => a + (Number(p.despesasEncargos) || 0), 0);
+  const modalidade = ANEXOB_Q10_MODALIDADE[q10.modalidadePagamento];
+
+  return `<Quadro10>` +
+    el("AnexoBq10B01", q10.alienacaoPartesSociais ? "S" : "N") +
+    el("AnexoBq10B03", q10.perdaQualidadeResidente ? "S" : "N") +
+    listaComLinhas("AnexoBq10BT01", partesSociais.map(p => ({
+      EntidadeEmitente: p.entidadeEmitente, Codigos: p.codigos, NTitulos: p.numeroTitulos, CapitalSocial: p.capitalSocial,
+      AnoRealizacao: p.anoRealizacao, MesRealizacao: p.mesRealizacao, ValorRealizacao: moeda(p.valorRealizacao),
+      AnoAquisicao: p.anoAquisicao, MesAquisicao: p.mesAquisicao, ValorAquisicao: moeda(p.valorAquisicao),
+      DespesasEncargos: moeda(p.despesasEncargos)
+    }))) +
+    (partesSociais.length ? el("AnexoBq10SomaC01", moeda(somaC01)) + el("AnexoBq10SomaC02", moeda(somaC02)) + el("AnexoBq10SomaC03", moeda(somaC03)) : "") +
+    (q10.destinoUE ? el("AnexoBq10C05", q10.destinoUE) : "") +
+    (q10.destinoOutro ? el("AnexoBq10C06", q10.destinoOutro) : "") +
+    (modalidade ? el("AnexoBq10B07", modalidade) : "") +
+    `</Quadro10>`;
+}
+
+function temDadosQuadro10AnexoB(q10) {
+  if (!q10) return false;
+  return !!q10.alienacaoPartesSociais || !!q10.perdaQualidadeResidente ||
+    (q10.partesSociais && q10.partesSociais.length > 0) || !!q10.destinoUE || !!q10.destinoOutro || !!q10.modalidadePagamento;
+}
+
 // AnexoB/J/L/SS têm atributo id=NIF e repetem-se por sujeito passivo quando ambos têm
 // atividade/rendimentos próprios nesse anexo. Nesta fase ainda não temos exemplo preenchido
 // nem confirmação de como fica o segundo anexo repetido, por isso emite-se apenas o esqueleto
@@ -396,11 +512,20 @@ function buildAnexoB(model) {
   const quadro07 = temDadosQuadro07(b.quadro07)
     ? buildQuadro07(b.quadro07)
     : (pass.Quadro07 || `<Quadro07/>`);
+  const quadro08 = temDadosQuadro08AnexoB(b.quadro08)
+    ? buildQuadro08AnexoB(b.quadro08)
+    : (pass.Quadro08 || `<Quadro08/>`);
+  const quadro09 = temDadosQuadro09AnexoB(b.quadro09)
+    ? buildQuadro09AnexoB(b.quadro09)
+    : (pass.Quadro09 || `<Quadro09/>`);
+  const quadro10 = temDadosQuadro10AnexoB(b.quadro10)
+    ? buildQuadro10AnexoB(b.quadro10)
+    : (pass.Quadro10 || `<Quadro10/>`);
   const quadro17 = temDadosQuadro17(b.quadro17)
     ? buildQuadro17(b.quadro17)
     : (pass.Quadro17 || `<Quadro17/>`);
 
-  const quadros08a16 = [8, 9, 10, 11, 12, 13, 14, 15, 16].map(i => {
+  const quadros11a16 = [11, 12, 13, 14, 15, 16].map(i => {
     const numero = String(i).padStart(2, "0");
     return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
   }).join("");
@@ -415,7 +540,10 @@ function buildAnexoB(model) {
     quadro05 +
     quadro06 +
     quadro07 +
-    quadros08a16 +
+    quadro08 +
+    quadro09 +
+    quadro10 +
+    quadros11a16 +
     quadro17 +
     quadro18 +
     `</AnexoB>`;

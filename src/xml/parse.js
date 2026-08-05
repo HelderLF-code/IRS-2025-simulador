@@ -228,6 +228,67 @@ function parseQuadro17(q17) {
   };
 }
 
+function parseQuadro08AnexoB(q08) {
+  if (!temConteudo(q08)) return undefined;
+  return {
+    houveAlienacaoImoveis: texto(q08, "AnexoBq08B01") === "S",
+    houveAfetacaoImoveis: texto(q08, "AnexoBq08B03") === "S",
+    imoveisAlienados: parseLinhasGenerico(filho(q08, "AnexoBq08AT01")).map(l => ({
+      freguesia: l.Freguesia, tipo: l.Tipo, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte,
+      codigo: l.Codigo, ano: l.AnoVendaDesafetacaoAfetacao, mes: l.MesVendaDesafetacaoAfetacao,
+      dia: l.DiaVendaDesafetacaoAfetacao, valor: l.ValorVendaDesafetacaoAfetacao, campoQ4: l.CampoQ4,
+      valorDefinitivo: l.ValorDefinitivo, art139circ: l.Art139CIRC === "true"
+    })),
+    imoveisAfetos2021: texto(q08, "AnexoBq08B05") === "S",
+    optaRegimeTransitorio: texto(q08, "AnexoBq08B07") === "S",
+    imoveisRegimeTransitorio: parseLinhasGenerico(filho(q08, "AnexoBq08BT01")).map(l => ({
+      freguesia: l.Freguesia, tipo: l.Tipo, artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte,
+      codigo: l.Codigo, ano: l.AnoAfetacao, mes: l.MesAfetacao, dia: l.DiaAfetacao
+    })),
+    houveAlienacao2021: texto(q08, "AnexoBq08B09") === "S",
+    imoveisAlienados2021: parseLinhasGenerico(filho(q08, "AnexoBq08CT01")).map(l => ({
+      freguesia: l.Freguesia, tipo: l.Tipo, artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte,
+      ano: l.AnoVenda, mes: l.MesVenda, dia: l.DiaVenda, valor: l.ValorVenda, campoQ4: l.CampoQ4,
+      valorDefinitivo: l.ValorDefinitivo, art139circ: l.Art139CIRC === "true"
+    })),
+    houveDesafetacao2021: texto(q08, "AnexoBq08B11") === "S",
+    houveAfetacao2021: texto(q08, "AnexoBq08B13") === "S",
+    imoveisDesafetadosAfetados2021: parseLinhasGenerico(filho(q08, "AnexoBq08CT02")).map(l => ({
+      freguesia: l.Freguesia, tipo: l.Tipo, artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte,
+      codigo: l.Codigo, ano: l.AnoDesafetacaoAfetacao, mes: l.MesDesafetacaoAfetacao, dia: l.DiaDesafetacaoAfetacao
+    }))
+  };
+}
+
+function parseQuadro09AnexoB(q09) {
+  if (!temConteudo(q09)) return undefined;
+  return {
+    linhas: parseLinhasGenerico(filho(q09, "AnexoBq09T01")).map(l => ({
+      ativosFixosTangiveis: l.AtivosFixosTangiveis, ativosIntangiveis: l.AtivosIntangiveis,
+      ativosBiologicosNaoConsumiveis: l.AtivosBiologicosNaoConsumiveis
+    }))
+  };
+}
+
+const ANEXOB_Q10_MODALIDADE_POR_VALOR = { "1": "imediato", "2": "diferido", "3": "fracionado" };
+
+function parseQuadro10AnexoB(q10) {
+  if (!temConteudo(q10)) return undefined;
+  return {
+    alienacaoPartesSociais: texto(q10, "AnexoBq10B01") === "S",
+    perdaQualidadeResidente: texto(q10, "AnexoBq10B03") === "S",
+    partesSociais: parseLinhasGenerico(filho(q10, "AnexoBq10BT01")).map(l => ({
+      entidadeEmitente: l.EntidadeEmitente, codigos: l.Codigos, numeroTitulos: l.NTitulos, capitalSocial: l.CapitalSocial,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos
+    })),
+    destinoUE: texto(q10, "AnexoBq10C05"),
+    destinoOutro: texto(q10, "AnexoBq10C06"),
+    modalidadePagamento: ANEXOB_Q10_MODALIDADE_POR_VALOR[texto(q10, "AnexoBq10B07")]
+  };
+}
+
 function parseAnexoB(anexoB) {
   if (!anexoB) return { anexoB: undefined, anexoBPassthrough: {}, anexoBTemDados: false };
 
@@ -292,12 +353,18 @@ function parseAnexoB(anexoB) {
   }
 
   const q07 = filho(anexoB, "Quadro07");
+  const q08 = filho(anexoB, "Quadro08");
+  const q09b = filho(anexoB, "Quadro09");
+  const q10b = filho(anexoB, "Quadro10");
   const q17 = filho(anexoB, "Quadro17");
   b.quadro07 = parseQuadro07(q07);
+  b.quadro08 = parseQuadro08AnexoB(q08);
+  b.quadro09 = parseQuadro09AnexoB(q09b);
+  b.quadro10 = parseQuadro10AnexoB(q10b);
   b.quadro17 = parseQuadro17(q17);
 
   const passthrough = {};
-  [8, 9, 10, 11, 12, 13, 14, 15, 16, 18].forEach(i => {
+  [11, 12, 13, 14, 15, 16, 18].forEach(i => {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoB, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
@@ -307,7 +374,8 @@ function parseAnexoB(anexoB) {
   // usado para decidir se se deve voltar a emitir os quadros 3B/5/6 ao reexportar
   // sem reduzir tudo a um "Não" implícito quando não há realmente nada preenchido.
   const anexoBTemDados = temConteudo(q01) || temConteudo(q04) || temConteudo(q05) || temConteudo(q06) ||
-    temConteudo(q07) || temConteudo(q17) || Object.keys(passthrough).length > 0;
+    temConteudo(q07) || temConteudo(q08) || temConteudo(q09b) || temConteudo(q10b) || temConteudo(q17) ||
+    Object.keys(passthrough).length > 0;
 
   return { anexoB: b, anexoBPassthrough: passthrough, anexoBTemDados };
 }

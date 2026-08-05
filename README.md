@@ -41,13 +41,20 @@ regenerar o `simulador-irs.html`.
   IRS Jovem, estudantes dependentes).
 - Anexo B: Quadros 1 (regime), 3 (titular/atividade), 4 (rendimentos brutos, todos os
   códigos 4A/4B/4C), 5 (regras da categoria A), 6 (retenções na fonte/pagamentos por
-  conta), 7 (encargos em caso de opção pela categoria A ou ato isolado > €200.000 — nomes
-  de campo confirmados num exemplo real; o efeito no cálculo da estimativa **ainda não
-  está implementado**, só a captura/exportação dos dados) e 17 (despesas e encargos para
-  efeitos do mínimo de despesas da categoria B — 17A/17B confirmados num exemplo real,
-  17C/17D extrapolados do mesmo padrão, por confirmar). Quadros 8 a 16 e 18 (alienação de
-  imóveis, mais-valias de partes sociais, atividade agrícola plurianual, alojamento local,
-  incêndios florestais, etc.) ainda sem interface própria.
+  conta), 7 (encargos em caso de opção pela categoria A ou ato isolado > €200.000), 8
+  (alienação/desafetação/afetação de imóveis — Quadros 8A/8B/8C.1/8C.2), 9 (mais-valias —
+  reinvestimento do valor de realização) e 10 (partes sociais adquiridas ao abrigo do
+  regime de neutralidade fiscal). Nomes de campo dos Quadros 7, 8, 9 e 10 confirmados
+  contra um exemplo real, exceto a modalidade de pagamento do Quadro 10C (só "imediato"
+  confirmado). O efeito no cálculo da estimativa dos Quadros 7 (regras da categoria A) e 8
+  a 10 (mais-valias) **ainda não está implementado** — regras próprias e complexas
+  (art.ºs 44.º e seguintes do CIRS para mais-valias imobiliárias, art.º 10.º-A para partes
+  sociais), só a captura/exportação dos dados. Quadro 17 (despesas e encargos para efeitos
+  do mínimo de despesas da categoria B — 17A/17B confirmados num exemplo real, 17C/17D
+  extrapolados do mesmo padrão, por confirmar). Quadros 11 a 16 e 18 (prejuízos fiscais em
+  sucessão, tributação autónoma, subsídios/alojamento local/RNH/floresta, alienação de
+  imóveis dos AIMI, despesas do art.º 31.º-A, mais-valias por incêndios florestais) ainda
+  sem interface própria.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -90,7 +97,7 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos E, G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
-Quadros 8-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
+Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
 declaração que já tenha dados nessas secções, esses dados são preservados tal como
 estavam (mas ainda não podem ser vistos/editados na interface) e mantidos ao exportar de
 novo — para não haver perda de informação.
@@ -103,13 +110,18 @@ novo — para não haver perda de informação.
    (atributo `id` com o NIF de cada titular) quando ambos têm rendimentos próprios nesse anexo.
 3. **Anexo B, Quadro 17C/17D** — nomes de campo (`AnexoBq17C17051-17054`, `AnexoBq17DT01`)
    extrapolados do padrão confirmado no 17A/17B, não validados contra um exemplo com a
-   opção "declarar despesas em alternativa" preenchida. **Anexo B, Quadro 7 → efeito no
-   cálculo**: os dados da opção pelas regras da categoria A (despesas do Quadro 7A, limites
-   dos artigos 25.º/27.º do CIRS) já são capturados e exportados, mas a estimativa continua
-   sempre a aplicar os coeficientes do regime simplificado — falta implementar este cálculo
-   alternativo. **Anexo B, Quadros 8-16 e 18** — alienação de imóveis, mais-valias de
-   partes sociais, atividade agrícola plurianual, alojamento local, incêndios florestais,
-   etc. — ainda sem interface própria.
+   opção "declarar despesas em alternativa" preenchida. **Anexo B, Quadro 10C — modalidade
+   de pagamento** — só se confirmou o valor 1 = imediato; 2 = diferido e 3 = fracionado são
+   extrapolados por analogia (ordem no formulário), não confirmados. **Anexo B, Quadros 7 a
+   10 → efeito no cálculo**: os dados de encargos da opção pela categoria A (Quadro 7,
+   limites dos artigos 25.º/27.º do CIRS) e de mais-valias (Quadros 8, 9 e 10 — alienação
+   de imóveis, reinvestimento, partes sociais) já são capturados e exportados, mas a
+   estimativa ainda não os usa no cálculo — regras próprias e complexas (correção
+   monetária, percentagem de exclusão de tributação, prazos de detenção, etc.) por
+   implementar. **Anexo B, Quadros 11-16 e 18** — prejuízos fiscais em sucessão,
+   tributação autónoma, subsídios/alojamento local/RNH/floresta, alienação de imóveis dos
+   AIMI, despesas do art.º 31.º-A, mais-valias por incêndios florestais — ainda sem
+   interface própria.
 4. **Anexo H, Quadro 6B** — calculados os códigos 601 a 607; os de mecenato (609 em
    diante — científico/social/cultural/ambiental/donativos, dezenas de códigos com
    condições de elegibilidade próprias) continuam só registados no XML, sem entrar no

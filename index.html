@@ -306,6 +306,88 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <div class="row">
   <div><label>N.º de anos/fração — explorações silvícolas plurianuais (7E)</label><input id="anexoB07C781" type="number" step="1"></div>
 </div>
+
+<h3>Alienação/desafetação/afetação de imóveis (Quadro 8)</h3>
+<p class="aviso-topo">
+  Só captura e exporta os dados — <strong>o cálculo de mais-valias ainda não está
+  implementado</strong> (regras próprias e complexas do art.º 44.º e seguintes do CIRS).
+</p>
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB08Alienacao"> Houve alienação/desafetação de imóveis (8A, anos 2020 e anteriores)?</label></div>
+  <div><label><input type="checkbox" id="anexoB08Afetacao"> Houve afetação de imóveis à atividade (8A)?</label></div>
+</div>
+<datalist id="listaCodigosAnexoB08A">
+  <option value="01">01 — Alienação onerosa de imóvel</option>
+  <option value="06">06 — Alienação onerosa de imóvel adquirido para o património particular e depois afeto à atividade</option>
+  <option value="02">02 — Afetação de imóvel do património particular à atividade</option>
+  <option value="03">03 — Afetação de imóvel habitacional do património particular à atividade</option>
+  <option value="04">04 — Desafetação (restituição ao património particular) de imóvel habitacional afeto à categoria F</option>
+  <option value="05">05 — Desafetação (restituição ao património particular) de imóvel</option>
+</datalist>
+<table id="tabelaAnexoB08A">
+  <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th>Código</th><th>Ano</th><th>Mês</th><th>Dia</th><th>Valor (€)</th><th>Campo Q4</th><th>Valor definitivo (€)</th><th>Recurso art.º 139.º CIRC?</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB08A()">+ Adicionar imóvel (8A)</button>
+
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB08Afetos2021"> Tinha imóveis afetos à atividade em 1/jan/2021 (8B)?</label></div>
+  <div><label><input type="checkbox" id="anexoB08OptaTransitorio"> Opta pelo regime transitório (art.º 369.º Lei 75-B/2020) (8B)?</label></div>
+</div>
+<table id="tabelaAnexoB08B">
+  <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th>Código</th><th>Ano</th><th>Mês</th><th>Dia</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB08B()">+ Adicionar imóvel (8B)</button>
+
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB08Alienacao2021"> Houve alienação de imóveis (8C.1, anos 2021+)?</label></div>
+</div>
+<table id="tabelaAnexoB08C1">
+  <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th>Ano</th><th>Mês</th><th>Dia</th><th>Valor (€)</th><th>Campo Q4</th><th>Valor definitivo (€)</th><th>Recurso art.º 139.º CIRC?</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB08C1()">+ Adicionar imóvel (8C.1)</button>
+
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB08Desafetacao2021"> Houve desafetação de imóveis (8C.2, anos 2021+)?</label></div>
+  <div><label><input type="checkbox" id="anexoB08Afetacao2021"> Houve afetação de imóveis (8C.2, anos 2021+)?</label></div>
+</div>
+<table id="tabelaAnexoB08C2">
+  <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th>Código</th><th>Ano</th><th>Mês</th><th>Dia</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB08C2()">+ Adicionar imóvel (8C.2)</button>
+
+<h3>Mais-valias — reinvestimento do valor de realização (Quadro 9)</h3>
+<table id="tabelaAnexoB09">
+  <thead><tr><th>Ativos fixos tangíveis (€)</th><th>Ativos intangíveis (€)</th><th>Ativos biológicos não consumíveis (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB09()">+ Adicionar</button>
+
+<h3>Partes sociais adquiridas ao abrigo do regime de neutralidade fiscal (Quadro 10)</h3>
+<div class="row">
+  <div><label><input type="checkbox" id="anexoB10Alienacao"> Houve alienação de partes sociais antes de decorridos 5 anos (10A)?</label></div>
+  <div><label><input type="checkbox" id="anexoB10PerdaResidente"> Houve perda da qualidade de residente antes de decorridos 5 anos (10A)?</label></div>
+</div>
+<table id="tabelaAnexoB10">
+  <thead><tr><th>Entidade emitente (NIF)</th><th>Código</th><th>N.º títulos</th><th>Capital social (%)</th><th>Ano realização</th><th>Mês realização</th><th>Valor realização (€)</th><th>Ano aquisição</th><th>Mês aquisição</th><th>Valor aquisição (€)</th><th>Despesas/encargos (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoB10()">+ Adicionar</button>
+<div class="row">
+  <div><label>Destino — Estado membro UE/EEE (código país) <small class="hint">(10C)</small></label><input id="anexoB10DestinoUE" type="text" size="4"></div>
+  <div><label>Destino — outro país (código) <small class="hint">(10C)</small></label><input id="anexoB10DestinoOutro" type="text" size="4"></div>
+  <div><label>Modalidade de pagamento <small class="hint">(10C — só "imediato" confirmado num exemplo real)</small></label>
+    <select id="anexoB10Modalidade">
+      <option value="">(não indicado)</option>
+      <option value="imediato">Imediato</option>
+      <option value="diferido">Diferido</option>
+      <option value="fracionado">Fracionado</option>
+    </select>
+  </div>
+</div>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -557,6 +639,220 @@ indicares, assume-se o escalão mais baixo.</small></p>
     tbody.appendChild(tr);
   };
 
+  window.adicionarLinhaAnexoB08A = function () {
+    const tbody = document.querySelector("#tabelaAnexoB08A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab08a-freguesia" size="8"></td>
+      <td><select class="ab08a-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ab08a-artigo" size="8"></td>
+      <td><input class="ab08a-fraccao" size="6"></td>
+      <td><input class="ab08a-quota" type="number" step="0.01"></td>
+      <td><input class="ab08a-codigo" size="4" list="listaCodigosAnexoB08A"></td>
+      <td><input class="ab08a-ano" type="number" size="6"></td>
+      <td><input class="ab08a-mes" type="number" size="4"></td>
+      <td><input class="ab08a-dia" type="number" size="4"></td>
+      <td><input class="ab08a-valor" type="number" step="0.01"></td>
+      <td><input class="ab08a-campoq4" size="4"></td>
+      <td><input class="ab08a-valordefinitivo" type="number" step="0.01"></td>
+      <td><input class="ab08a-art139" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB08B = function () {
+    const tbody = document.querySelector("#tabelaAnexoB08B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab08b-freguesia" size="8"></td>
+      <td><select class="ab08b-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ab08b-artigo" size="8"></td>
+      <td><input class="ab08b-fraccao" size="6"></td>
+      <td><input class="ab08b-quota" type="number" step="0.01"></td>
+      <td><input class="ab08b-codigo" size="4"></td>
+      <td><input class="ab08b-ano" type="number" size="6"></td>
+      <td><input class="ab08b-mes" type="number" size="4"></td>
+      <td><input class="ab08b-dia" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB08C1 = function () {
+    const tbody = document.querySelector("#tabelaAnexoB08C1 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab08c1-freguesia" size="8"></td>
+      <td><select class="ab08c1-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ab08c1-artigo" size="8"></td>
+      <td><input class="ab08c1-fraccao" size="6"></td>
+      <td><input class="ab08c1-quota" type="number" step="0.01"></td>
+      <td><input class="ab08c1-ano" type="number" size="6"></td>
+      <td><input class="ab08c1-mes" type="number" size="4"></td>
+      <td><input class="ab08c1-dia" type="number" size="4"></td>
+      <td><input class="ab08c1-valor" type="number" step="0.01"></td>
+      <td><input class="ab08c1-campoq4" size="4"></td>
+      <td><input class="ab08c1-valordefinitivo" type="number" step="0.01"></td>
+      <td><input class="ab08c1-art139" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB08C2 = function () {
+    const tbody = document.querySelector("#tabelaAnexoB08C2 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab08c2-freguesia" size="8"></td>
+      <td><select class="ab08c2-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ab08c2-artigo" size="8"></td>
+      <td><input class="ab08c2-fraccao" size="6"></td>
+      <td><input class="ab08c2-quota" type="number" step="0.01"></td>
+      <td><input class="ab08c2-codigo" size="4"></td>
+      <td><input class="ab08c2-ano" type="number" size="6"></td>
+      <td><input class="ab08c2-mes" type="number" size="4"></td>
+      <td><input class="ab08c2-dia" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB09 = function () {
+    const tbody = document.querySelector("#tabelaAnexoB09 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab09-fixostangiveis" type="number" step="0.01"></td>
+      <td><input class="ab09-intangiveis" type="number" step="0.01"></td>
+      <td><input class="ab09-biologicos" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoB10 = function () {
+    const tbody = document.querySelector("#tabelaAnexoB10 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ab10-entidade" size="10"></td>
+      <td><input class="ab10-codigos" size="4"></td>
+      <td><input class="ab10-ntitulos" type="number"></td>
+      <td><input class="ab10-capitalsocial" type="number" step="0.01"></td>
+      <td><input class="ab10-anorealizacao" type="number" size="6"></td>
+      <td><input class="ab10-mesrealizacao" type="number" size="4"></td>
+      <td><input class="ab10-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ab10-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ab10-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ab10-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ab10-despesas" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro08AnexoB() {
+    const imoveisAlienados = [...document.querySelectorAll("#tabelaAnexoB08A tbody tr")].map(tr => ({
+      freguesia: tr.querySelector(".ab08a-freguesia").value,
+      tipo: tr.querySelector(".ab08a-tipo").value,
+      artigo: tr.querySelector(".ab08a-artigo").value,
+      fraccao: tr.querySelector(".ab08a-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ab08a-quota").value || undefined,
+      codigo: tr.querySelector(".ab08a-codigo").value,
+      ano: tr.querySelector(".ab08a-ano").value, mes: tr.querySelector(".ab08a-mes").value, dia: tr.querySelector(".ab08a-dia").value,
+      valor: tr.querySelector(".ab08a-valor").value || 0,
+      campoQ4: tr.querySelector(".ab08a-campoq4").value || undefined,
+      valorDefinitivo: tr.querySelector(".ab08a-valordefinitivo").value || undefined,
+      art139circ: tr.querySelector(".ab08a-art139").checked
+    }));
+    const imoveisRegimeTransitorio = [...document.querySelectorAll("#tabelaAnexoB08B tbody tr")].map(tr => ({
+      freguesia: tr.querySelector(".ab08b-freguesia").value,
+      tipo: tr.querySelector(".ab08b-tipo").value,
+      artigo: tr.querySelector(".ab08b-artigo").value,
+      fracao: tr.querySelector(".ab08b-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ab08b-quota").value || undefined,
+      codigo: tr.querySelector(".ab08b-codigo").value,
+      ano: tr.querySelector(".ab08b-ano").value, mes: tr.querySelector(".ab08b-mes").value, dia: tr.querySelector(".ab08b-dia").value
+    }));
+    const imoveisAlienados2021 = [...document.querySelectorAll("#tabelaAnexoB08C1 tbody tr")].map(tr => ({
+      freguesia: tr.querySelector(".ab08c1-freguesia").value,
+      tipo: tr.querySelector(".ab08c1-tipo").value,
+      artigo: tr.querySelector(".ab08c1-artigo").value,
+      fracao: tr.querySelector(".ab08c1-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ab08c1-quota").value || undefined,
+      ano: tr.querySelector(".ab08c1-ano").value, mes: tr.querySelector(".ab08c1-mes").value, dia: tr.querySelector(".ab08c1-dia").value,
+      valor: tr.querySelector(".ab08c1-valor").value || 0,
+      campoQ4: tr.querySelector(".ab08c1-campoq4").value || undefined,
+      valorDefinitivo: tr.querySelector(".ab08c1-valordefinitivo").value || undefined,
+      art139circ: tr.querySelector(".ab08c1-art139").checked
+    }));
+    const imoveisDesafetadosAfetados2021 = [...document.querySelectorAll("#tabelaAnexoB08C2 tbody tr")].map(tr => ({
+      freguesia: tr.querySelector(".ab08c2-freguesia").value,
+      tipo: tr.querySelector(".ab08c2-tipo").value,
+      artigo: tr.querySelector(".ab08c2-artigo").value,
+      fracao: tr.querySelector(".ab08c2-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ab08c2-quota").value || undefined,
+      codigo: tr.querySelector(".ab08c2-codigo").value,
+      ano: tr.querySelector(".ab08c2-ano").value, mes: tr.querySelector(".ab08c2-mes").value, dia: tr.querySelector(".ab08c2-dia").value
+    }));
+
+    const houveAlienacaoImoveis = document.getElementById("anexoB08Alienacao").checked;
+    const houveAfetacaoImoveis = document.getElementById("anexoB08Afetacao").checked;
+    const imoveisAfetos2021 = document.getElementById("anexoB08Afetos2021").checked;
+    const optaRegimeTransitorio = document.getElementById("anexoB08OptaTransitorio").checked;
+    const houveAlienacao2021 = document.getElementById("anexoB08Alienacao2021").checked;
+    const houveDesafetacao2021 = document.getElementById("anexoB08Desafetacao2021").checked;
+    const houveAfetacao2021 = document.getElementById("anexoB08Afetacao2021").checked;
+
+    const temDados = houveAlienacaoImoveis || houveAfetacaoImoveis || imoveisAlienados.length ||
+      imoveisAfetos2021 || optaRegimeTransitorio || imoveisRegimeTransitorio.length ||
+      houveAlienacao2021 || imoveisAlienados2021.length ||
+      houveDesafetacao2021 || houveAfetacao2021 || imoveisDesafetadosAfetados2021.length;
+    if (!temDados) return undefined;
+
+    return {
+      houveAlienacaoImoveis, houveAfetacaoImoveis, imoveisAlienados,
+      imoveisAfetos2021, optaRegimeTransitorio, imoveisRegimeTransitorio,
+      houveAlienacao2021, imoveisAlienados2021,
+      houveDesafetacao2021, houveAfetacao2021, imoveisDesafetadosAfetados2021
+    };
+  }
+
+  function lerQuadro09AnexoB() {
+    const linhas = [...document.querySelectorAll("#tabelaAnexoB09 tbody tr")].map(tr => ({
+      ativosFixosTangiveis: tr.querySelector(".ab09-fixostangiveis").value || 0,
+      ativosIntangiveis: tr.querySelector(".ab09-intangiveis").value || 0,
+      ativosBiologicosNaoConsumiveis: tr.querySelector(".ab09-biologicos").value || 0
+    }));
+    return linhas.length ? { linhas } : undefined;
+  }
+
+  function lerQuadro10AnexoB() {
+    const partesSociais = [...document.querySelectorAll("#tabelaAnexoB10 tbody tr")].map(tr => ({
+      entidadeEmitente: tr.querySelector(".ab10-entidade").value,
+      codigos: tr.querySelector(".ab10-codigos").value,
+      numeroTitulos: tr.querySelector(".ab10-ntitulos").value || undefined,
+      capitalSocial: tr.querySelector(".ab10-capitalsocial").value || undefined,
+      anoRealizacao: tr.querySelector(".ab10-anorealizacao").value,
+      mesRealizacao: tr.querySelector(".ab10-mesrealizacao").value,
+      valorRealizacao: tr.querySelector(".ab10-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".ab10-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ab10-mesaquisicao").value,
+      valorAquisicao: tr.querySelector(".ab10-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ab10-despesas").value || 0
+    }));
+    const alienacaoPartesSociais = document.getElementById("anexoB10Alienacao").checked;
+    const perdaQualidadeResidente = document.getElementById("anexoB10PerdaResidente").checked;
+    const destinoUE = document.getElementById("anexoB10DestinoUE").value || undefined;
+    const destinoOutro = document.getElementById("anexoB10DestinoOutro").value || undefined;
+    const modalidadePagamento = document.getElementById("anexoB10Modalidade").value || undefined;
+
+    const temDados = alienacaoPartesSociais || perdaQualidadeResidente || partesSociais.length ||
+      destinoUE || destinoOutro || modalidadePagamento;
+    if (!temDados) return undefined;
+
+    return { alienacaoPartesSociais, perdaQualidadeResidente, partesSociais, destinoUE, destinoOutro, modalidadePagamento };
+  }
+
   function lerQuadro07AnexoB() {
     const despesas = {};
     document.querySelectorAll(".ab7-desp").forEach(input => {
@@ -642,6 +938,9 @@ indicares, assume-se o escalão mais baixo.</small></p>
       estabelecimentoEstavel: document.getElementById("anexoBEstabelecimentoEstavel").checked,
       rendimentosBrutos,
       quadro07: lerQuadro07AnexoB(),
+      quadro08: lerQuadro08AnexoB(),
+      quadro09: lerQuadro09AnexoB(),
+      quadro10: lerQuadro10AnexoB(),
       quadro17: lerQuadro17AnexoB(),
       categoriaA: {
         unicaEntidade: document.getElementById("anexoBUnicaEntidade").checked,
@@ -845,7 +1144,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   function temAtividadeAnexoB(anexoB) {
     return !!(dadosPreservados.anexoBAtivo || anexoB.regimeSimplificado || anexoB.atoIsolado ||
       anexoB.naturezaProfComInd || anexoB.naturezaAgricola || anexoB.rendimentosBrutos.length ||
-      anexoB.quadro07 || anexoB.quadro17 ||
+      anexoB.quadro07 || anexoB.quadro08 || anexoB.quadro09 || anexoB.quadro10 || anexoB.quadro17 ||
       Object.keys(dadosPreservados.anexoBPassthrough || {}).length);
   }
 
@@ -941,6 +1240,24 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.querySelector("#tabelaAnexoB07Seguros tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoB07Predios tbody").innerHTML = "";
       document.getElementById("anexoB07C781").value = "";
+      document.getElementById("anexoB08Alienacao").checked = false;
+      document.getElementById("anexoB08Afetacao").checked = false;
+      document.querySelector("#tabelaAnexoB08A tbody").innerHTML = "";
+      document.getElementById("anexoB08Afetos2021").checked = false;
+      document.getElementById("anexoB08OptaTransitorio").checked = false;
+      document.querySelector("#tabelaAnexoB08B tbody").innerHTML = "";
+      document.getElementById("anexoB08Alienacao2021").checked = false;
+      document.querySelector("#tabelaAnexoB08C1 tbody").innerHTML = "";
+      document.getElementById("anexoB08Desafetacao2021").checked = false;
+      document.getElementById("anexoB08Afetacao2021").checked = false;
+      document.querySelector("#tabelaAnexoB08C2 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoB09 tbody").innerHTML = "";
+      document.getElementById("anexoB10Alienacao").checked = false;
+      document.getElementById("anexoB10PerdaResidente").checked = false;
+      document.querySelector("#tabelaAnexoB10 tbody").innerHTML = "";
+      document.getElementById("anexoB10DestinoUE").value = "";
+      document.getElementById("anexoB10DestinoOutro").value = "";
+      document.getElementById("anexoB10Modalidade").value = "";
       document.getElementById("anexoB17001").value = "";
       document.getElementById("anexoB17002").value = "";
       document.querySelector("#tabelaAnexoB17Entidades tbody").innerHTML = "";
@@ -997,7 +1314,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
         "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
         "estabelecimentoEstavel", "rendimentosBrutos", "categoriaA", "retencoes",
-        "quadro07", "quadro17"
+        "quadro07", "quadro08", "quadro09", "quadro10", "quadro17"
       ];
       let anexoBExtrasQ03 = {};
 
@@ -1053,6 +1370,110 @@ indicares, assume-se o escalão mais baixo.</small></p>
             tr.querySelector(".ab07d-valorasp").value = p.valorASP || "";
           });
           document.getElementById("anexoB07C781").value = q7.anosSilvicolasPlurianual || "";
+        }
+
+        if (b.quadro08) {
+          const q8 = b.quadro08;
+          document.getElementById("anexoB08Alienacao").checked = !!q8.houveAlienacaoImoveis;
+          document.getElementById("anexoB08Afetacao").checked = !!q8.houveAfetacaoImoveis;
+          (q8.imoveisAlienados || []).forEach(p => {
+            adicionarLinhaAnexoB08A();
+            const tr = document.querySelector("#tabelaAnexoB08A tbody tr:last-child");
+            tr.querySelector(".ab08a-freguesia").value = p.freguesia || "";
+            if (p.tipo) tr.querySelector(".ab08a-tipo").value = p.tipo;
+            tr.querySelector(".ab08a-artigo").value = p.artigo || "";
+            tr.querySelector(".ab08a-fraccao").value = p.fraccao || "";
+            tr.querySelector(".ab08a-quota").value = p.quotaParte || "";
+            tr.querySelector(".ab08a-codigo").value = p.codigo || "";
+            tr.querySelector(".ab08a-ano").value = p.ano || "";
+            tr.querySelector(".ab08a-mes").value = p.mes || "";
+            tr.querySelector(".ab08a-dia").value = p.dia || "";
+            tr.querySelector(".ab08a-valor").value = p.valor || "";
+            tr.querySelector(".ab08a-campoq4").value = p.campoQ4 || "";
+            tr.querySelector(".ab08a-valordefinitivo").value = p.valorDefinitivo || "";
+            tr.querySelector(".ab08a-art139").checked = !!p.art139circ;
+          });
+          document.getElementById("anexoB08Afetos2021").checked = !!q8.imoveisAfetos2021;
+          document.getElementById("anexoB08OptaTransitorio").checked = !!q8.optaRegimeTransitorio;
+          (q8.imoveisRegimeTransitorio || []).forEach(p => {
+            adicionarLinhaAnexoB08B();
+            const tr = document.querySelector("#tabelaAnexoB08B tbody tr:last-child");
+            tr.querySelector(".ab08b-freguesia").value = p.freguesia || "";
+            if (p.tipo) tr.querySelector(".ab08b-tipo").value = p.tipo;
+            tr.querySelector(".ab08b-artigo").value = p.artigo || "";
+            tr.querySelector(".ab08b-fraccao").value = p.fracao || "";
+            tr.querySelector(".ab08b-quota").value = p.quotaParte || "";
+            tr.querySelector(".ab08b-codigo").value = p.codigo || "";
+            tr.querySelector(".ab08b-ano").value = p.ano || "";
+            tr.querySelector(".ab08b-mes").value = p.mes || "";
+            tr.querySelector(".ab08b-dia").value = p.dia || "";
+          });
+          document.getElementById("anexoB08Alienacao2021").checked = !!q8.houveAlienacao2021;
+          (q8.imoveisAlienados2021 || []).forEach(p => {
+            adicionarLinhaAnexoB08C1();
+            const tr = document.querySelector("#tabelaAnexoB08C1 tbody tr:last-child");
+            tr.querySelector(".ab08c1-freguesia").value = p.freguesia || "";
+            if (p.tipo) tr.querySelector(".ab08c1-tipo").value = p.tipo;
+            tr.querySelector(".ab08c1-artigo").value = p.artigo || "";
+            tr.querySelector(".ab08c1-fraccao").value = p.fracao || "";
+            tr.querySelector(".ab08c1-quota").value = p.quotaParte || "";
+            tr.querySelector(".ab08c1-ano").value = p.ano || "";
+            tr.querySelector(".ab08c1-mes").value = p.mes || "";
+            tr.querySelector(".ab08c1-dia").value = p.dia || "";
+            tr.querySelector(".ab08c1-valor").value = p.valor || "";
+            tr.querySelector(".ab08c1-campoq4").value = p.campoQ4 || "";
+            tr.querySelector(".ab08c1-valordefinitivo").value = p.valorDefinitivo || "";
+            tr.querySelector(".ab08c1-art139").checked = !!p.art139circ;
+          });
+          document.getElementById("anexoB08Desafetacao2021").checked = !!q8.houveDesafetacao2021;
+          document.getElementById("anexoB08Afetacao2021").checked = !!q8.houveAfetacao2021;
+          (q8.imoveisDesafetadosAfetados2021 || []).forEach(p => {
+            adicionarLinhaAnexoB08C2();
+            const tr = document.querySelector("#tabelaAnexoB08C2 tbody tr:last-child");
+            tr.querySelector(".ab08c2-freguesia").value = p.freguesia || "";
+            if (p.tipo) tr.querySelector(".ab08c2-tipo").value = p.tipo;
+            tr.querySelector(".ab08c2-artigo").value = p.artigo || "";
+            tr.querySelector(".ab08c2-fraccao").value = p.fracao || "";
+            tr.querySelector(".ab08c2-quota").value = p.quotaParte || "";
+            tr.querySelector(".ab08c2-codigo").value = p.codigo || "";
+            tr.querySelector(".ab08c2-ano").value = p.ano || "";
+            tr.querySelector(".ab08c2-mes").value = p.mes || "";
+            tr.querySelector(".ab08c2-dia").value = p.dia || "";
+          });
+        }
+
+        if (b.quadro09) {
+          (b.quadro09.linhas || []).forEach(l => {
+            adicionarLinhaAnexoB09();
+            const tr = document.querySelector("#tabelaAnexoB09 tbody tr:last-child");
+            tr.querySelector(".ab09-fixostangiveis").value = l.ativosFixosTangiveis || "";
+            tr.querySelector(".ab09-intangiveis").value = l.ativosIntangiveis || "";
+            tr.querySelector(".ab09-biologicos").value = l.ativosBiologicosNaoConsumiveis || "";
+          });
+        }
+
+        if (b.quadro10) {
+          const q10 = b.quadro10;
+          document.getElementById("anexoB10Alienacao").checked = !!q10.alienacaoPartesSociais;
+          document.getElementById("anexoB10PerdaResidente").checked = !!q10.perdaQualidadeResidente;
+          (q10.partesSociais || []).forEach(p => {
+            adicionarLinhaAnexoB10();
+            const tr = document.querySelector("#tabelaAnexoB10 tbody tr:last-child");
+            tr.querySelector(".ab10-entidade").value = p.entidadeEmitente || "";
+            tr.querySelector(".ab10-codigos").value = p.codigos || "";
+            tr.querySelector(".ab10-ntitulos").value = p.numeroTitulos || "";
+            tr.querySelector(".ab10-capitalsocial").value = p.capitalSocial || "";
+            tr.querySelector(".ab10-anorealizacao").value = p.anoRealizacao || "";
+            tr.querySelector(".ab10-mesrealizacao").value = p.mesRealizacao || "";
+            tr.querySelector(".ab10-valorrealizacao").value = p.valorRealizacao || "";
+            tr.querySelector(".ab10-anoaquisicao").value = p.anoAquisicao || "";
+            tr.querySelector(".ab10-mesaquisicao").value = p.mesAquisicao || "";
+            tr.querySelector(".ab10-valoraquisicao").value = p.valorAquisicao || "";
+            tr.querySelector(".ab10-despesas").value = p.despesasEncargos || "";
+          });
+          document.getElementById("anexoB10DestinoUE").value = q10.destinoUE || "";
+          document.getElementById("anexoB10DestinoOutro").value = q10.destinoOutro || "";
+          document.getElementById("anexoB10Modalidade").value = q10.modalidadePagamento || "";
         }
 
         if (b.quadro17) {
