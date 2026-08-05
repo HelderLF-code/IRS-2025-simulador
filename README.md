@@ -20,16 +20,22 @@ regenerar o `simulador-irs.html`.
 
 ## Estado atual
 
-- Rosto: Quadros 1, 2, 3 (ano/NIF), 4/5 (tributação conjunta), 6 (dependentes,
-  incluindo deficiência e guarda conjunta), 8A (residência fiscal — Continente/Açores/
-  Madeira), 9 (IBAN), 10 (natureza da declaração — 1.ª declaração/substituição). Os
-  nomes dos campos do Quadro 8/10 (`Q08B01`/`Q10B01`) foram inferidos por analogia com o
-  padrão confirmado no Quadro 4 (um único campo cujo valor é o número do campo do papel
-  assinalado) — **ainda não confirmados** contra um exemplo real com estes quadros
-  preenchidos (o único exemplo completo disponível tem-nos vazios). Se não reconhecidos
-  ao importar, os dados originais são preservados tal como estavam. Quadro 7 (ascendentes/
-  colaterais), Quadro 8B (não residentes), 11 (consignação do IRS/IVA) e 13 (prazos
-  especiais) ainda sem interface própria.
+- Rosto (separador "Rosto" — inclui o agregado familiar, que corresponde ao Quadro 6):
+  Quadros 1, 2, 3 (ano/NIF), 4/5 (tributação conjunta), 6 (dependentes, incluindo
+  deficiência e guarda conjunta), 8A (residência fiscal — Continente/Açores/Madeira), 9
+  (IBAN + "associar IBAN ao NIF"), 10 (natureza da declaração — 1.ª declaração/
+  substituição). Os nomes dos campos (`Q08B01`, `Q09B01`/`Q09B01b`, `Q10B01`) foram
+  **confirmados** contra um exemplo real (residente Continente, 1.ª declaração, associar
+  IBAN = Sim). O padrão observado: um quadro pode ter um único campo cujo valor é o
+  número do campo do papel assinalado (Quadro 4, 8A, 10, 13), e/ou vários campos
+  independentes com nomes próprios por grupo de escolha (Quadro 8B — não residente).
+  Quando o quadro importado já tem conteúdo (mesmo que inclua campos não modelados, como
+  o Quadro 8B de não residentes), esse conteúdo original tem sempre prioridade sobre o
+  valor calculado a partir dos campos da interface — só se gera a partir do zero quando o
+  quadro vem vazio. Quadro 7 (ascendentes/colaterais), Quadro 8B (não residentes), 11
+  (consignação do IRS/IVA) e 13 (prazos especiais) têm significado conhecido e nomes de
+  campo já confirmados num exemplo real (ver comentários em `src/xml/parse.js`), mas
+  ainda sem interface própria — os dados são preservados tal como vieram ao importar.
 - Anexo A: Quadro 4 completo (rendimentos/retenções/contribuições, pagamentos por
   conta, outras deduções, seguros de desgaste rápido, incentivos fiscais, ex-residentes,
   IRS Jovem, estudantes dependentes).

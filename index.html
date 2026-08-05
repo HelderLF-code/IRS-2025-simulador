@@ -58,7 +58,7 @@
 
 <div class="layout">
   <nav class="barra-secoes">
-    <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Agregado Familiar</button>
+    <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Rosto</button>
     <button type="button" data-secao="anexoA" onclick="mostrarSecao('anexoA')">Anexo A</button>
     <button type="button" data-secao="anexoB" onclick="mostrarSecao('anexoB')">Anexo B</button>
     <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
@@ -67,7 +67,7 @@
   <div class="conteudo-secoes">
 
 <div class="painel ativo" id="painel-agregado">
-<h2>Agregado Familiar</h2>
+<h2>Rosto</h2>
 <fieldset>
   <div class="row">
     <div><label>Ano dos rendimentos</label><input id="ano" type="number" value="2025"></div>
@@ -90,6 +90,13 @@
         <option value="">(não indicado)</option>
         <option value="primeira">1.ª declaração do ano</option>
         <option value="substituicao">Declaração de substituição</option>
+      </select>
+    </div>
+    <div><label>Associar IBAN ao NIF <small class="hint">(Rosto, Quadro 9)</small></label>
+      <select id="associarIbanNif">
+        <option value="">(não indicado)</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
       </select>
     </div>
   </div>
@@ -559,6 +566,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
       iban: document.getElementById("iban").value || undefined,
       residenciaFiscal: document.getElementById("residenciaFiscal").value || undefined,
       naturezaDeclaracao: document.getElementById("naturezaDeclaracao").value || undefined,
+      associarIbanNif: document.getElementById("associarIbanNif").value || undefined,
       dependentes
     };
   }
@@ -676,6 +684,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("nifB").value = dados.agregado.nifB || "";
       document.getElementById("residenciaFiscal").value = dados.agregado.residenciaFiscal || "";
       document.getElementById("naturezaDeclaracao").value = dados.agregado.naturezaDeclaracao || "";
+      document.getElementById("associarIbanNif").value = dados.agregado.associarIbanNif || "";
 
       document.querySelector("#tabelaDependentes tbody").innerHTML = "";
       dados.agregado.dependentes.forEach(dep => {

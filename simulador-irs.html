@@ -58,7 +58,7 @@
 
 <div class="layout">
   <nav class="barra-secoes">
-    <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Agregado Familiar</button>
+    <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Rosto</button>
     <button type="button" data-secao="anexoA" onclick="mostrarSecao('anexoA')">Anexo A</button>
     <button type="button" data-secao="anexoB" onclick="mostrarSecao('anexoB')">Anexo B</button>
     <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
@@ -67,7 +67,7 @@
   <div class="conteudo-secoes">
 
 <div class="painel ativo" id="painel-agregado">
-<h2>Agregado Familiar</h2>
+<h2>Rosto</h2>
 <fieldset>
   <div class="row">
     <div><label>Ano dos rendimentos</label><input id="ano" type="number" value="2025"></div>
@@ -90,6 +90,13 @@
         <option value="">(não indicado)</option>
         <option value="primeira">1.ª declaração do ano</option>
         <option value="substituicao">Declaração de substituição</option>
+      </select>
+    </div>
+    <div><label>Associar IBAN ao NIF <small class="hint">(Rosto, Quadro 9)</small></label>
+      <select id="associarIbanNif">
+        <option value="">(não indicado)</option>
+        <option value="sim">Sim</option>
+        <option value="nao">Não</option>
       </select>
     </div>
   </div>
@@ -759,7 +766,7 @@ const COD_RESIDENCIA_FISCAL = { continente: 1, acores: 2, madeira: 3 };
 const COD_NATUREZA_DECLARACAO = { primeira: 1, substituicao: 2 };
 
 function buildRosto(model) {
-  const { ano, nifA, nifB, tributacaoConjunta, iban, residenciaFiscal, naturezaDeclaracao, dependentes = [] } = model.agregado;
+  const { ano, nifA, nifB, tributacaoConjunta, iban, residenciaFiscal, naturezaDeclaracao, associarIbanNif, dependentes = [] } = model.agregado;
   const passthrough = model.rostoPassthrough || {};
 
   const quadro04 = tributacaoConjunta ? `<Quadro04>${el("Q04B01", 1)}</Quadro04>` : `<Quadro04/>`;
@@ -789,20 +796,33 @@ function buildRosto(model) {
     `</Quadro06>`;
 
   // Quadro08 (residência fiscal) e Quadro10 (natureza da declaração): nomes de campo
-  // (Q08B01/Q10B01) inferidos por analogia com o padrão observado no Quadro04 (um único
-  // campo cujo valor é o número do campo do papel assinalado) — ainda não confirmados
-  // contra um exemplo real com estes quadros preenchidos. Só cobrem os casos mais comuns
-  // (residente, Continente/Açores/Madeira; 1.ª declaração/substituição); os restantes casos
-  // (não residente, prazos especiais, etc.) mantêm-se em passthrough tal como antes.
+  // (Q08B01/Q10B01, um único campo cujo valor é o número do campo do papel assinalado)
+  // confirmados contra um exemplo real (Q08B01=1 para Continente, Q10B01=1 para 1.ª
+  // declaração). Só cobrem os casos mais comuns (residente, Continente/Açores/Madeira;
+  // 1.ª declaração/substituição). O passthrough tem sempre prioridade sobre o valor
+  // calculado quando existe (quadro importado com conteúdo) — para não perder campos que
+  // a app ainda não modela (ex: Quadro08B de não residentes) só porque reconhecemos um dos
+  // campos. Isto significa que alterar o dropdown depois de importar uma declaração que já
+  // tinha estes quadros preenchidos não se reflete na exportação — só se aplica a partir
+  // de um quadro em branco.
   const codResidencia = COD_RESIDENCIA_FISCAL[residenciaFiscal];
-  const quadro08 = codResidencia
+  const quadro08 = passthrough.Quadro08 || (codResidencia
     ? `<Quadro08>${el("Q08B01", codResidencia)}</Quadro08>`
-    : (passthrough.Quadro08 || `<Quadro08/>`);
+    : `<Quadro08/>`);
 
   const codNatureza = COD_NATUREZA_DECLARACAO[naturezaDeclaracao];
-  const quadro10 = codNatureza
+  const quadro10 = passthrough.Quadro10 || (codNatureza
     ? `<Quadro10>${el("Q10B01", codNatureza)}</Quadro10>`
-    : (passthrough.Quadro10 || `<Quadro10/>`);
+    : `<Quadro10/>`);
+
+  // Quadro09 — "Pretende que a AT associe este IBAN aos seus dados de identificação do
+  // NIF...?" Confirmado num exemplo real (ordem das tags incluída): Sim ->
+  // Q09B01b="true" seguido de Q09B01="S" (o significado exato do sufixo "b" não está
+  // documentado nas instruções; assume-se que só aparece quando a resposta é "Sim", por
+  // ser o único caso observado).
+  const quadro09Extra = associarIbanNif === "sim" ? `${el("Q09B01b", "true")}${el("Q09B01", "S")}`
+    : associarIbanNif === "nao" ? el("Q09B01", "N")
+    : "";
 
   return `<Rosto>` +
     `<QuadroInicio/>` +
@@ -814,7 +834,7 @@ function buildRosto(model) {
     quadro06 +
     (passthrough.Quadro07 || `<Quadro07>${el("Rostoq07AT01")}${el("Rostoq07BT01")}${el("Rostoq07CT01")}</Quadro07>`) +
     quadro08 +
-    `<Quadro09>${el("Q09C01", iban)}</Quadro09>` +
+    `<Quadro09>${el("Q09C01", iban)}${quadro09Extra}</Quadro09>` +
     quadro10 +
     (passthrough.Quadro11 || `<Quadro11/>`) +
     (passthrough.Quadro13 || `<Quadro13>${el("Rostoq13T01")}</Quadro13>`) +
@@ -1131,10 +1151,29 @@ if (typeof module !== "undefined" && module.exports) {
 // devolve o modelo de dados usado pela aplicação, para continuar a preencher/editar
 // a partir daí.
 //
-// Secções que a aplicação ainda não sabe editar (Anexos B/E/G/G1/H/J/L/SS, e os
-// Quadros 07/08/10/11/13 do Rosto) são preservadas tal como vieram no ficheiro
-// importado ("passthrough"), para que exportar de novo não perca dados que o
-// utilizador não tocou.
+// Secções que a aplicação ainda não sabe editar (Anexos B/E/G/G1/H/J/L/SS, Quadro 07 e
+// 08B/11/13 do Rosto) são preservadas tal como vieram no ficheiro importado
+// ("passthrough"), para que exportar de novo não perca dados que o utilizador não tocou.
+//
+// Nomes de campo do Rosto confirmados contra um exemplo real (para referência futura, se
+// se vier a construir interface própria para estes quadros):
+//   Quadro07 — Rostoq07AT01 (ascendentes em comunhão de habitação, lista com NIF +
+//     DeficienteGrau), Rostoq07BT01 (outros ascendentes/colaterais, mesma estrutura),
+//     Rostoq07CT01 (crianças/jovens acolhidos, lista).
+//   Quadro08B (não residentes) — Q08B04 (não residente, valor=4), Q08C06 (código do país,
+//     tabela do Anexo J), Q08B07 (opta regras gerais não residentes, valor=7) — grupo
+//     mutuamente exclusivo com Q08B08 (opta por regime alternativo, valor=8, não
+//     confirmado); dentro desse: Q08B09 (taxas gerais art.º 68.º, valor=9) — mutuamente
+//     exclusivo com Q08B10 (regras dos residentes art.º 17.º-A, valor=10, não
+//     confirmado); Q08C11 (total rendimentos no estrangeiro, decimal); Q08C13/Q08C14
+//     (residência fiscal parcial — datas de início/fim, AAAA-MM-DD).
+//   Quadro11 (consignação IRS/IVA) — Q11B01 (entidade escolhida: valor 1=código 1101,
+//     2=código 1102, 3=código 1103, 4=código 1104 — não totalmente confirmado, só se viu
+//     o valor 2), Q11B01a (booleano — provavelmente corresponde à checkbox "IRS"; a
+//     checkbox "IVA" e o NIF da entidade não apareceram preenchidos no exemplo).
+//   Quadro13 (prazos especiais) — Q13B01 (motivo do prazo especial: valor 1/2/3/5/7
+//     conforme o campo do papel assinalado — grupo mutuamente exclusivo; campo 04 é a
+//     data do facto, campo06 é a lista Rostoq13T01), Q13C04 (data do facto, AAAA-MM-DD).
 //
 // Ficheiro carregado como <script> normal (não módulo), tal como os restantes.
 
@@ -1199,6 +1238,7 @@ function parseDependentes(quadro06) {
 
 const RESIDENCIA_FISCAL_POR_COD = { "1": "continente", "2": "acores", "3": "madeira" };
 const NATUREZA_DECLARACAO_POR_COD = { "1": "primeira", "2": "substituicao" };
+const ASSOCIAR_IBAN_NIF_POR_COD = { "S": "sim", "N": "nao" };
 
 function parseRosto(rosto) {
   const q02 = filho(rosto, "Quadro02");
@@ -1222,15 +1262,21 @@ function parseRosto(rosto) {
     // fica undefined e o quadro original é preservado tal como veio (passthrough abaixo).
     residenciaFiscal: RESIDENCIA_FISCAL_POR_COD[texto(q08, "Q08B01")],
     naturezaDeclaracao: NATUREZA_DECLARACAO_POR_COD[texto(q10, "Q10B01")],
+    associarIbanNif: ASSOCIAR_IBAN_NIF_POR_COD[texto(q09, "Q09B01")],
     dependentes: parseDependentes(q06)
   };
 
   // Guarda tal como veio, para não perder dados nos quadros que a app ainda não edita
-  // (ou não reconhece, no caso do Quadro08/10 — ver nota acima).
+  // (ou não reconhece, no caso do Quadro08/10 — ver nota acima). Só se guarda passthrough
+  // quando o quadro tem mesmo conteúdo (elementos filhos) — um quadro vazio
+  // (<Quadro08/>) não é guardado, para que os campos reconhecidos (Q08B01/Q10B01) e
+  // editáveis na interface continuem a poder gerar o quadro a partir do zero.
   const passthrough = {};
   ["Quadro07", "Quadro08", "Quadro10", "Quadro11", "Quadro13"].forEach(nome => {
     const el = filho(rosto, nome);
-    if (el) passthrough[nome] = serializar(el);
+    if (el && Array.from(el.childNodes).some(n => n.nodeType === 1)) {
+      passthrough[nome] = serializar(el);
+    }
   });
 
   return { agregado, rostoPassthrough: passthrough };
@@ -1829,6 +1875,7 @@ if (typeof module !== "undefined" && module.exports) {
       iban: document.getElementById("iban").value || undefined,
       residenciaFiscal: document.getElementById("residenciaFiscal").value || undefined,
       naturezaDeclaracao: document.getElementById("naturezaDeclaracao").value || undefined,
+      associarIbanNif: document.getElementById("associarIbanNif").value || undefined,
       dependentes
     };
   }
@@ -1946,6 +1993,7 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("nifB").value = dados.agregado.nifB || "";
       document.getElementById("residenciaFiscal").value = dados.agregado.residenciaFiscal || "";
       document.getElementById("naturezaDeclaracao").value = dados.agregado.naturezaDeclaracao || "";
+      document.getElementById("associarIbanNif").value = dados.agregado.associarIbanNif || "";
 
       document.querySelector("#tabelaDependentes tbody").innerHTML = "";
       dados.agregado.dependentes.forEach(dep => {

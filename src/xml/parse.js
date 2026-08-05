@@ -2,10 +2,29 @@
 // devolve o modelo de dados usado pela aplicação, para continuar a preencher/editar
 // a partir daí.
 //
-// Secções que a aplicação ainda não sabe editar (Anexos B/E/G/G1/H/J/L/SS, e os
-// Quadros 07/08/10/11/13 do Rosto) são preservadas tal como vieram no ficheiro
-// importado ("passthrough"), para que exportar de novo não perca dados que o
-// utilizador não tocou.
+// Secções que a aplicação ainda não sabe editar (Anexos B/E/G/G1/H/J/L/SS, Quadro 07 e
+// 08B/11/13 do Rosto) são preservadas tal como vieram no ficheiro importado
+// ("passthrough"), para que exportar de novo não perca dados que o utilizador não tocou.
+//
+// Nomes de campo do Rosto confirmados contra um exemplo real (para referência futura, se
+// se vier a construir interface própria para estes quadros):
+//   Quadro07 — Rostoq07AT01 (ascendentes em comunhão de habitação, lista com NIF +
+//     DeficienteGrau), Rostoq07BT01 (outros ascendentes/colaterais, mesma estrutura),
+//     Rostoq07CT01 (crianças/jovens acolhidos, lista).
+//   Quadro08B (não residentes) — Q08B04 (não residente, valor=4), Q08C06 (código do país,
+//     tabela do Anexo J), Q08B07 (opta regras gerais não residentes, valor=7) — grupo
+//     mutuamente exclusivo com Q08B08 (opta por regime alternativo, valor=8, não
+//     confirmado); dentro desse: Q08B09 (taxas gerais art.º 68.º, valor=9) — mutuamente
+//     exclusivo com Q08B10 (regras dos residentes art.º 17.º-A, valor=10, não
+//     confirmado); Q08C11 (total rendimentos no estrangeiro, decimal); Q08C13/Q08C14
+//     (residência fiscal parcial — datas de início/fim, AAAA-MM-DD).
+//   Quadro11 (consignação IRS/IVA) — Q11B01 (entidade escolhida: valor 1=código 1101,
+//     2=código 1102, 3=código 1103, 4=código 1104 — não totalmente confirmado, só se viu
+//     o valor 2), Q11B01a (booleano — provavelmente corresponde à checkbox "IRS"; a
+//     checkbox "IVA" e o NIF da entidade não apareceram preenchidos no exemplo).
+//   Quadro13 (prazos especiais) — Q13B01 (motivo do prazo especial: valor 1/2/3/5/7
+//     conforme o campo do papel assinalado — grupo mutuamente exclusivo; campo 04 é a
+//     data do facto, campo06 é a lista Rostoq13T01), Q13C04 (data do facto, AAAA-MM-DD).
 //
 // Ficheiro carregado como <script> normal (não módulo), tal como os restantes.
 
@@ -70,6 +89,7 @@ function parseDependentes(quadro06) {
 
 const RESIDENCIA_FISCAL_POR_COD = { "1": "continente", "2": "acores", "3": "madeira" };
 const NATUREZA_DECLARACAO_POR_COD = { "1": "primeira", "2": "substituicao" };
+const ASSOCIAR_IBAN_NIF_POR_COD = { "S": "sim", "N": "nao" };
 
 function parseRosto(rosto) {
   const q02 = filho(rosto, "Quadro02");
@@ -93,15 +113,21 @@ function parseRosto(rosto) {
     // fica undefined e o quadro original é preservado tal como veio (passthrough abaixo).
     residenciaFiscal: RESIDENCIA_FISCAL_POR_COD[texto(q08, "Q08B01")],
     naturezaDeclaracao: NATUREZA_DECLARACAO_POR_COD[texto(q10, "Q10B01")],
+    associarIbanNif: ASSOCIAR_IBAN_NIF_POR_COD[texto(q09, "Q09B01")],
     dependentes: parseDependentes(q06)
   };
 
   // Guarda tal como veio, para não perder dados nos quadros que a app ainda não edita
-  // (ou não reconhece, no caso do Quadro08/10 — ver nota acima).
+  // (ou não reconhece, no caso do Quadro08/10 — ver nota acima). Só se guarda passthrough
+  // quando o quadro tem mesmo conteúdo (elementos filhos) — um quadro vazio
+  // (<Quadro08/>) não é guardado, para que os campos reconhecidos (Q08B01/Q10B01) e
+  // editáveis na interface continuem a poder gerar o quadro a partir do zero.
   const passthrough = {};
   ["Quadro07", "Quadro08", "Quadro10", "Quadro11", "Quadro13"].forEach(nome => {
     const el = filho(rosto, nome);
-    if (el) passthrough[nome] = serializar(el);
+    if (el && Array.from(el.childNodes).some(n => n.nodeType === 1)) {
+      passthrough[nome] = serializar(el);
+    }
   });
 
   return { agregado, rostoPassthrough: passthrough };
