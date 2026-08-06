@@ -609,6 +609,14 @@ const PARAMETROS_2025 = {
   // desta regra, mesmo sem nada declarado (replica o valor visto na Demonstração de
   // Liquidação da AT, que coincide com o mínimo da dedução específica da categoria A).
   minimoContribuicoesCategoriaB: 4462.15,
+  // Taxa especial aplicada aos rendimentos de capitais do Anexo E — Quadro 4A (art.º 72.º
+  // do CIRS) quando NÃO se opta pelo englobamento — 28% é a taxa mais comum para
+  // rendimentos de capitais (mesma taxa liberatória "padrão" do art.º 71.º), mas o art.º
+  // 72.º tem taxas diferentes consoante o tipo de rendimento (ex: entidades em regime fiscal
+  // privilegiado a 35%) que as instruções de preenchimento do Anexo E não especificam por
+  // código. A VALIDAR antes de uso real — se algum cliente tiver rendimentos sujeitos a uma
+  // taxa diferente de 28%, o valor calculado para a Categoria E estará errado.
+  taxaEspecialCategoriaE: 0.28,
   // Deduções à coleta por despesas gerais (art.º 78.º e seguintes do CIRS), a partir dos
   // totais anuais registados no e-fatura. "porAgregado: true" nos limites significa que o
   // limite duplica em tributação conjunta (2 sujeitos passivos); os restantes são já por
@@ -838,6 +846,48 @@ if (typeof module !== "undefined" && module.exports) {
     return { porLinha, totalDeducao, naoCalculados };
   }
 
+  // Categoria E (rendimentos de capitais, Anexo E): sem opção pelo englobamento, os
+  // rendimentos do Quadro 4A (taxas especiais, art.º 72.º CIRS) são tributados à taxa
+  // especial (parametros.taxaEspecialCategoriaE — A VALIDAR, o art.º 72.º tem taxas
+  // diferentes consoante o tipo de rendimento) e essa coleta soma-se diretamente à coleta
+  // líquida, sem entrar no rendimento coletável nem nas deduções à coleta gerais (mesma
+  // lógica das taxas liberatórias/autónomas). Os rendimentos do Quadro 4B (taxas
+  // liberatórias, art.º 71.º CIRS) já estão definitivamente tributados por retenção na
+  // fonte e não entram na estimativa nesse caso.
+  // Com opção pelo englobamento, os rendimentos de ambos os quadros somam-se ao rendimento
+  // global e são tributados nos escalões gerais como os das restantes categorias, com
+  // crédito das retenções já efetuadas (Quadro 4B).
+  function calcularRendimentoCategoriaE(anexoE, parametros) {
+    const e = anexoE || {};
+    const taxasEspeciais = e.rendimentosTaxasEspeciais || [];
+    const taxasLiberatorias = e.rendimentosTaxasLiberatorias || [];
+    const somaTaxasEspeciais = taxasEspeciais.reduce((acc, r) => acc + (Number(r.rendimento) || 0), 0);
+    const somaTaxasLiberatoriasRend = taxasLiberatorias.reduce((acc, r) => acc + (Number(r.rendimento) || 0), 0);
+    const somaTaxasLiberatoriasRet = taxasLiberatorias.reduce((acc, r) => acc + (Number(r.retencao) || 0), 0);
+
+    if (e.optaEnglobamento) {
+      return {
+        optaEnglobamento: true,
+        rendimentoBrutoTaxasEspeciais: somaTaxasEspeciais,
+        rendimentoBrutoTaxasLiberatorias: somaTaxasLiberatoriasRend,
+        rendimentoEnglobado: somaTaxasEspeciais + somaTaxasLiberatoriasRend,
+        coletaEspecial: 0,
+        retencoes: somaTaxasLiberatoriasRet
+      };
+    }
+
+    const taxa = parametros.taxaEspecialCategoriaE ?? 0.28;
+    return {
+      optaEnglobamento: false,
+      rendimentoBrutoTaxasEspeciais: somaTaxasEspeciais,
+      rendimentoBrutoTaxasLiberatorias: somaTaxasLiberatoriasRend,
+      rendimentoEnglobado: 0,
+      coletaEspecial: somaTaxasEspeciais * taxa,
+      taxaEspecial: taxa,
+      retencoes: 0
+    };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -850,17 +900,20 @@ if (typeof module !== "undefined" && module.exports) {
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, anexoH, despesasEFatura, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
 
     const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
+    const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
-    // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo.
-    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel;
+    // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A
+    // Categoria E só entra aqui quando se opta pelo englobamento (senão é tributada à parte,
+    // na coleta especial abaixo).
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado;
     const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
@@ -876,9 +929,11 @@ if (typeof module !== "undefined" && module.exports) {
     const dedPensoesAlimentos = calcularDeducaoPensoesAlimentos(anexoH);
     const deducaoBeneficios = calcularDeducaoBeneficiosDeficiencia(anexoH, parametros);
     const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos + deducaoBeneficios.totalDeducao;
-    const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
+    // A coleta especial da Categoria E (taxas do art.º 72.º) soma-se depois das deduções à
+    // coleta gerais — tal como as taxas liberatórias/autónomas, não é reduzida por elas.
+    const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal) + categoriaE.coletaEspecial;
 
-    const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
+    const retencoesFonte = somaA.retencoes + categoriaB.retencoes + categoriaE.retencoes;
     const pagamentosPorConta = categoriaB.pagamentosPorConta;
     const retencoesTotais = retencoesFonte + pagamentosPorConta;
     const resultado = retencoesTotais - coletaLiquida; // positivo = reembolso, negativo = a pagar
@@ -894,6 +949,7 @@ if (typeof module !== "undefined" && module.exports) {
       despesasCalculadasB: categoriaB.despesasCalculadas,
       valorMinimoDespesasB: categoriaB.valorMinimoDespesas,
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
+      categoriaE,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoGlobal,
       rendimentoLiquido,
@@ -918,6 +974,7 @@ if (typeof module !== "undefined" && module.exports) {
     somaRendimentosCategoriaA,
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
+    calcularRendimentoCategoriaE,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
     calcularDeducaoBeneficiosDeficiencia,
@@ -2216,6 +2273,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const valorAbs = formatarMoeda(Math.abs(resultado.resultado));
   const temCategoriaB = !!resultado.rendimentoBrutoB;
   const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+  const categoriaE = resultado.categoriaE || {};
+  const temCategoriaE = categoriaE.rendimentoBrutoTaxasEspeciais > 0 || categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
 
   return `<!doctype html>
 <html lang="pt">
@@ -2253,11 +2312,17 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${linha("Categoria B — rendimento bruto (regime simplificado)", resultado.rendimentoBrutoB)}
     ${linha("Categoria B — após coeficiente aplicável", resultado.rendimentoTributavelBaseB)}
     ${temAcrescimo ? linha("Categoria B — acréscimo por despesas insuficientes", resultado.acrescimoAoRendimentoB) : ""}` : ""}
+    ${temCategoriaE ? (categoriaE.optaEnglobamento
+      ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
+      : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
   comprovadas (contribuições para a Segurança Social e despesas gerais do e-fatura) têm de atingir 15%
   dos rendimentos sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
+  ${temCategoriaE && !categoriaE.optaEnglobamento ? `<p class="nota">Os rendimentos de capitais (Categoria E)
+  não englobados são tributados à parte, à taxa especial de ${(categoriaE.taxaEspecial * 100).toFixed(0)}%
+  (a confirmar consoante o tipo de rendimento), somando-se diretamente à coleta líquida.</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
@@ -2268,6 +2333,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
       .map(l => linha(`Dedução à coleta — ${l.codigo} ${l.label}`, -l.deducao)).join("")}
     ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
       .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
+    ${temCategoriaE && !categoriaE.optaEnglobamento ? linha("Coleta especial (Categoria E)", categoriaE.coletaEspecial) : ""}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}
   </table>
 
@@ -2998,9 +3064,10 @@ if (typeof module !== "undefined" && module.exports) {
     const agregado = lerAgregado();
     const anexoA = lerAnexoA();
     const anexoB = lerAnexoB();
+    const anexoE = lerAnexoE();
     const anexoH = lerAnexoH();
     const despesasEFatura = lerDespesasEFatura();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoH, despesasEFatura, parametros });
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -3009,6 +3076,7 @@ if (typeof module !== "undefined" && module.exports) {
     const temCategoriaA = !!resultado.rendimentoBrutoA;
     const temCategoriaB = !!resultado.rendimentoBrutoB;
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+    const temCategoriaE = resultado.categoriaE.rendimentoBrutoTaxasEspeciais > 0 || resultado.categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
     const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
       .filter(c => c.despesa > 0)
       .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
@@ -3022,6 +3090,11 @@ if (typeof module !== "undefined" && module.exports) {
       <strong>Categoria B — após coeficiente aplicável:</strong> ${formatarMoeda(resultado.rendimentoTributavelBaseB)} €<br>` +
       (temAcrescimo ? `<strong>Categoria B — acréscimo por despesas insuficientes:</strong> ${formatarMoeda(resultado.acrescimoAoRendimentoB)} €<br>` : "")
       : "") +
+      (temCategoriaE ? (resultado.categoriaE.optaEnglobamento ? `
+      <strong>Categoria E — rendimento englobado:</strong> ${formatarMoeda(resultado.categoriaE.rendimentoEnglobado)} €<br>` : `
+      <strong>Categoria E — rendimento sujeito a taxa especial:</strong> ${formatarMoeda(resultado.categoriaE.rendimentoBrutoTaxasEspeciais)} €<br>
+      <strong>Categoria E — coleta especial (taxa ${(resultado.categoriaE.taxaEspecial * 100).toFixed(0)}%, a confirmar):</strong> ${formatarMoeda(resultado.categoriaE.coletaEspecial)} €<br>`)
+      : "") +
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>
       <strong>Coleta:</strong> ${formatarMoeda(resultado.coletaBruta)} €<br>
@@ -3032,6 +3105,8 @@ if (typeof module !== "undefined" && module.exports) {
         .map(l => `<strong>Dedução à coleta (${l.codigo} — ${l.label}):</strong> -${formatarMoeda(l.deducao)} €<br>`)
         .join("") +
       linhasDeducoesArt78 +
+      (!resultado.categoriaE.optaEnglobamento && resultado.categoriaE.coletaEspecial > 0
+        ? `<strong>Coleta especial (Categoria E):</strong> +${formatarMoeda(resultado.categoriaE.coletaEspecial)} €<br>` : "") +
       `<strong>Coleta líquida:</strong> ${formatarMoeda(resultado.coletaLiquida)} €<br>
       <hr>
       <strong>Retenções na fonte:</strong> ${formatarMoeda(resultado.retencoesFonte)} €<br>` +

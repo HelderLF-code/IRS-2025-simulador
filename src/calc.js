@@ -166,6 +166,48 @@
     return { porLinha, totalDeducao, naoCalculados };
   }
 
+  // Categoria E (rendimentos de capitais, Anexo E): sem opção pelo englobamento, os
+  // rendimentos do Quadro 4A (taxas especiais, art.º 72.º CIRS) são tributados à taxa
+  // especial (parametros.taxaEspecialCategoriaE — A VALIDAR, o art.º 72.º tem taxas
+  // diferentes consoante o tipo de rendimento) e essa coleta soma-se diretamente à coleta
+  // líquida, sem entrar no rendimento coletável nem nas deduções à coleta gerais (mesma
+  // lógica das taxas liberatórias/autónomas). Os rendimentos do Quadro 4B (taxas
+  // liberatórias, art.º 71.º CIRS) já estão definitivamente tributados por retenção na
+  // fonte e não entram na estimativa nesse caso.
+  // Com opção pelo englobamento, os rendimentos de ambos os quadros somam-se ao rendimento
+  // global e são tributados nos escalões gerais como os das restantes categorias, com
+  // crédito das retenções já efetuadas (Quadro 4B).
+  function calcularRendimentoCategoriaE(anexoE, parametros) {
+    const e = anexoE || {};
+    const taxasEspeciais = e.rendimentosTaxasEspeciais || [];
+    const taxasLiberatorias = e.rendimentosTaxasLiberatorias || [];
+    const somaTaxasEspeciais = taxasEspeciais.reduce((acc, r) => acc + (Number(r.rendimento) || 0), 0);
+    const somaTaxasLiberatoriasRend = taxasLiberatorias.reduce((acc, r) => acc + (Number(r.rendimento) || 0), 0);
+    const somaTaxasLiberatoriasRet = taxasLiberatorias.reduce((acc, r) => acc + (Number(r.retencao) || 0), 0);
+
+    if (e.optaEnglobamento) {
+      return {
+        optaEnglobamento: true,
+        rendimentoBrutoTaxasEspeciais: somaTaxasEspeciais,
+        rendimentoBrutoTaxasLiberatorias: somaTaxasLiberatoriasRend,
+        rendimentoEnglobado: somaTaxasEspeciais + somaTaxasLiberatoriasRend,
+        coletaEspecial: 0,
+        retencoes: somaTaxasLiberatoriasRet
+      };
+    }
+
+    const taxa = parametros.taxaEspecialCategoriaE ?? 0.28;
+    return {
+      optaEnglobamento: false,
+      rendimentoBrutoTaxasEspeciais: somaTaxasEspeciais,
+      rendimentoBrutoTaxasLiberatorias: somaTaxasLiberatoriasRend,
+      rendimentoEnglobado: 0,
+      coletaEspecial: somaTaxasEspeciais * taxa,
+      taxaEspecial: taxa,
+      retencoes: 0
+    };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -178,17 +220,20 @@
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, anexoH, despesasEFatura, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
 
     const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
+    const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
-    // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo.
-    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel;
+    // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A
+    // Categoria E só entra aqui quando se opta pelo englobamento (senão é tributada à parte,
+    // na coleta especial abaixo).
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado;
     const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
@@ -204,9 +249,11 @@
     const dedPensoesAlimentos = calcularDeducaoPensoesAlimentos(anexoH);
     const deducaoBeneficios = calcularDeducaoBeneficiosDeficiencia(anexoH, parametros);
     const dedColetaTotal = dedColetaDependentes + deducoesArt78.totalDeducao + dedPensoesAlimentos + deducaoBeneficios.totalDeducao;
-    const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal);
+    // A coleta especial da Categoria E (taxas do art.º 72.º) soma-se depois das deduções à
+    // coleta gerais — tal como as taxas liberatórias/autónomas, não é reduzida por elas.
+    const coletaLiquida = Math.max(0, coletaBruta - dedColetaTotal) + categoriaE.coletaEspecial;
 
-    const retencoesFonte = somaA.retencoes + categoriaB.retencoes;
+    const retencoesFonte = somaA.retencoes + categoriaB.retencoes + categoriaE.retencoes;
     const pagamentosPorConta = categoriaB.pagamentosPorConta;
     const retencoesTotais = retencoesFonte + pagamentosPorConta;
     const resultado = retencoesTotais - coletaLiquida; // positivo = reembolso, negativo = a pagar
@@ -222,6 +269,7 @@
       despesasCalculadasB: categoriaB.despesasCalculadas,
       valorMinimoDespesasB: categoriaB.valorMinimoDespesas,
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
+      categoriaE,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoGlobal,
       rendimentoLiquido,
@@ -246,6 +294,7 @@
     somaRendimentosCategoriaA,
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
+    calcularRendimentoCategoriaE,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
     calcularDeducaoBeneficiosDeficiencia,

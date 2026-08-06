@@ -59,8 +59,15 @@ regenerar o `simulador-irs.html`.
   art.º 72.º CIRS), opção pelo englobamento, Quadro 4B (rendimentos sujeitos a taxas
   liberatórias, art.º 71.º CIRS — só relevante com englobamento) e Quadro 5A/5B
   (rendimentos de anos anteriores, art.º 74.º CIRS). Nomes de campo confirmados contra um
-  exemplo real. Não afeta o cálculo da estimativa — o motor de cálculo cobre as
-  Categorias A e B, não a Categoria E.
+  exemplo real. Entra no cálculo da estimativa: sem optar pelo englobamento, os
+  rendimentos do Quadro 4A são tributados à taxa especial `taxaEspecialCategoriaE`
+  (28% por omissão) e essa coleta soma-se diretamente à coleta líquida (não passa pelos
+  escalões nem pelas deduções à coleta gerais); com englobamento, os rendimentos dos
+  Quadros 4A e 4B somam-se ao rendimento global e são tributados nos escalões gerais, com
+  crédito das retenções do Quadro 4B. **A taxa de 28% é só a mais comum — o art.º 72.º do
+  CIRS tem taxas diferentes consoante o tipo de rendimento (ex: 35% para entidades em
+  regime fiscal privilegiado), que as instruções de preenchimento não especificam por
+  código — por confirmar antes de uso real com rendimentos sujeitos a taxa diferente.**
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com

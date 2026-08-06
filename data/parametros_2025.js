@@ -64,6 +64,14 @@ const PARAMETROS_2025 = {
   // desta regra, mesmo sem nada declarado (replica o valor visto na Demonstração de
   // Liquidação da AT, que coincide com o mínimo da dedução específica da categoria A).
   minimoContribuicoesCategoriaB: 4462.15,
+  // Taxa especial aplicada aos rendimentos de capitais do Anexo E — Quadro 4A (art.º 72.º
+  // do CIRS) quando NÃO se opta pelo englobamento — 28% é a taxa mais comum para
+  // rendimentos de capitais (mesma taxa liberatória "padrão" do art.º 71.º), mas o art.º
+  // 72.º tem taxas diferentes consoante o tipo de rendimento (ex: entidades em regime fiscal
+  // privilegiado a 35%) que as instruções de preenchimento do Anexo E não especificam por
+  // código. A VALIDAR antes de uso real — se algum cliente tiver rendimentos sujeitos a uma
+  // taxa diferente de 28%, o valor calculado para a Categoria E estará errado.
+  taxaEspecialCategoriaE: 0.28,
   // Deduções à coleta por despesas gerais (art.º 78.º e seguintes do CIRS), a partir dos
   // totais anuais registados no e-fatura. "porAgregado: true" nos limites significa que o
   // limite duplica em tributação conjunta (2 sujeitos passivos); os restantes são já por

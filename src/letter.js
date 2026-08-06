@@ -31,6 +31,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const valorAbs = formatarMoeda(Math.abs(resultado.resultado));
   const temCategoriaB = !!resultado.rendimentoBrutoB;
   const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
+  const categoriaE = resultado.categoriaE || {};
+  const temCategoriaE = categoriaE.rendimentoBrutoTaxasEspeciais > 0 || categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
 
   return `<!doctype html>
 <html lang="pt">
@@ -68,11 +70,17 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${linha("Categoria B — rendimento bruto (regime simplificado)", resultado.rendimentoBrutoB)}
     ${linha("Categoria B — após coeficiente aplicável", resultado.rendimentoTributavelBaseB)}
     ${temAcrescimo ? linha("Categoria B — acréscimo por despesas insuficientes", resultado.acrescimoAoRendimentoB) : ""}` : ""}
+    ${temCategoriaE ? (categoriaE.optaEnglobamento
+      ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
+      : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
   comprovadas (contribuições para a Segurança Social e despesas gerais do e-fatura) têm de atingir 15%
   dos rendimentos sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
+  ${temCategoriaE && !categoriaE.optaEnglobamento ? `<p class="nota">Os rendimentos de capitais (Categoria E)
+  não englobados são tributados à parte, à taxa especial de ${(categoriaE.taxaEspecial * 100).toFixed(0)}%
+  (a confirmar consoante o tipo de rendimento), somando-se diretamente à coleta líquida.</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
@@ -83,6 +91,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
       .map(l => linha(`Dedução à coleta — ${l.codigo} ${l.label}`, -l.deducao)).join("")}
     ${resultado.deducoesArt78.porCategoria.filter(c => c.despesa > 0)
       .map(c => linha(`Dedução à coleta — ${c.label}`, -c.deducao)).join("")}
+    ${temCategoriaE && !categoriaE.optaEnglobamento ? linha("Coleta especial (Categoria E)", categoriaE.coletaEspecial) : ""}
     ${linha("Coleta líquida", resultado.coletaLiquida, { destaque: true })}
   </table>
 
