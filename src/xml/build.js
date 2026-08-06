@@ -325,6 +325,84 @@ function temDadosQuadro04AnexoG(q04) {
     (q04.alienacaoEstado && q04.alienacaoEstado.length > 0);
 }
 
+// Anexo G, Quadro 5 (reinvestimento do valor de realização de imóvel destinado a
+// habitação própria e permanente, art.º 10.º CIRS): nomes de campo confirmados contra um
+// exemplo real. Cobre até duas alienações reinvestidas no mesmo ano (5001-5016 e a réplica
+// 5021-5040), a identificação matricial do imóvel de reinvestimento (5A1), os contratos de
+// seguro/fundo de pensões/regime público de capitalização (5A2) e a amortização de
+// empréstimo (5B). Não afeta ainda o cálculo — a isenção de mais-valias por reinvestimento
+// tem regras próprias que ainda não estão implementadas.
+function buildReinvestimentoAnexoG(r, camposNumeros) {
+  const [cAno, cCamposQ4, cEmprestimo, cSemCredito, cSeguro, c24MesesAntes, cMais24Suspensao,
+    cAnoAlienacao, cAnoSeguinte, cSegundoAno, cTerceiroAno, cApos36Suspensao, cSeguroAno, cSeguroAnoSeguinte] = camposNumeros;
+  if (!r) return "";
+  const camposQ4 = listaComLinhas(`AnexoGq05AT0${cCamposQ4}`, (r.camposQ4 || []).map(c => ({ CamposQuadro4: c })));
+  return el(`AnexoGq05C${cAno}`, r.ano) +
+    camposQ4 +
+    el(`AnexoGq05C${cEmprestimo}`, r.valorEmprestimoDivida !== undefined ? moeda(r.valorEmprestimoDivida) : undefined) +
+    el(`AnexoGq05C${cSemCredito}`, r.valorReinvestirSemCredito !== undefined ? moeda(r.valorReinvestirSemCredito) : undefined) +
+    el(`AnexoGq05C${cSeguro}`, r.valorReinvestirSeguro !== undefined ? moeda(r.valorReinvestirSeguro) : undefined) +
+    el(`AnexoGq05C${c24MesesAntes}`, r.reinvestido24MesesAntes !== undefined ? moeda(r.reinvestido24MesesAntes) : undefined) +
+    el(`AnexoGq05C${cMais24Suspensao}`, r.reinvestidoMais24MesesAntesSuspensao !== undefined ? moeda(r.reinvestidoMais24MesesAntesSuspensao) : undefined) +
+    el(`AnexoGq05C${cAnoAlienacao}`, r.reinvestidoAnoAlienacao !== undefined ? moeda(r.reinvestidoAnoAlienacao) : undefined) +
+    el(`AnexoGq05C${cAnoSeguinte}`, r.reinvestidoAnoSeguinte !== undefined ? moeda(r.reinvestidoAnoSeguinte) : undefined) +
+    el(`AnexoGq05C${cSegundoAno}`, r.reinvestidoSegundoAnoSeguinte !== undefined ? moeda(r.reinvestidoSegundoAnoSeguinte) : undefined) +
+    el(`AnexoGq05C${cTerceiroAno}`, r.reinvestidoTerceiroAnoSeguinte !== undefined ? moeda(r.reinvestidoTerceiroAnoSeguinte) : undefined) +
+    el(`AnexoGq05C${cApos36Suspensao}`, r.reinvestidoApos36MesesSuspensao !== undefined ? moeda(r.reinvestidoApos36MesesSuspensao) : undefined) +
+    el(`AnexoGq05C${cSeguroAno}`, r.reinvestidoSeguroAnoAlienacao !== undefined ? moeda(r.reinvestidoSeguroAnoAlienacao) : undefined) +
+    el(`AnexoGq05C${cSeguroAnoSeguinte}`, r.reinvestidoSeguroAnoSeguinte !== undefined ? moeda(r.reinvestidoSeguroAnoSeguinte) : undefined);
+}
+
+function temDadosReinvestimento(r) {
+  if (!r) return false;
+  return !!r.ano || (r.camposQ4 && r.camposQ4.length > 0) ||
+    r.valorEmprestimoDivida !== undefined || r.valorReinvestirSemCredito !== undefined || r.valorReinvestirSeguro !== undefined ||
+    r.reinvestido24MesesAntes !== undefined || r.reinvestidoMais24MesesAntesSuspensao !== undefined ||
+    r.reinvestidoAnoAlienacao !== undefined || r.reinvestidoAnoSeguinte !== undefined ||
+    r.reinvestidoSegundoAnoSeguinte !== undefined || r.reinvestidoTerceiroAnoSeguinte !== undefined ||
+    r.reinvestidoApos36MesesSuspensao !== undefined || r.reinvestidoSeguroAnoAlienacao !== undefined ||
+    r.reinvestidoSeguroAnoSeguinte !== undefined;
+}
+
+function buildQuadro05AnexoG(q05) {
+  if (!q05) return `<Quadro05/>`;
+
+  const bloco1 = buildReinvestimentoAnexoG(q05.reinvestimento1, [5001, 1, 5005, 5006, 5012, 5007, 5015, 5008, 5009, 5010, 5011, 5016, 5013, 5014]);
+  const identif1 = q05.reinvestimento1 && q05.reinvestimento1.identificacao;
+  const bloco1AC = identif1 ? el("AnexoGq05AC1", identif1.freguesia) + el("AnexoGq05AC2", identif1.tipo) +
+    el("AnexoGq05AC3", identif1.artigo) + el("AnexoGq05AC4", identif1.fracao) + el("AnexoGq05AC5", identif1.quotaParte) : "";
+
+  const bloco2 = buildReinvestimentoAnexoG(q05.reinvestimento2, [5021, 2, 5025, 5026, 5036, 5027, 5039, 5028, 5029, 5030, 5031, 5040, 5037, 5038]);
+  const identif2 = q05.reinvestimento2 && q05.reinvestimento2.identificacao;
+  const bloco2AC = identif2 ? el("AnexoGq05AC6", identif2.freguesia) + el("AnexoGq05AC7", identif2.tipo) +
+    el("AnexoGq05AC8", identif2.artigo) + el("AnexoGq05AC9", identif2.fracao) + el("AnexoGq05AC10", identif2.quotaParte) : "";
+
+  const a2t01 = listaComLinhas("AnexoGq05A2T01", (q05.contratosSeguroFundo || []).map(c => ({
+    CamposQuadro5A: c.campoQ5A, Titular: c.titular, Codigo: c.codigo, Ano: c.ano, Mes: c.mes, Valor: moeda(c.valor),
+    NifPortugues: c.nifPortugues, Pais: c.pais, NumeroFiscalUE: c.numeroFiscalUE, Beneficiario: c.beneficiario
+  })));
+
+  const b = q05.amortizacaoEmprestimo || {};
+  const temB = b.campoQ4 || b.anoEmprestimo || b.valorCapitalDivida !== undefined || b.valorAmortizacao !== undefined;
+  const blocoB = temB
+    ? el("AnexoGq05C5032", b.campoQ4) + el("AnexoGq05C5033", b.anoEmprestimo) +
+      el("AnexoGq05C5034", b.valorCapitalDivida !== undefined ? moeda(b.valorCapitalDivida) : undefined) +
+      el("AnexoGq05C5035", b.valorAmortizacao !== undefined ? moeda(b.valorAmortizacao) : undefined)
+    : "";
+
+  return `<Quadro05>` +
+    bloco1 + bloco2 + bloco1AC + bloco2AC + a2t01 + blocoB +
+    `</Quadro05>`;
+}
+
+function temDadosQuadro05AnexoG(q05) {
+  if (!q05) return false;
+  return temDadosReinvestimento(q05.reinvestimento1) || temDadosReinvestimento(q05.reinvestimento2) ||
+    (q05.contratosSeguroFundo && q05.contratosSeguroFundo.length > 0) ||
+    !!(q05.amortizacaoEmprestimo && (q05.amortizacaoEmprestimo.campoQ4 || q05.amortizacaoEmprestimo.anoEmprestimo ||
+      q05.amortizacaoEmprestimo.valorCapitalDivida !== undefined || q05.amortizacaoEmprestimo.valorAmortizacao !== undefined));
+}
+
 function buildAnexoG(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const g = model.anexoG || {};
@@ -337,8 +415,12 @@ function buildAnexoG(model) {
     ? buildQuadro04AnexoG(g.quadro04)
     : (pass.Quadro04 || `<Quadro04/>`);
 
-  const quadrosRestantes = Array.from({ length: 15 }, (_, i) => {
-    const numero = String(i + 5).padStart(2, "0");
+  const quadro05 = temDadosQuadro05AnexoG(g.quadro05)
+    ? buildQuadro05AnexoG(g.quadro05)
+    : (pass.Quadro05 || `<Quadro05/>`);
+
+  const quadrosRestantes = Array.from({ length: 14 }, (_, i) => {
+    const numero = String(i + 6).padStart(2, "0");
     return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
   }).join("");
 
@@ -346,6 +428,7 @@ function buildAnexoG(model) {
     `<Quadro02>${el("AnexoGq02C01", ano)}</Quadro02>` +
     quadro03 +
     quadro04 +
+    quadro05 +
     quadrosRestantes +
     `</AnexoG>`;
 }

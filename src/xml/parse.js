@@ -223,19 +223,77 @@ function parseQuadro04AnexoG(q04) {
   };
 }
 
+// Ver nota em build.js: nomes de campo do Quadro05 confirmados contra um exemplo real.
+function parseReinvestimentoAnexoG(q05, camposNumeros) {
+  const [cAno, cCamposQ4, cEmprestimo, cSemCredito, cSeguro, c24MesesAntes, cMais24Suspensao,
+    cAnoAlienacao, cAnoSeguinte, cSegundoAno, cTerceiroAno, cApos36Suspensao, cSeguroAno, cSeguroAnoSeguinte] = camposNumeros;
+  return {
+    ano: texto(q05, `AnexoGq05C${cAno}`),
+    camposQ4: parseLinhasGenerico(filho(q05, `AnexoGq05AT0${cCamposQ4}`)).map(l => l.CamposQuadro4),
+    valorEmprestimoDivida: texto(q05, `AnexoGq05C${cEmprestimo}`),
+    valorReinvestirSemCredito: texto(q05, `AnexoGq05C${cSemCredito}`),
+    valorReinvestirSeguro: texto(q05, `AnexoGq05C${cSeguro}`),
+    reinvestido24MesesAntes: texto(q05, `AnexoGq05C${c24MesesAntes}`),
+    reinvestidoMais24MesesAntesSuspensao: texto(q05, `AnexoGq05C${cMais24Suspensao}`),
+    reinvestidoAnoAlienacao: texto(q05, `AnexoGq05C${cAnoAlienacao}`),
+    reinvestidoAnoSeguinte: texto(q05, `AnexoGq05C${cAnoSeguinte}`),
+    reinvestidoSegundoAnoSeguinte: texto(q05, `AnexoGq05C${cSegundoAno}`),
+    reinvestidoTerceiroAnoSeguinte: texto(q05, `AnexoGq05C${cTerceiroAno}`),
+    reinvestidoApos36MesesSuspensao: texto(q05, `AnexoGq05C${cApos36Suspensao}`),
+    reinvestidoSeguroAnoAlienacao: texto(q05, `AnexoGq05C${cSeguroAno}`),
+    reinvestidoSeguroAnoSeguinte: texto(q05, `AnexoGq05C${cSeguroAnoSeguinte}`)
+  };
+}
+
+function parseQuadro05AnexoG(q05) {
+  if (!temConteudo(q05)) return undefined;
+  return {
+    reinvestimento1: {
+      ...parseReinvestimentoAnexoG(q05, [5001, 1, 5005, 5006, 5012, 5007, 5015, 5008, 5009, 5010, 5011, 5016, 5013, 5014]),
+      identificacao: {
+        freguesia: texto(q05, "AnexoGq05AC1"), tipo: texto(q05, "AnexoGq05AC2"),
+        artigo: texto(q05, "AnexoGq05AC3"), fracao: texto(q05, "AnexoGq05AC4"), quotaParte: texto(q05, "AnexoGq05AC5")
+      }
+    },
+    reinvestimento2: {
+      ...parseReinvestimentoAnexoG(q05, [5021, 2, 5025, 5026, 5036, 5027, 5039, 5028, 5029, 5030, 5031, 5040, 5037, 5038]),
+      identificacao: {
+        freguesia: texto(q05, "AnexoGq05AC6"), tipo: texto(q05, "AnexoGq05AC7"),
+        artigo: texto(q05, "AnexoGq05AC8"), fracao: texto(q05, "AnexoGq05AC9"), quotaParte: texto(q05, "AnexoGq05AC10")
+      }
+    },
+    contratosSeguroFundo: parseLinhasGenerico(filho(q05, "AnexoGq05A2T01")).map(l => ({
+      campoQ5A: l.CamposQuadro5A, titular: l.Titular, codigo: l.Codigo, ano: l.Ano, mes: l.Mes, valor: l.Valor,
+      nifPortugues: l.NifPortugues, pais: l.Pais, numeroFiscalUE: l.NumeroFiscalUE, beneficiario: l.Beneficiario
+    })),
+    amortizacaoEmprestimo: {
+      campoQ4: texto(q05, "AnexoGq05C5032"), anoEmprestimo: texto(q05, "AnexoGq05C5033"),
+      valorCapitalDivida: texto(q05, "AnexoGq05C5034"), valorAmortizacao: texto(q05, "AnexoGq05C5035")
+    }
+  };
+}
+
 function parseAnexoG(anexoG) {
   if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
   const q04 = filho(anexoG, "Quadro04");
+  const q05 = filho(anexoG, "Quadro05");
   const quadro04 = parseQuadro04AnexoG(q04);
+  const quadro05 = parseQuadro05AnexoG(q05);
 
   const passthrough = {};
-  for (let i = 5; i <= 19; i++) {
+  for (let i = 6; i <= 19; i++) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoG, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
-  return { anexoG: quadro04 ? { quadro04 } : undefined, anexoGPassthrough: passthrough };
+  const anexoGModel = (quadro04 || quadro05) ? {} : undefined;
+  if (anexoGModel) {
+    if (quadro04) anexoGModel.quadro04 = quadro04;
+    if (quadro05) anexoGModel.quadro05 = quadro05;
+  }
+
+  return { anexoG: anexoGModel, anexoGPassthrough: passthrough };
 }
 
 // Anexo E (rendimentos de capitais): nomes de campo confirmados contra um exemplo real.

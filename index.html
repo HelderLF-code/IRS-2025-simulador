@@ -544,6 +544,101 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04F()">+ Adicionar</button>
+
+<h3>Reinvestimento em habitação própria e permanente (Quadro 5)</h3>
+<p class="aviso-topo">
+  Isenta a mais-valia se o valor de realização for reinvestido na aquisição de outro
+  imóvel/terreno para construção, ou de um contrato de seguro/fundo de pensões/regime
+  público de capitalização/poupança pan-europeu, para habitação própria. Cobre até duas
+  alienações reinvestidas no mesmo ano (campos 5001-5016 e 5021-5040 do papel).
+</p>
+
+<h4>1.ª alienação reinvestida</h4>
+<div class="row">
+  <div><label>Ano da alienação <small class="hint">(5001)</small></label><input id="ag05r1Ano" type="number" size="6"></div>
+  <div><label>Campo(s) do Quadro 4 (separados por vírgula) <small class="hint">(5002-5004)</small></label><input id="ag05r1CamposQ4" type="text" placeholder="4001, 4002"></div>
+</div>
+<div class="row">
+  <div><label>Empréstimo em dívida à data da alienação (€) <small class="hint">(5005)</small></label><input id="ag05r1Emprestimo" type="number" step="0.01"></div>
+  <div><label>Valor a reinvestir sem recurso a crédito (€) <small class="hint">(5006)</small></label><input id="ag05r1SemCredito" type="number" step="0.01"></div>
+  <div><label>Valor a reinvestir em seguro/fundo de pensões (€) <small class="hint">(5012)</small></label><input id="ag05r1Seguro" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Reinvestido nos 24 meses anteriores (€) <small class="hint">(5007)</small></label><input id="ag05r1Antes24m" type="number" step="0.01"></div>
+  <div><label>Reinvestido há mais de 24 meses — suspensão prazo (€) <small class="hint">(5015)</small></label><input id="ag05r1AntesSuspensao" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Reinvestido no ano da alienação (€) <small class="hint">(5008)</small></label><input id="ag05r1AnoAlienacao" type="number" step="0.01"></div>
+  <div><label>Reinvestido no ano seguinte (€) <small class="hint">(5009)</small></label><input id="ag05r1AnoSeguinte" type="number" step="0.01"></div>
+  <div><label>Reinvestido no 2.º ano seguinte (€) <small class="hint">(5010)</small></label><input id="ag05r1SegundoAno" type="number" step="0.01"></div>
+  <div><label>Reinvestido no 3.º ano seguinte, dentro 36 meses (€) <small class="hint">(5011)</small></label><input id="ag05r1TerceiroAno" type="number" step="0.01"></div>
+  <div><label>Reinvestido após 36 meses — suspensão prazo (€) <small class="hint">(5016)</small></label><input id="ag05r1Apos36m" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Seguro/fundo — reinvestido no ano da alienação (€) <small class="hint">(5013)</small></label><input id="ag05r1SeguroAno" type="number" step="0.01"></div>
+  <div><label>Seguro/fundo — reinvestido no ano seguinte (€) <small class="hint">(5014)</small></label><input id="ag05r1SeguroAnoSeguinte" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Freguesia (imóvel de reinvestimento) <small class="hint">(5A1)</small></label><input id="ag05r1Freguesia" size="8"></div>
+  <div><label>Tipo</label><select id="ag05r1Tipo"><option value="">-</option><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></div>
+  <div><label>Artigo</label><input id="ag05r1Artigo" size="8"></div>
+  <div><label>Fração</label><input id="ag05r1Fracao" size="6"></div>
+  <div><label>Quota (%)</label><input id="ag05r1Quota" type="number" step="0.01"></div>
+</div>
+
+<h4>2.ª alienação reinvestida <small class="hint">(campos 5021-5040 — raro, só se houve duas alienações reinvestidas no mesmo ano)</small></h4>
+<div class="row">
+  <div><label>Ano da alienação <small class="hint">(5021)</small></label><input id="ag05r2Ano" type="number" size="6"></div>
+  <div><label>Campo(s) do Quadro 4 <small class="hint">(5022-5024)</small></label><input id="ag05r2CamposQ4" type="text" placeholder="4001, 4002"></div>
+</div>
+<div class="row">
+  <div><label>Empréstimo em dívida (€) <small class="hint">(5025)</small></label><input id="ag05r2Emprestimo" type="number" step="0.01"></div>
+  <div><label>Valor a reinvestir sem crédito (€) <small class="hint">(5026)</small></label><input id="ag05r2SemCredito" type="number" step="0.01"></div>
+  <div><label>Valor a reinvestir em seguro/fundo (€) <small class="hint">(5036)</small></label><input id="ag05r2Seguro" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Reinvestido nos 24 meses anteriores (€) <small class="hint">(5027)</small></label><input id="ag05r2Antes24m" type="number" step="0.01"></div>
+  <div><label>Reinvestido há mais de 24 meses — suspensão (€) <small class="hint">(5039)</small></label><input id="ag05r2AntesSuspensao" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Reinvestido no ano da alienação (€) <small class="hint">(5028)</small></label><input id="ag05r2AnoAlienacao" type="number" step="0.01"></div>
+  <div><label>Reinvestido no ano seguinte (€) <small class="hint">(5029)</small></label><input id="ag05r2AnoSeguinte" type="number" step="0.01"></div>
+  <div><label>Reinvestido no 2.º ano seguinte (€) <small class="hint">(5030)</small></label><input id="ag05r2SegundoAno" type="number" step="0.01"></div>
+  <div><label>Reinvestido no 3.º ano seguinte, dentro 36 meses (€) <small class="hint">(5031)</small></label><input id="ag05r2TerceiroAno" type="number" step="0.01"></div>
+  <div><label>Reinvestido após 36 meses — suspensão (€) <small class="hint">(5040)</small></label><input id="ag05r2Apos36m" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Seguro/fundo — reinvestido no ano da alienação (€) <small class="hint">(5037)</small></label><input id="ag05r2SeguroAno" type="number" step="0.01"></div>
+  <div><label>Seguro/fundo — reinvestido no ano seguinte (€) <small class="hint">(5038)</small></label><input id="ag05r2SeguroAnoSeguinte" type="number" step="0.01"></div>
+</div>
+<div class="row">
+  <div><label>Freguesia (imóvel de reinvestimento) <small class="hint">(5A1)</small></label><input id="ag05r2Freguesia" size="8"></div>
+  <div><label>Tipo</label><select id="ag05r2Tipo"><option value="">-</option><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></div>
+  <div><label>Artigo</label><input id="ag05r2Artigo" size="8"></div>
+  <div><label>Fração</label><input id="ag05r2Fracao" size="6"></div>
+  <div><label>Quota (%)</label><input id="ag05r2Quota" type="number" step="0.01"></div>
+</div>
+
+<h4>Contrato de seguro/fundo de pensões/regime público de capitalização (Quadro 5A2)</h4>
+<datalist id="listaCodigoContratoG05A2">
+  <option value="01">01 — Aquisição de um contrato de seguro</option>
+  <option value="02">02 — Adesão individual a um fundo de pensões aberto</option>
+  <option value="03">03 — Contribuição para o regime público de capitalização</option>
+  <option value="04">04 — Produto individual de poupança pan-europeu</option>
+</datalist>
+<table id="tabelaAnexoG05A2">
+  <thead><tr><th>Campo do Q5A (ex: 5013)</th><th>Titular</th><th>Código</th><th>Ano</th><th>Mês</th><th>Valor (€)</th><th>NIF português</th><th>País</th><th>N.º fiscal (UE/EEE)</th><th>Beneficiário</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG05A2()">+ Adicionar</button>
+
+<h4>Amortização de empréstimo (Quadro 5B)</h4>
+<div class="row">
+  <div><label>Campo do Quadro 4 <small class="hint">(5032)</small></label><input id="ag05bCampoQ4" size="6"></div>
+  <div><label>Ano do empréstimo <small class="hint">(5033)</small></label><input id="ag05bAno" type="number" size="6"></div>
+  <div><label>Valor capital em dívida (€) <small class="hint">(5034)</small></label><input id="ag05bCapital" type="number" step="0.01"></div>
+  <div><label>Valor usado na amortização (€) <small class="hint">(5035)</small></label><input id="ag05bAmortizacao" type="number" step="0.01"></div>
+</div>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -1517,9 +1612,97 @@ indicares, assume-se o escalão mais baixo.</small></p>
     return { imoveis, reabilitacao, afetacaoB1, afetacaoB2, afetacaoB3, alienacaoEGF, apoioNaoReembolsavel, afetosAtividade3anos, alienacaoEstado };
   }
 
+  window.adicionarLinhaAnexoG05A2 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG05A2 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag05a2-campo" size="6"></td>
+      <td><select class="ag05a2-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag05a2-codigo" size="4" list="listaCodigoContratoG05A2"></td>
+      <td><input class="ag05a2-ano" type="number" size="6"></td>
+      <td><input class="ag05a2-mes" type="number" size="4"></td>
+      <td><input class="ag05a2-valor" type="number" step="0.01"></td>
+      <td><input class="ag05a2-nifpt" size="10"></td>
+      <td><input class="ag05a2-pais" size="4"></td>
+      <td><input class="ag05a2-numfiscal" size="14"></td>
+      <td><select class="ag05a2-beneficiario"><option value="A">A</option><option value="B">B</option></select></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerReinvestimentoAnexoG(prefixo) {
+    const g = (id) => document.getElementById(`${prefixo}${id}`);
+    const camposQ4Texto = g("CamposQ4").value || "";
+    const camposQ4 = camposQ4Texto.split(",").map(s => s.trim()).filter(Boolean);
+    return {
+      ano: g("Ano").value || undefined,
+      camposQ4,
+      valorEmprestimoDivida: g("Emprestimo").value || undefined,
+      valorReinvestirSemCredito: g("SemCredito").value || undefined,
+      valorReinvestirSeguro: g("Seguro").value || undefined,
+      reinvestido24MesesAntes: g("Antes24m").value || undefined,
+      reinvestidoMais24MesesAntesSuspensao: g("AntesSuspensao").value || undefined,
+      reinvestidoAnoAlienacao: g("AnoAlienacao").value || undefined,
+      reinvestidoAnoSeguinte: g("AnoSeguinte").value || undefined,
+      reinvestidoSegundoAnoSeguinte: g("SegundoAno").value || undefined,
+      reinvestidoTerceiroAnoSeguinte: g("TerceiroAno").value || undefined,
+      reinvestidoApos36MesesSuspensao: g("Apos36m").value || undefined,
+      reinvestidoSeguroAnoAlienacao: g("SeguroAno").value || undefined,
+      reinvestidoSeguroAnoSeguinte: g("SeguroAnoSeguinte").value || undefined,
+      identificacao: {
+        freguesia: g("Freguesia").value || undefined,
+        tipo: g("Tipo").value || undefined,
+        artigo: g("Artigo").value || undefined,
+        fracao: g("Fracao").value || undefined,
+        quotaParte: g("Quota").value || undefined
+      }
+    };
+  }
+
+  function temDadosReinvestimentoAnexoG(r) {
+    return !!(r.ano || r.camposQ4.length || r.valorEmprestimoDivida || r.valorReinvestirSemCredito ||
+      r.valorReinvestirSeguro || r.reinvestido24MesesAntes || r.reinvestidoMais24MesesAntesSuspensao ||
+      r.reinvestidoAnoAlienacao || r.reinvestidoAnoSeguinte || r.reinvestidoSegundoAnoSeguinte ||
+      r.reinvestidoTerceiroAnoSeguinte || r.reinvestidoApos36MesesSuspensao || r.reinvestidoSeguroAnoAlienacao ||
+      r.reinvestidoSeguroAnoSeguinte);
+  }
+
+  function lerQuadro05AnexoG() {
+    const reinvestimento1 = lerReinvestimentoAnexoG("ag05r1");
+    const reinvestimento2 = lerReinvestimentoAnexoG("ag05r2");
+    const contratosSeguroFundo = [...document.querySelectorAll("#tabelaAnexoG05A2 tbody tr")].map(tr => ({
+      campoQ5A: tr.querySelector(".ag05a2-campo").value,
+      titular: tr.querySelector(".ag05a2-titular").value,
+      codigo: tr.querySelector(".ag05a2-codigo").value,
+      ano: tr.querySelector(".ag05a2-ano").value,
+      mes: tr.querySelector(".ag05a2-mes").value,
+      valor: tr.querySelector(".ag05a2-valor").value || 0,
+      nifPortugues: tr.querySelector(".ag05a2-nifpt").value || undefined,
+      pais: tr.querySelector(".ag05a2-pais").value || undefined,
+      numeroFiscalUE: tr.querySelector(".ag05a2-numfiscal").value || undefined,
+      beneficiario: tr.querySelector(".ag05a2-beneficiario").value
+    }));
+    const amortizacaoEmprestimo = {
+      campoQ4: document.getElementById("ag05bCampoQ4").value || undefined,
+      anoEmprestimo: document.getElementById("ag05bAno").value || undefined,
+      valorCapitalDivida: document.getElementById("ag05bCapital").value || undefined,
+      valorAmortizacao: document.getElementById("ag05bAmortizacao").value || undefined
+    };
+    const temAmortizacao = amortizacaoEmprestimo.campoQ4 || amortizacaoEmprestimo.anoEmprestimo ||
+      amortizacaoEmprestimo.valorCapitalDivida || amortizacaoEmprestimo.valorAmortizacao;
+
+    const temDados = temDadosReinvestimentoAnexoG(reinvestimento1) || temDadosReinvestimentoAnexoG(reinvestimento2) ||
+      contratosSeguroFundo.length || temAmortizacao;
+    if (!temDados) return undefined;
+
+    return { reinvestimento1, reinvestimento2, contratosSeguroFundo, amortizacaoEmprestimo };
+  }
+
   function lerAnexoG() {
     const quadro04 = lerQuadro04AnexoG();
-    return quadro04 ? { quadro04 } : undefined;
+    const quadro05 = lerQuadro05AnexoG();
+    return (quadro04 || quadro05) ? { quadro04, quadro05 } : undefined;
   }
 
   function lerAnexoH() {
@@ -1846,6 +2029,18 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.querySelector("#tabelaAnexoG04D tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoG04E tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoG04F tbody").innerHTML = "";
+      ["ag05r1", "ag05r2"].forEach(prefixo => {
+        ["Ano", "CamposQ4", "Emprestimo", "SemCredito", "Seguro", "Antes24m", "AntesSuspensao",
+          "AnoAlienacao", "AnoSeguinte", "SegundoAno", "TerceiroAno", "Apos36m", "SeguroAno", "SeguroAnoSeguinte",
+          "Freguesia", "Tipo", "Artigo", "Fracao", "Quota"].forEach(campo => {
+          document.getElementById(`${prefixo}${campo}`).value = "";
+        });
+      });
+      document.querySelector("#tabelaAnexoG05A2 tbody").innerHTML = "";
+      document.getElementById("ag05bCampoQ4").value = "";
+      document.getElementById("ag05bAno").value = "";
+      document.getElementById("ag05bCapital").value = "";
+      document.getElementById("ag05bAmortizacao").value = "";
 
       if (dados.anexoG && dados.anexoG.quadro04) {
         const q4 = dados.anexoG.quadro04;
@@ -1962,6 +2157,57 @@ indicares, assume-se o escalão mais baixo.</small></p>
           tr.querySelector(".ag04f-campo").value = f.campoQ4 || "";
           tr.querySelector(".ag04f-nif").value = f.nifAdquirente || "";
         });
+      }
+
+      if (dados.anexoG && dados.anexoG.quadro05) {
+        const q5 = dados.anexoG.quadro05;
+        const preencherReinvestimento = (prefixo, r) => {
+          if (!r) return;
+          const set = (id, valor) => { document.getElementById(`${prefixo}${id}`).value = valor || ""; };
+          set("Ano", r.ano);
+          set("CamposQ4", (r.camposQ4 || []).join(", "));
+          set("Emprestimo", r.valorEmprestimoDivida);
+          set("SemCredito", r.valorReinvestirSemCredito);
+          set("Seguro", r.valorReinvestirSeguro);
+          set("Antes24m", r.reinvestido24MesesAntes);
+          set("AntesSuspensao", r.reinvestidoMais24MesesAntesSuspensao);
+          set("AnoAlienacao", r.reinvestidoAnoAlienacao);
+          set("AnoSeguinte", r.reinvestidoAnoSeguinte);
+          set("SegundoAno", r.reinvestidoSegundoAnoSeguinte);
+          set("TerceiroAno", r.reinvestidoTerceiroAnoSeguinte);
+          set("Apos36m", r.reinvestidoApos36MesesSuspensao);
+          set("SeguroAno", r.reinvestidoSeguroAnoAlienacao);
+          set("SeguroAnoSeguinte", r.reinvestidoSeguroAnoSeguinte);
+          if (r.identificacao) {
+            set("Freguesia", r.identificacao.freguesia);
+            if (r.identificacao.tipo) document.getElementById(`${prefixo}Tipo`).value = r.identificacao.tipo;
+            set("Artigo", r.identificacao.artigo);
+            set("Fracao", r.identificacao.fracao);
+            set("Quota", r.identificacao.quotaParte);
+          }
+        };
+        preencherReinvestimento("ag05r1", q5.reinvestimento1);
+        preencherReinvestimento("ag05r2", q5.reinvestimento2);
+        (q5.contratosSeguroFundo || []).forEach(c => {
+          adicionarLinhaAnexoG05A2();
+          const tr = document.querySelector("#tabelaAnexoG05A2 tbody tr:last-child");
+          tr.querySelector(".ag05a2-campo").value = c.campoQ5A || "";
+          if (c.titular) tr.querySelector(".ag05a2-titular").value = c.titular;
+          tr.querySelector(".ag05a2-codigo").value = c.codigo || "";
+          tr.querySelector(".ag05a2-ano").value = c.ano || "";
+          tr.querySelector(".ag05a2-mes").value = c.mes || "";
+          tr.querySelector(".ag05a2-valor").value = c.valor || "";
+          tr.querySelector(".ag05a2-nifpt").value = c.nifPortugues || "";
+          tr.querySelector(".ag05a2-pais").value = c.pais || "";
+          tr.querySelector(".ag05a2-numfiscal").value = c.numeroFiscalUE || "";
+          if (c.beneficiario) tr.querySelector(".ag05a2-beneficiario").value = c.beneficiario;
+        });
+        if (q5.amortizacaoEmprestimo) {
+          document.getElementById("ag05bCampoQ4").value = q5.amortizacaoEmprestimo.campoQ4 || "";
+          document.getElementById("ag05bAno").value = q5.amortizacaoEmprestimo.anoEmprestimo || "";
+          document.getElementById("ag05bCapital").value = q5.amortizacaoEmprestimo.valorCapitalDivida || "";
+          document.getElementById("ag05bAmortizacao").value = q5.amortizacaoEmprestimo.valorAmortizacao || "";
+        }
       }
 
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
