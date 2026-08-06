@@ -240,6 +240,116 @@ function buildAnexoE(model) {
     `</AnexoE>`;
 }
 
+// Anexo G, Quadro 4 (alienação onerosa de imóveis e afetações relacionadas): nomes de
+// campo confirmados contra um exemplo real. Não afeta ainda o cálculo da estimativa —
+// mais-valias imobiliárias têm regras próprias e complexas (correção monetária, exclusão
+// de 50% do saldo, reinvestimento em habitação própria no Quadro 5, etc.) ainda por
+// implementar; os dados ficam capturados e exportados corretamente.
+function buildQuadro04AnexoG(q04) {
+  if (!q04) return `<Quadro04/>`;
+
+  const imoveis = q04.imoveis || [];
+  const somaC01 = imoveis.reduce((a, i) => a + (Number(i.valorRealizacao) || 0), 0);
+  const somaC02 = imoveis.reduce((a, i) => a + (Number(i.valorAquisicao) || 0), 0);
+  const somaC03 = imoveis.reduce((a, i) => a + (Number(i.despesasEncargos) || 0), 0);
+
+  const t01 = listaComLinhas("AnexoGq04T01", imoveis.map((i, idx) => ({
+    NLinha: i.nlinha || (4001 + idx), Titular: i.titular,
+    AnoRealizacao: i.anoRealizacao, MesRealizacao: i.mesRealizacao, DiaRealizacao: i.diaRealizacao,
+    ValorRealizacao: moeda(i.valorRealizacao),
+    AnoAquisicao: i.anoAquisicao, MesAquisicao: i.mesAquisicao, DiaAquisicao: i.diaAquisicao,
+    ValorAquisicao: moeda(i.valorAquisicao), DespesasEncargos: moeda(i.despesasEncargos),
+    Freguesia: i.freguesia, TipoPredio: i.tipoPredio, Artigo: i.artigo, Fraccao: i.fraccao, QuotaParte: i.quotaParte
+  })));
+
+  const at01 = listaComLinhas("AnexoGq04AT01", (q04.reabilitacao || []).map(r => ({
+    CamposQuadro4: r.campoQ4, AnoConclusao: r.anoConclusao, MesConclusao: r.mesConclusao, DiaConclusao: r.diaConclusao
+  })));
+
+  const bt01 = listaComLinhas("AnexoGq04BT01", (q04.afetacaoB1 || []).map(b => ({
+    Titular: b.titular, NaturezaBens: b.naturezaBens, AnoAfectacao: b.anoAfetacao, MesAfectacao: b.mesAfetacao,
+    ValorAfetacao: moeda(b.valorAfetacao), AnoAquisicao: b.anoAquisicao, MesAquisicao: b.mesAquisicao,
+    ValorAquisicao: moeda(b.valorAquisicao), DespesasEncargos: moeda(b.despesasEncargos),
+    Freguesia: b.freguesia, TipoPredio: b.tipoPredio
+  })));
+
+  const bt02 = listaComLinhas("AnexoGq04BT02", (q04.afetacaoB2 || []).map(b => ({
+    Titular: b.titular, AnoAfetacao: b.anoAfetacao, MesAfetacao: b.mesAfetacao, ValorAfetacao: moeda(b.valorAfetacao),
+    AnoAquisicao: b.anoAquisicao, MesAquisicao: b.mesAquisicao, ValorAquisicao: moeda(b.valorAquisicao)
+  })));
+
+  const bt03 = listaComLinhas("AnexoGq04BT03", (q04.afetacaoB3 || []).map(b => ({
+    Titular: b.titular, AnoAfetacao: b.anoAfetacao, MesAfetacao: b.mesAfetacao, ValorAfetacao: moeda(b.valorAfetacao),
+    AnoAquisicao: b.anoAquisicao, MesAquisicao: b.mesAquisicao, ValorAquisicao: moeda(b.valorAquisicao),
+    DespesasEncargos: moeda(b.despesasEncargos), Freguesia: b.freguesia, TipoPredio: b.tipoPredio,
+    Artigo: b.artigo, Fracao: b.fracao, QuotaParte: b.quotaParte
+  })));
+
+  const ct01 = listaComLinhas("AnexoGq04CT01", (q04.alienacaoEGF || []).map(c => ({
+    CamposQuadro4: c.campoQ4, NIF: c.nif
+  })));
+
+  const dt01 = listaComLinhas("AnexoGq04DT01", (q04.apoioNaoReembolsavel || []).map(d => ({
+    CamposQuadro4: d.campoQ4, Finalidade: d.finalidade, AnoApoio: d.anoApoio, MesApoio: d.mesApoio,
+    ValorApoio: moeda(d.valorApoio), ValorPatrimonialTributario: moeda(d.valorPatrimonialTributario)
+  })));
+
+  const et01 = listaComLinhas("AnexoGq04ET01", (q04.afetosAtividade3anos || []).map(e => ({
+    Titular: e.titular, AnoTransferencia: e.anoTransferencia, MesTransferencia: e.mesTransferencia, DiaTransferencia: e.diaTransferencia,
+    AnoRealizacao: e.anoRealizacao, MesRealizacao: e.mesRealizacao, DiaRealizacao: e.diaRealizacao, ValorRealizacao: moeda(e.valorRealizacao),
+    AnoAquisicao: e.anoAquisicao, MesAquisicao: e.mesAquisicao, DiaAquisicao: e.diaAquisicao, ValorAquisicao: moeda(e.valorAquisicao),
+    Freguesia: e.freguesia, TipoPredio: e.tipoPredio, Artigo: e.artigo, Fracao: e.fracao, QuotaParte: e.quotaParte
+  })));
+
+  const ft01 = listaComLinhas("AnexoGq04FT01", (q04.alienacaoEstado || []).map(f => ({
+    CamposQuadro4: f.campoQ4, NIFAdquirente: f.nifAdquirente
+  })));
+
+  return `<Quadro04>` +
+    t01 +
+    (imoveis.length ? el("AnexoGq04T01SomaC01", moeda(somaC01)) + el("AnexoGq04T01SomaC02", moeda(somaC02)) + el("AnexoGq04T01SomaC03", moeda(somaC03)) : "") +
+    at01 + bt01 + bt02 + bt03 + ct01 + dt01 + et01 + ft01 +
+    `</Quadro04>`;
+}
+
+function temDadosQuadro04AnexoG(q04) {
+  if (!q04) return false;
+  return (q04.imoveis && q04.imoveis.length > 0) ||
+    (q04.reabilitacao && q04.reabilitacao.length > 0) ||
+    (q04.afetacaoB1 && q04.afetacaoB1.length > 0) ||
+    (q04.afetacaoB2 && q04.afetacaoB2.length > 0) ||
+    (q04.afetacaoB3 && q04.afetacaoB3.length > 0) ||
+    (q04.alienacaoEGF && q04.alienacaoEGF.length > 0) ||
+    (q04.apoioNaoReembolsavel && q04.apoioNaoReembolsavel.length > 0) ||
+    (q04.afetosAtividade3anos && q04.afetosAtividade3anos.length > 0) ||
+    (q04.alienacaoEstado && q04.alienacaoEstado.length > 0);
+}
+
+function buildAnexoG(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const g = model.anexoG || {};
+  const pass = model.anexoGPassthrough || {};
+  const quadro03 = tributacaoConjunta
+    ? `<Quadro03>${el("AnexoGq03C01", nifA)}${el("AnexoGq03C02", nifB)}</Quadro03>`
+    : `<Quadro03>${el("AnexoGq03C01", nifA)}</Quadro03>`;
+
+  const quadro04 = temDadosQuadro04AnexoG(g.quadro04)
+    ? buildQuadro04AnexoG(g.quadro04)
+    : (pass.Quadro04 || `<Quadro04/>`);
+
+  const quadrosRestantes = Array.from({ length: 15 }, (_, i) => {
+    const numero = String(i + 5).padStart(2, "0");
+    return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
+  }).join("");
+
+  return `<AnexoG>` +
+    `<Quadro02>${el("AnexoGq02C01", ano)}</Quadro02>` +
+    quadro03 +
+    quadro04 +
+    quadrosRestantes +
+    `</AnexoG>`;
+}
+
 // Anexos ainda não mapeados em detalhe (Fase 3+): emite apenas o cabeçalho ano+NIF,
 // tal como observado nos exemplos fornecidos, mantendo o esqueleto vazio nos restantes quadros.
 function buildAnexoEsqueleto(nomeAnexo, prefixo, model, quadrosVazios, temC02) {
@@ -718,7 +828,7 @@ function buildModelo3XML(model) {
     const pass = model.anexosPassthrough || {};
     partes.push(buildAnexoB(model));
     partes.push(buildAnexoE(model));
-    partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
+    partes.push(buildAnexoG(model));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
     partes.push(buildAnexoH(model));
     partes.push(pass.AnexoJ || buildAnexoJ(model));

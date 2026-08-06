@@ -68,6 +68,19 @@ regenerar o `simulador-irs.html`.
   CIRS tem taxas diferentes consoante o tipo de rendimento (ex: 35% para entidades em
   regime fiscal privilegiado), que as instruções de preenchimento não especificam por
   código — por confirmar antes de uso real com rendimentos sujeitos a taxa diferente.**
+- Anexo G (mais-valias e outros incrementos patrimoniais): Quadro 4 (alienação onerosa de
+  imóveis) completo — 4 (tabela principal), 4A (imóveis recuperados/reabilitação), 4B1
+  (afetação de bens à atividade, até 2020), 4B2 (afetação de bens móveis, 2021+), 4B3
+  (afetação de imóveis, regime transitório 2021+), 4C (alienação a EGF/UGF), 4D (imóveis
+  com apoio não reembolsável), 4E (imóveis afetos à atividade alienados <3 anos após
+  transferência) e 4F (alienação ao Estado/RA/entidades públicas). Nomes de campo
+  confirmados contra um exemplo real. Este é o anexo mais extenso do Modelo 3 (19
+  quadros) — os Quadros 5 a 19 (reinvestimento em habitação própria, partes sociais,
+  criptoativos, instrumentos financeiros derivados, indemnizações, etc.) ainda sem
+  interface própria. **O cálculo de mais-valias ainda não está implementado** — regras
+  próprias e complexas (correção monetária, exclusão de 50% do saldo entre mais e
+  menos-valias, reinvestimento em habitação própria) — os dados do Quadro 4 ficam
+  capturados e exportados corretamente, mas não entram na estimativa.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -108,12 +121,12 @@ regenerar o `simulador-irs.html`.
   Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
   fora dos separadores.
 
-A estrutura XML dos Anexos G, G1, J, L, SS ainda **não** está mapeada em detalhe — são
+A estrutura XML dos Anexos G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
-Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H. Ao **importar** uma
-declaração que já tenha dados nessas secções, esses dados são preservados tal como
-estavam (mas ainda não podem ser vistos/editados na interface) e mantidos ao exportar de
-novo — para não haver perda de informação.
+Quadros 5-19 do Anexo G, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10
+do Anexo H. Ao **importar** uma declaração que já tenha dados nessas secções, esses dados
+são preservados tal como estavam (mas ainda não podem ser vistos/editados na interface) e
+mantidos ao exportar de novo — para não haver perda de informação.
 
 ## Por confirmar / próximos passos
 
@@ -143,9 +156,11 @@ novo — para não haver perda de informação.
    Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
    Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
    implementar.
-5. Cada anexo por implementar (G, G1, J, L, SS) vai precisar de um exemplo XML preenchido
-   + as respetivas instruções de preenchimento, tal como foi feito para os Anexos A, B, E
-   e H.
+5. **Anexo G, Quadros 5-19** (reinvestimento em habitação própria, partes sociais,
+   criptoativos, instrumentos financeiros derivados, indemnizações, etc.) — já tenho as
+   instruções e um exemplo preenchido, falta implementar. Cada anexo por implementar do
+   zero (G1, J, L, SS) vai precisar de um exemplo XML preenchido + as respetivas
+   instruções de preenchimento, tal como foi feito para os Anexos A, B, E, G e H.
 6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.

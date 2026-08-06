@@ -167,13 +167,75 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
     if (el) passthrough[nome] = serializar(el);
   });
   return passthrough;
+}
+
+// Anexo G, Quadro 4 (alienação onerosa de imóveis): nomes de campo confirmados contra um
+// exemplo real. Os restantes quadros (5-19: reinvestimento em habitação própria, partes
+// sociais, criptoativos, etc.) ficam em passthrough (model.anexoGPassthrough).
+function parseQuadro04AnexoG(q04) {
+  if (!temConteudo(q04)) return undefined;
+  return {
+    imoveis: parseLinhasGenerico(filho(q04, "AnexoGq04T01")).map(l => ({
+      nlinha: l.NLinha, titular: l.Titular,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao,
+      valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao,
+      valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos,
+      freguesia: l.Freguesia, tipoPredio: l.TipoPredio, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte
+    })),
+    reabilitacao: parseLinhasGenerico(filho(q04, "AnexoGq04AT01")).map(l => ({
+      campoQ4: l.CamposQuadro4, anoConclusao: l.AnoConclusao, mesConclusao: l.MesConclusao, diaConclusao: l.DiaConclusao
+    })),
+    afetacaoB1: parseLinhasGenerico(filho(q04, "AnexoGq04BT01")).map(l => ({
+      titular: l.Titular, naturezaBens: l.NaturezaBens, anoAfetacao: l.AnoAfectacao, mesAfetacao: l.MesAfectacao,
+      valorAfetacao: l.ValorAfetacao, anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao,
+      valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos, freguesia: l.Freguesia, tipoPredio: l.TipoPredio
+    })),
+    afetacaoB2: parseLinhasGenerico(filho(q04, "AnexoGq04BT02")).map(l => ({
+      titular: l.Titular, anoAfetacao: l.AnoAfetacao, mesAfetacao: l.MesAfetacao, valorAfetacao: l.ValorAfetacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao
+    })),
+    afetacaoB3: parseLinhasGenerico(filho(q04, "AnexoGq04BT03")).map(l => ({
+      titular: l.Titular, anoAfetacao: l.AnoAfetacao, mesAfetacao: l.MesAfetacao, valorAfetacao: l.ValorAfetacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos, freguesia: l.Freguesia, tipoPredio: l.TipoPredio,
+      artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte
+    })),
+    alienacaoEGF: parseLinhasGenerico(filho(q04, "AnexoGq04CT01")).map(l => ({ campoQ4: l.CamposQuadro4, nif: l.NIF })),
+    apoioNaoReembolsavel: parseLinhasGenerico(filho(q04, "AnexoGq04DT01")).map(l => ({
+      campoQ4: l.CamposQuadro4, finalidade: l.Finalidade, anoApoio: l.AnoApoio, mesApoio: l.MesApoio,
+      valorApoio: l.ValorApoio, valorPatrimonialTributario: l.ValorPatrimonialTributario
+    })),
+    afetosAtividade3anos: parseLinhasGenerico(filho(q04, "AnexoGq04ET01")).map(l => ({
+      titular: l.Titular, anoTransferencia: l.AnoTransferencia, mesTransferencia: l.MesTransferencia, diaTransferencia: l.DiaTransferencia,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+      freguesia: l.Freguesia, tipoPredio: l.TipoPredio, artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte
+    })),
+    alienacaoEstado: parseLinhasGenerico(filho(q04, "AnexoGq04FT01")).map(l => ({ campoQ4: l.CamposQuadro4, nifAdquirente: l.NIFAdquirente }))
+  };
+}
+
+function parseAnexoG(anexoG) {
+  if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
+  const q04 = filho(anexoG, "Quadro04");
+  const quadro04 = parseQuadro04AnexoG(q04);
+
+  const passthrough = {};
+  for (let i = 5; i <= 19; i++) {
+    const numero = String(i).padStart(2, "0");
+    const elQ = filho(anexoG, `Quadro${numero}`);
+    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
+  }
+
+  return { anexoG: quadro04 ? { quadro04 } : undefined, anexoGPassthrough: passthrough };
 }
 
 // Anexo E (rendimentos de capitais): nomes de campo confirmados contra um exemplo real.
@@ -465,12 +527,14 @@ function parseModelo3XML(xmlTexto) {
   const anexoA = filho(raiz, "AnexoA");
   const anexoB = filho(raiz, "AnexoB");
   const anexoE = filho(raiz, "AnexoE");
+  const anexoG = filho(raiz, "AnexoG");
   const anexoH = filho(raiz, "AnexoH");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
   const { anexoB: anexoBModel, anexoBPassthrough, anexoBTemDados } = parseAnexoB(anexoB);
   const { anexoE: anexoEModel } = parseAnexoE(anexoE);
+  const { anexoG: anexoGModel, anexoGPassthrough } = parseAnexoG(anexoG);
   const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
@@ -482,6 +546,8 @@ function parseModelo3XML(xmlTexto) {
     anexoBPassthrough,
     anexoBTemDados,
     anexoE: anexoEModel,
+    anexoG: anexoGModel,
+    anexoGPassthrough,
     anexoH: anexoHModel,
     anexoHPassthrough,
     rostoPassthrough,

@@ -62,6 +62,7 @@
     <button type="button" data-secao="anexoA" onclick="mostrarSecao('anexoA')">Anexo A</button>
     <button type="button" data-secao="anexoB" onclick="mostrarSecao('anexoB')">Anexo B</button>
     <button type="button" data-secao="anexoE" onclick="mostrarSecao('anexoE')">Anexo E</button>
+    <button type="button" data-secao="anexoG" onclick="mostrarSecao('anexoG')">Anexo G</button>
     <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
     <button type="button" data-secao="anexoH" onclick="mostrarSecao('anexoH')">Anexo H</button>
   </nav>
@@ -445,6 +446,104 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE5B()">+ Adicionar (5B — opção regime n.º 3 art.º 74.º)</button>
+</div>
+
+<div class="painel" id="painel-anexoG">
+<h2>Anexo G — Mais-Valias e Outros Incrementos Patrimoniais</h2>
+<p class="aviso-topo">
+  Este é o anexo mais extenso de todos (19 quadros). Por agora só está implementado o
+  Quadro 4 (alienação onerosa de imóveis) — nomes de campo confirmados contra um exemplo
+  real. Os Quadros 5 a 19 (reinvestimento em habitação própria, partes sociais, criptoativos,
+  instrumentos financeiros, etc.) ainda não têm interface própria; se importares uma
+  declaração com dados nesses quadros, ficam preservados tal como estavam.
+  <strong>O cálculo de mais-valias ainda não está implementado</strong> — regras próprias e
+  complexas (correção monetária, exclusão de 50% do saldo, reinvestimento, etc.) — os dados
+  ficam guardados e exportados no XML, mas a estimativa não os usa.
+</p>
+
+<h3>Alienação onerosa de imóveis (Quadro 4)</h3>
+<table id="tabelaAnexoG04">
+  <thead><tr>
+    <th>Titular</th><th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th><th>Despesas/encargos (€)</th>
+    <th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04()">+ Adicionar imóvel</button>
+
+<h3>Imóveis recuperados/reabilitação (Quadro 4A)</h3>
+<table id="tabelaAnexoG04A">
+  <thead><tr><th>Campo do Q4 (ex: 4001)</th><th>Ano conclusão</th><th>Mês</th><th>Dia</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04A()">+ Adicionar</button>
+
+<h3>Afetação de bens móveis/imóveis à atividade — 2020 e anteriores (Quadro 4B1)</h3>
+<table id="tabelaAnexoG04B1">
+  <thead><tr>
+    <th>Titular</th><th>Natureza (M/I)</th><th>Ano afetação</th><th>Mês</th><th>Valor afetação (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Valor aquisição (€)</th><th>Despesas/encargos (€)</th><th>Freguesia</th><th>Tipo</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04B1()">+ Adicionar</button>
+
+<h3>Afetação de bens móveis à atividade — 2021+ (Quadro 4B2)</h3>
+<table id="tabelaAnexoG04B2">
+  <thead><tr><th>Titular</th><th>Ano afetação</th><th>Mês</th><th>Valor afetação (€)</th><th>Ano aquis.</th><th>Mês</th><th>Valor aquisição (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04B2()">+ Adicionar</button>
+
+<h3>Afetação de imóveis à atividade — regime transitório 2021+ (Quadro 4B3)</h3>
+<table id="tabelaAnexoG04B3">
+  <thead><tr>
+    <th>Titular</th><th>Ano afetação</th><th>Mês</th><th>Valor afetação (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Valor aquisição (€)</th><th>Despesas/encargos (€)</th>
+    <th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04B3()">+ Adicionar</button>
+
+<h3>Alienação de imóveis rústicos a EGF/UGF (Quadro 4C)</h3>
+<table id="tabelaAnexoG04C">
+  <thead><tr><th>Campo do Q4 (ex: 4001)</th><th>NIF da EGF/UGF</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04C()">+ Adicionar</button>
+
+<h3>Imóveis com apoio não reembolsável — habitação própria (Quadro 4D)</h3>
+<datalist id="listaFinalidadeApoioG04D">
+  <option value="01">01 — Aquisição de imóvel</option>
+  <option value="02">02 — Construção ou reconstrução de imóvel</option>
+  <option value="03">03 — Realização de obras de conservação de imóvel</option>
+</datalist>
+<table id="tabelaAnexoG04D">
+  <thead><tr><th>Campo do Q4</th><th>Finalidade</th><th>Ano apoio</th><th>Mês</th><th>Valor apoio (€)</th><th>Valor patrimonial tributário (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04D()">+ Adicionar</button>
+
+<h3>Imóveis afetos à atividade alienados antes de 3 anos após transferência (Quadro 4E)</h3>
+<table id="tabelaAnexoG04E">
+  <thead><tr>
+    <th>Titular</th><th>Ano transf.</th><th>Mês</th><th>Dia</th>
+    <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
+    <th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04E()">+ Adicionar</button>
+
+<h3>Alienação de imóveis para habitação ao Estado/RA/entidades públicas (Quadro 4F)</h3>
+<table id="tabelaAnexoG04F">
+  <thead><tr><th>Campo do Q4</th><th>NIF da entidade adquirente</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG04F()">+ Adicionar</button>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -1235,6 +1334,116 @@ function buildAnexoE(model) {
     `</AnexoE>`;
 }
 
+// Anexo G, Quadro 4 (alienação onerosa de imóveis e afetações relacionadas): nomes de
+// campo confirmados contra um exemplo real. Não afeta ainda o cálculo da estimativa —
+// mais-valias imobiliárias têm regras próprias e complexas (correção monetária, exclusão
+// de 50% do saldo, reinvestimento em habitação própria no Quadro 5, etc.) ainda por
+// implementar; os dados ficam capturados e exportados corretamente.
+function buildQuadro04AnexoG(q04) {
+  if (!q04) return `<Quadro04/>`;
+
+  const imoveis = q04.imoveis || [];
+  const somaC01 = imoveis.reduce((a, i) => a + (Number(i.valorRealizacao) || 0), 0);
+  const somaC02 = imoveis.reduce((a, i) => a + (Number(i.valorAquisicao) || 0), 0);
+  const somaC03 = imoveis.reduce((a, i) => a + (Number(i.despesasEncargos) || 0), 0);
+
+  const t01 = listaComLinhas("AnexoGq04T01", imoveis.map((i, idx) => ({
+    NLinha: i.nlinha || (4001 + idx), Titular: i.titular,
+    AnoRealizacao: i.anoRealizacao, MesRealizacao: i.mesRealizacao, DiaRealizacao: i.diaRealizacao,
+    ValorRealizacao: moeda(i.valorRealizacao),
+    AnoAquisicao: i.anoAquisicao, MesAquisicao: i.mesAquisicao, DiaAquisicao: i.diaAquisicao,
+    ValorAquisicao: moeda(i.valorAquisicao), DespesasEncargos: moeda(i.despesasEncargos),
+    Freguesia: i.freguesia, TipoPredio: i.tipoPredio, Artigo: i.artigo, Fraccao: i.fraccao, QuotaParte: i.quotaParte
+  })));
+
+  const at01 = listaComLinhas("AnexoGq04AT01", (q04.reabilitacao || []).map(r => ({
+    CamposQuadro4: r.campoQ4, AnoConclusao: r.anoConclusao, MesConclusao: r.mesConclusao, DiaConclusao: r.diaConclusao
+  })));
+
+  const bt01 = listaComLinhas("AnexoGq04BT01", (q04.afetacaoB1 || []).map(b => ({
+    Titular: b.titular, NaturezaBens: b.naturezaBens, AnoAfectacao: b.anoAfetacao, MesAfectacao: b.mesAfetacao,
+    ValorAfetacao: moeda(b.valorAfetacao), AnoAquisicao: b.anoAquisicao, MesAquisicao: b.mesAquisicao,
+    ValorAquisicao: moeda(b.valorAquisicao), DespesasEncargos: moeda(b.despesasEncargos),
+    Freguesia: b.freguesia, TipoPredio: b.tipoPredio
+  })));
+
+  const bt02 = listaComLinhas("AnexoGq04BT02", (q04.afetacaoB2 || []).map(b => ({
+    Titular: b.titular, AnoAfetacao: b.anoAfetacao, MesAfetacao: b.mesAfetacao, ValorAfetacao: moeda(b.valorAfetacao),
+    AnoAquisicao: b.anoAquisicao, MesAquisicao: b.mesAquisicao, ValorAquisicao: moeda(b.valorAquisicao)
+  })));
+
+  const bt03 = listaComLinhas("AnexoGq04BT03", (q04.afetacaoB3 || []).map(b => ({
+    Titular: b.titular, AnoAfetacao: b.anoAfetacao, MesAfetacao: b.mesAfetacao, ValorAfetacao: moeda(b.valorAfetacao),
+    AnoAquisicao: b.anoAquisicao, MesAquisicao: b.mesAquisicao, ValorAquisicao: moeda(b.valorAquisicao),
+    DespesasEncargos: moeda(b.despesasEncargos), Freguesia: b.freguesia, TipoPredio: b.tipoPredio,
+    Artigo: b.artigo, Fracao: b.fracao, QuotaParte: b.quotaParte
+  })));
+
+  const ct01 = listaComLinhas("AnexoGq04CT01", (q04.alienacaoEGF || []).map(c => ({
+    CamposQuadro4: c.campoQ4, NIF: c.nif
+  })));
+
+  const dt01 = listaComLinhas("AnexoGq04DT01", (q04.apoioNaoReembolsavel || []).map(d => ({
+    CamposQuadro4: d.campoQ4, Finalidade: d.finalidade, AnoApoio: d.anoApoio, MesApoio: d.mesApoio,
+    ValorApoio: moeda(d.valorApoio), ValorPatrimonialTributario: moeda(d.valorPatrimonialTributario)
+  })));
+
+  const et01 = listaComLinhas("AnexoGq04ET01", (q04.afetosAtividade3anos || []).map(e => ({
+    Titular: e.titular, AnoTransferencia: e.anoTransferencia, MesTransferencia: e.mesTransferencia, DiaTransferencia: e.diaTransferencia,
+    AnoRealizacao: e.anoRealizacao, MesRealizacao: e.mesRealizacao, DiaRealizacao: e.diaRealizacao, ValorRealizacao: moeda(e.valorRealizacao),
+    AnoAquisicao: e.anoAquisicao, MesAquisicao: e.mesAquisicao, DiaAquisicao: e.diaAquisicao, ValorAquisicao: moeda(e.valorAquisicao),
+    Freguesia: e.freguesia, TipoPredio: e.tipoPredio, Artigo: e.artigo, Fracao: e.fracao, QuotaParte: e.quotaParte
+  })));
+
+  const ft01 = listaComLinhas("AnexoGq04FT01", (q04.alienacaoEstado || []).map(f => ({
+    CamposQuadro4: f.campoQ4, NIFAdquirente: f.nifAdquirente
+  })));
+
+  return `<Quadro04>` +
+    t01 +
+    (imoveis.length ? el("AnexoGq04T01SomaC01", moeda(somaC01)) + el("AnexoGq04T01SomaC02", moeda(somaC02)) + el("AnexoGq04T01SomaC03", moeda(somaC03)) : "") +
+    at01 + bt01 + bt02 + bt03 + ct01 + dt01 + et01 + ft01 +
+    `</Quadro04>`;
+}
+
+function temDadosQuadro04AnexoG(q04) {
+  if (!q04) return false;
+  return (q04.imoveis && q04.imoveis.length > 0) ||
+    (q04.reabilitacao && q04.reabilitacao.length > 0) ||
+    (q04.afetacaoB1 && q04.afetacaoB1.length > 0) ||
+    (q04.afetacaoB2 && q04.afetacaoB2.length > 0) ||
+    (q04.afetacaoB3 && q04.afetacaoB3.length > 0) ||
+    (q04.alienacaoEGF && q04.alienacaoEGF.length > 0) ||
+    (q04.apoioNaoReembolsavel && q04.apoioNaoReembolsavel.length > 0) ||
+    (q04.afetosAtividade3anos && q04.afetosAtividade3anos.length > 0) ||
+    (q04.alienacaoEstado && q04.alienacaoEstado.length > 0);
+}
+
+function buildAnexoG(model) {
+  const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const g = model.anexoG || {};
+  const pass = model.anexoGPassthrough || {};
+  const quadro03 = tributacaoConjunta
+    ? `<Quadro03>${el("AnexoGq03C01", nifA)}${el("AnexoGq03C02", nifB)}</Quadro03>`
+    : `<Quadro03>${el("AnexoGq03C01", nifA)}</Quadro03>`;
+
+  const quadro04 = temDadosQuadro04AnexoG(g.quadro04)
+    ? buildQuadro04AnexoG(g.quadro04)
+    : (pass.Quadro04 || `<Quadro04/>`);
+
+  const quadrosRestantes = Array.from({ length: 15 }, (_, i) => {
+    const numero = String(i + 5).padStart(2, "0");
+    return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
+  }).join("");
+
+  return `<AnexoG>` +
+    `<Quadro02>${el("AnexoGq02C01", ano)}</Quadro02>` +
+    quadro03 +
+    quadro04 +
+    quadrosRestantes +
+    `</AnexoG>`;
+}
+
 // Anexos ainda não mapeados em detalhe (Fase 3+): emite apenas o cabeçalho ano+NIF,
 // tal como observado nos exemplos fornecidos, mantendo o esqueleto vazio nos restantes quadros.
 function buildAnexoEsqueleto(nomeAnexo, prefixo, model, quadrosVazios, temC02) {
@@ -1713,7 +1922,7 @@ function buildModelo3XML(model) {
     const pass = model.anexosPassthrough || {};
     partes.push(buildAnexoB(model));
     partes.push(buildAnexoE(model));
-    partes.push(pass.AnexoG || buildAnexoEsqueleto("AnexoG", "AnexoG", model, Array.from({length: 16}, (_, i) => String(i + 4).padStart(2, "0")), true));
+    partes.push(buildAnexoG(model));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
     partes.push(buildAnexoH(model));
     partes.push(pass.AnexoJ || buildAnexoJ(model));
@@ -1906,13 +2115,75 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoG", "AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
     if (el) passthrough[nome] = serializar(el);
   });
   return passthrough;
+}
+
+// Anexo G, Quadro 4 (alienação onerosa de imóveis): nomes de campo confirmados contra um
+// exemplo real. Os restantes quadros (5-19: reinvestimento em habitação própria, partes
+// sociais, criptoativos, etc.) ficam em passthrough (model.anexoGPassthrough).
+function parseQuadro04AnexoG(q04) {
+  if (!temConteudo(q04)) return undefined;
+  return {
+    imoveis: parseLinhasGenerico(filho(q04, "AnexoGq04T01")).map(l => ({
+      nlinha: l.NLinha, titular: l.Titular,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao,
+      valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao,
+      valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos,
+      freguesia: l.Freguesia, tipoPredio: l.TipoPredio, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte
+    })),
+    reabilitacao: parseLinhasGenerico(filho(q04, "AnexoGq04AT01")).map(l => ({
+      campoQ4: l.CamposQuadro4, anoConclusao: l.AnoConclusao, mesConclusao: l.MesConclusao, diaConclusao: l.DiaConclusao
+    })),
+    afetacaoB1: parseLinhasGenerico(filho(q04, "AnexoGq04BT01")).map(l => ({
+      titular: l.Titular, naturezaBens: l.NaturezaBens, anoAfetacao: l.AnoAfectacao, mesAfetacao: l.MesAfectacao,
+      valorAfetacao: l.ValorAfetacao, anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao,
+      valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos, freguesia: l.Freguesia, tipoPredio: l.TipoPredio
+    })),
+    afetacaoB2: parseLinhasGenerico(filho(q04, "AnexoGq04BT02")).map(l => ({
+      titular: l.Titular, anoAfetacao: l.AnoAfetacao, mesAfetacao: l.MesAfetacao, valorAfetacao: l.ValorAfetacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao
+    })),
+    afetacaoB3: parseLinhasGenerico(filho(q04, "AnexoGq04BT03")).map(l => ({
+      titular: l.Titular, anoAfetacao: l.AnoAfetacao, mesAfetacao: l.MesAfetacao, valorAfetacao: l.ValorAfetacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos, freguesia: l.Freguesia, tipoPredio: l.TipoPredio,
+      artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte
+    })),
+    alienacaoEGF: parseLinhasGenerico(filho(q04, "AnexoGq04CT01")).map(l => ({ campoQ4: l.CamposQuadro4, nif: l.NIF })),
+    apoioNaoReembolsavel: parseLinhasGenerico(filho(q04, "AnexoGq04DT01")).map(l => ({
+      campoQ4: l.CamposQuadro4, finalidade: l.Finalidade, anoApoio: l.AnoApoio, mesApoio: l.MesApoio,
+      valorApoio: l.ValorApoio, valorPatrimonialTributario: l.ValorPatrimonialTributario
+    })),
+    afetosAtividade3anos: parseLinhasGenerico(filho(q04, "AnexoGq04ET01")).map(l => ({
+      titular: l.Titular, anoTransferencia: l.AnoTransferencia, mesTransferencia: l.MesTransferencia, diaTransferencia: l.DiaTransferencia,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+      freguesia: l.Freguesia, tipoPredio: l.TipoPredio, artigo: l.Artigo, fracao: l.Fracao, quotaParte: l.QuotaParte
+    })),
+    alienacaoEstado: parseLinhasGenerico(filho(q04, "AnexoGq04FT01")).map(l => ({ campoQ4: l.CamposQuadro4, nifAdquirente: l.NIFAdquirente }))
+  };
+}
+
+function parseAnexoG(anexoG) {
+  if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
+  const q04 = filho(anexoG, "Quadro04");
+  const quadro04 = parseQuadro04AnexoG(q04);
+
+  const passthrough = {};
+  for (let i = 5; i <= 19; i++) {
+    const numero = String(i).padStart(2, "0");
+    const elQ = filho(anexoG, `Quadro${numero}`);
+    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
+  }
+
+  return { anexoG: quadro04 ? { quadro04 } : undefined, anexoGPassthrough: passthrough };
 }
 
 // Anexo E (rendimentos de capitais): nomes de campo confirmados contra um exemplo real.
@@ -2204,12 +2475,14 @@ function parseModelo3XML(xmlTexto) {
   const anexoA = filho(raiz, "AnexoA");
   const anexoB = filho(raiz, "AnexoB");
   const anexoE = filho(raiz, "AnexoE");
+  const anexoG = filho(raiz, "AnexoG");
   const anexoH = filho(raiz, "AnexoH");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
   const { anexoB: anexoBModel, anexoBPassthrough, anexoBTemDados } = parseAnexoB(anexoB);
   const { anexoE: anexoEModel } = parseAnexoE(anexoE);
+  const { anexoG: anexoGModel, anexoGPassthrough } = parseAnexoG(anexoG);
   const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
@@ -2221,6 +2494,8 @@ function parseModelo3XML(xmlTexto) {
     anexoBPassthrough,
     anexoBTemDados,
     anexoE: anexoEModel,
+    anexoG: anexoGModel,
+    anexoGPassthrough,
     anexoH: anexoHModel,
     anexoHPassthrough,
     rostoPassthrough,
@@ -2397,7 +2672,7 @@ if (typeof module !== "undefined" && module.exports) {
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
   // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
-  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoHPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
+  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoGPassthrough: {}, anexoHPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -2981,6 +3256,274 @@ if (typeof module !== "undefined" && module.exports) {
     return { rendimentosTaxasEspeciais, optaEnglobamento, rendimentosTaxasLiberatorias, rendimentosAnosAnteriores5A, rendimentosAnosAnteriores5B };
   }
 
+  window.adicionarLinhaAnexoG04 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag04-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag04-anorealizacao" type="number" size="6"></td>
+      <td><input class="ag04-mesrealizacao" type="number" size="4"></td>
+      <td><input class="ag04-diarealizacao" type="number" size="4"></td>
+      <td><input class="ag04-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag04-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag04-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag04-diaaquisicao" type="number" size="4"></td>
+      <td><input class="ag04-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag04-despesas" type="number" step="0.01"></td>
+      <td><input class="ag04-freguesia" size="8"></td>
+      <td><select class="ag04-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ag04-artigo" size="8"></td>
+      <td><input class="ag04-fraccao" size="6"></td>
+      <td><input class="ag04-quota" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04A = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag04a-campo" size="6"></td>
+      <td><input class="ag04a-ano" type="number" size="6"></td>
+      <td><input class="ag04a-mes" type="number" size="4"></td>
+      <td><input class="ag04a-dia" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04B1 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04B1 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag04b1-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><select class="ag04b1-natureza"><option value="M">M — Móveis</option><option value="I">I — Imóveis</option></select></td>
+      <td><input class="ag04b1-anoafetacao" type="number" size="6"></td>
+      <td><input class="ag04b1-mesafetacao" type="number" size="4"></td>
+      <td><input class="ag04b1-valorafetacao" type="number" step="0.01"></td>
+      <td><input class="ag04b1-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag04b1-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag04b1-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag04b1-despesas" type="number" step="0.01"></td>
+      <td><input class="ag04b1-freguesia" size="8"></td>
+      <td><select class="ag04b1-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04B2 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04B2 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag04b2-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag04b2-anoafetacao" type="number" size="6"></td>
+      <td><input class="ag04b2-mesafetacao" type="number" size="4"></td>
+      <td><input class="ag04b2-valorafetacao" type="number" step="0.01"></td>
+      <td><input class="ag04b2-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag04b2-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag04b2-valoraquisicao" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04B3 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04B3 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag04b3-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag04b3-anoafetacao" type="number" size="6"></td>
+      <td><input class="ag04b3-mesafetacao" type="number" size="4"></td>
+      <td><input class="ag04b3-valorafetacao" type="number" step="0.01"></td>
+      <td><input class="ag04b3-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag04b3-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag04b3-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag04b3-despesas" type="number" step="0.01"></td>
+      <td><input class="ag04b3-freguesia" size="8"></td>
+      <td><select class="ag04b3-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ag04b3-artigo" size="8"></td>
+      <td><input class="ag04b3-fracao" size="6"></td>
+      <td><input class="ag04b3-quota" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04C = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04C tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag04c-campo" size="6"></td>
+      <td><input class="ag04c-nif" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04D = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04D tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag04d-campo" size="6"></td>
+      <td><input class="ag04d-finalidade" size="4" list="listaFinalidadeApoioG04D"></td>
+      <td><input class="ag04d-ano" type="number" size="6"></td>
+      <td><input class="ag04d-mes" type="number" size="4"></td>
+      <td><input class="ag04d-valorapoio" type="number" step="0.01"></td>
+      <td><input class="ag04d-valorpatrimonial" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04E = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04E tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag04e-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag04e-anotransferencia" type="number" size="6"></td>
+      <td><input class="ag04e-mestransferencia" type="number" size="4"></td>
+      <td><input class="ag04e-diatransferencia" type="number" size="4"></td>
+      <td><input class="ag04e-anorealizacao" type="number" size="6"></td>
+      <td><input class="ag04e-mesrealizacao" type="number" size="4"></td>
+      <td><input class="ag04e-diarealizacao" type="number" size="4"></td>
+      <td><input class="ag04e-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag04e-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag04e-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag04e-diaaquisicao" type="number" size="4"></td>
+      <td><input class="ag04e-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag04e-freguesia" size="8"></td>
+      <td><select class="ag04e-tipo"><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ag04e-artigo" size="8"></td>
+      <td><input class="ag04e-fracao" size="6"></td>
+      <td><input class="ag04e-quota" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG04F = function () {
+    const tbody = document.querySelector("#tabelaAnexoG04F tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag04f-campo" size="6"></td>
+      <td><input class="ag04f-nif" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04AnexoG() {
+    const imoveis = [...document.querySelectorAll("#tabelaAnexoG04 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag04-titular").value,
+      anoRealizacao: tr.querySelector(".ag04-anorealizacao").value,
+      mesRealizacao: tr.querySelector(".ag04-mesrealizacao").value,
+      diaRealizacao: tr.querySelector(".ag04-diarealizacao").value,
+      valorRealizacao: tr.querySelector(".ag04-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag04-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag04-mesaquisicao").value,
+      diaAquisicao: tr.querySelector(".ag04-diaaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag04-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag04-despesas").value || 0,
+      freguesia: tr.querySelector(".ag04-freguesia").value,
+      tipoPredio: tr.querySelector(".ag04-tipo").value,
+      artigo: tr.querySelector(".ag04-artigo").value,
+      fraccao: tr.querySelector(".ag04-fraccao").value || undefined,
+      quotaParte: tr.querySelector(".ag04-quota").value || undefined
+    }));
+    const reabilitacao = [...document.querySelectorAll("#tabelaAnexoG04A tbody tr")].map(tr => ({
+      campoQ4: tr.querySelector(".ag04a-campo").value,
+      anoConclusao: tr.querySelector(".ag04a-ano").value,
+      mesConclusao: tr.querySelector(".ag04a-mes").value,
+      diaConclusao: tr.querySelector(".ag04a-dia").value
+    }));
+    const afetacaoB1 = [...document.querySelectorAll("#tabelaAnexoG04B1 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag04b1-titular").value,
+      naturezaBens: tr.querySelector(".ag04b1-natureza").value,
+      anoAfetacao: tr.querySelector(".ag04b1-anoafetacao").value,
+      mesAfetacao: tr.querySelector(".ag04b1-mesafetacao").value,
+      valorAfetacao: tr.querySelector(".ag04b1-valorafetacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag04b1-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag04b1-mesaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag04b1-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag04b1-despesas").value || 0,
+      freguesia: tr.querySelector(".ag04b1-freguesia").value,
+      tipoPredio: tr.querySelector(".ag04b1-tipo").value
+    }));
+    const afetacaoB2 = [...document.querySelectorAll("#tabelaAnexoG04B2 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag04b2-titular").value,
+      anoAfetacao: tr.querySelector(".ag04b2-anoafetacao").value,
+      mesAfetacao: tr.querySelector(".ag04b2-mesafetacao").value,
+      valorAfetacao: tr.querySelector(".ag04b2-valorafetacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag04b2-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag04b2-mesaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag04b2-valoraquisicao").value || 0
+    }));
+    const afetacaoB3 = [...document.querySelectorAll("#tabelaAnexoG04B3 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag04b3-titular").value,
+      anoAfetacao: tr.querySelector(".ag04b3-anoafetacao").value,
+      mesAfetacao: tr.querySelector(".ag04b3-mesafetacao").value,
+      valorAfetacao: tr.querySelector(".ag04b3-valorafetacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag04b3-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag04b3-mesaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag04b3-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag04b3-despesas").value || 0,
+      freguesia: tr.querySelector(".ag04b3-freguesia").value,
+      tipoPredio: tr.querySelector(".ag04b3-tipo").value,
+      artigo: tr.querySelector(".ag04b3-artigo").value,
+      fracao: tr.querySelector(".ag04b3-fracao").value || undefined,
+      quotaParte: tr.querySelector(".ag04b3-quota").value || undefined
+    }));
+    const alienacaoEGF = [...document.querySelectorAll("#tabelaAnexoG04C tbody tr")].map(tr => ({
+      campoQ4: tr.querySelector(".ag04c-campo").value,
+      nif: tr.querySelector(".ag04c-nif").value
+    }));
+    const apoioNaoReembolsavel = [...document.querySelectorAll("#tabelaAnexoG04D tbody tr")].map(tr => ({
+      campoQ4: tr.querySelector(".ag04d-campo").value,
+      finalidade: tr.querySelector(".ag04d-finalidade").value,
+      anoApoio: tr.querySelector(".ag04d-ano").value,
+      mesApoio: tr.querySelector(".ag04d-mes").value,
+      valorApoio: tr.querySelector(".ag04d-valorapoio").value || 0,
+      valorPatrimonialTributario: tr.querySelector(".ag04d-valorpatrimonial").value || 0
+    }));
+    const afetosAtividade3anos = [...document.querySelectorAll("#tabelaAnexoG04E tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag04e-titular").value,
+      anoTransferencia: tr.querySelector(".ag04e-anotransferencia").value,
+      mesTransferencia: tr.querySelector(".ag04e-mestransferencia").value,
+      diaTransferencia: tr.querySelector(".ag04e-diatransferencia").value,
+      anoRealizacao: tr.querySelector(".ag04e-anorealizacao").value,
+      mesRealizacao: tr.querySelector(".ag04e-mesrealizacao").value,
+      diaRealizacao: tr.querySelector(".ag04e-diarealizacao").value,
+      valorRealizacao: tr.querySelector(".ag04e-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag04e-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag04e-mesaquisicao").value,
+      diaAquisicao: tr.querySelector(".ag04e-diaaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag04e-valoraquisicao").value || 0,
+      freguesia: tr.querySelector(".ag04e-freguesia").value,
+      tipoPredio: tr.querySelector(".ag04e-tipo").value,
+      artigo: tr.querySelector(".ag04e-artigo").value,
+      fracao: tr.querySelector(".ag04e-fracao").value || undefined,
+      quotaParte: tr.querySelector(".ag04e-quota").value || undefined
+    }));
+    const alienacaoEstado = [...document.querySelectorAll("#tabelaAnexoG04F tbody tr")].map(tr => ({
+      campoQ4: tr.querySelector(".ag04f-campo").value,
+      nifAdquirente: tr.querySelector(".ag04f-nif").value
+    }));
+
+    const temDados = imoveis.length || reabilitacao.length || afetacaoB1.length || afetacaoB2.length ||
+      afetacaoB3.length || alienacaoEGF.length || apoioNaoReembolsavel.length ||
+      afetosAtividade3anos.length || alienacaoEstado.length;
+    if (!temDados) return undefined;
+
+    return { imoveis, reabilitacao, afetacaoB1, afetacaoB2, afetacaoB3, alienacaoEGF, apoioNaoReembolsavel, afetosAtividade3anos, alienacaoEstado };
+  }
+
+  function lerAnexoG() {
+    const quadro04 = lerQuadro04AnexoG();
+    return quadro04 ? { quadro04 } : undefined;
+  }
+
   function lerAnexoH() {
     const pensoesAlimentos = [...document.querySelectorAll("#tabelaAnexoHPensoes tbody tr")].map(tr => ({
       sujeitoPassivo: tr.querySelector(".ah-p-sp").value,
@@ -3136,6 +3679,8 @@ if (typeof module !== "undefined" && module.exports) {
       anexoB: temAtividadeAnexoB(anexoBLido) ? anexoBLido : undefined,
       anexoBPassthrough: dadosPreservados.anexoBPassthrough,
       anexoE: lerAnexoE(),
+      anexoG: lerAnexoG(),
+      anexoGPassthrough: dadosPreservados.anexoGPassthrough,
       anexoH: lerAnexoH(),
       anexoHPassthrough: dadosPreservados.anexoHPassthrough,
       rostoPassthrough: dadosPreservados.rostoPassthrough,
@@ -3291,6 +3836,133 @@ if (typeof module !== "undefined" && module.exports) {
           tr.querySelector(".ae5b-ano").value = r.anoRendimentos || "";
           tr.querySelector(".ae5b-rendimento").value = r.rendimento || "";
           tr.querySelector(".ae5b-retencoes").value = r.retencoesFonte || "";
+        });
+      }
+
+      document.querySelector("#tabelaAnexoG04 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04B1 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04B2 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04B3 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04C tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04D tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04E tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG04F tbody").innerHTML = "";
+
+      if (dados.anexoG && dados.anexoG.quadro04) {
+        const q4 = dados.anexoG.quadro04;
+        (q4.imoveis || []).forEach(i => {
+          adicionarLinhaAnexoG04();
+          const tr = document.querySelector("#tabelaAnexoG04 tbody tr:last-child");
+          if (i.titular) tr.querySelector(".ag04-titular").value = i.titular;
+          tr.querySelector(".ag04-anorealizacao").value = i.anoRealizacao || "";
+          tr.querySelector(".ag04-mesrealizacao").value = i.mesRealizacao || "";
+          tr.querySelector(".ag04-diarealizacao").value = i.diaRealizacao || "";
+          tr.querySelector(".ag04-valorrealizacao").value = i.valorRealizacao || "";
+          tr.querySelector(".ag04-anoaquisicao").value = i.anoAquisicao || "";
+          tr.querySelector(".ag04-mesaquisicao").value = i.mesAquisicao || "";
+          tr.querySelector(".ag04-diaaquisicao").value = i.diaAquisicao || "";
+          tr.querySelector(".ag04-valoraquisicao").value = i.valorAquisicao || "";
+          tr.querySelector(".ag04-despesas").value = i.despesasEncargos || "";
+          tr.querySelector(".ag04-freguesia").value = i.freguesia || "";
+          if (i.tipoPredio) tr.querySelector(".ag04-tipo").value = i.tipoPredio;
+          tr.querySelector(".ag04-artigo").value = i.artigo || "";
+          tr.querySelector(".ag04-fraccao").value = i.fraccao || "";
+          tr.querySelector(".ag04-quota").value = i.quotaParte || "";
+        });
+        (q4.reabilitacao || []).forEach(r => {
+          adicionarLinhaAnexoG04A();
+          const tr = document.querySelector("#tabelaAnexoG04A tbody tr:last-child");
+          tr.querySelector(".ag04a-campo").value = r.campoQ4 || "";
+          tr.querySelector(".ag04a-ano").value = r.anoConclusao || "";
+          tr.querySelector(".ag04a-mes").value = r.mesConclusao || "";
+          tr.querySelector(".ag04a-dia").value = r.diaConclusao || "";
+        });
+        (q4.afetacaoB1 || []).forEach(b => {
+          adicionarLinhaAnexoG04B1();
+          const tr = document.querySelector("#tabelaAnexoG04B1 tbody tr:last-child");
+          if (b.titular) tr.querySelector(".ag04b1-titular").value = b.titular;
+          if (b.naturezaBens) tr.querySelector(".ag04b1-natureza").value = b.naturezaBens;
+          tr.querySelector(".ag04b1-anoafetacao").value = b.anoAfetacao || "";
+          tr.querySelector(".ag04b1-mesafetacao").value = b.mesAfetacao || "";
+          tr.querySelector(".ag04b1-valorafetacao").value = b.valorAfetacao || "";
+          tr.querySelector(".ag04b1-anoaquisicao").value = b.anoAquisicao || "";
+          tr.querySelector(".ag04b1-mesaquisicao").value = b.mesAquisicao || "";
+          tr.querySelector(".ag04b1-valoraquisicao").value = b.valorAquisicao || "";
+          tr.querySelector(".ag04b1-despesas").value = b.despesasEncargos || "";
+          tr.querySelector(".ag04b1-freguesia").value = b.freguesia || "";
+          if (b.tipoPredio) tr.querySelector(".ag04b1-tipo").value = b.tipoPredio;
+        });
+        (q4.afetacaoB2 || []).forEach(b => {
+          adicionarLinhaAnexoG04B2();
+          const tr = document.querySelector("#tabelaAnexoG04B2 tbody tr:last-child");
+          if (b.titular) tr.querySelector(".ag04b2-titular").value = b.titular;
+          tr.querySelector(".ag04b2-anoafetacao").value = b.anoAfetacao || "";
+          tr.querySelector(".ag04b2-mesafetacao").value = b.mesAfetacao || "";
+          tr.querySelector(".ag04b2-valorafetacao").value = b.valorAfetacao || "";
+          tr.querySelector(".ag04b2-anoaquisicao").value = b.anoAquisicao || "";
+          tr.querySelector(".ag04b2-mesaquisicao").value = b.mesAquisicao || "";
+          tr.querySelector(".ag04b2-valoraquisicao").value = b.valorAquisicao || "";
+        });
+        (q4.afetacaoB3 || []).forEach(b => {
+          adicionarLinhaAnexoG04B3();
+          const tr = document.querySelector("#tabelaAnexoG04B3 tbody tr:last-child");
+          if (b.titular) tr.querySelector(".ag04b3-titular").value = b.titular;
+          tr.querySelector(".ag04b3-anoafetacao").value = b.anoAfetacao || "";
+          tr.querySelector(".ag04b3-mesafetacao").value = b.mesAfetacao || "";
+          tr.querySelector(".ag04b3-valorafetacao").value = b.valorAfetacao || "";
+          tr.querySelector(".ag04b3-anoaquisicao").value = b.anoAquisicao || "";
+          tr.querySelector(".ag04b3-mesaquisicao").value = b.mesAquisicao || "";
+          tr.querySelector(".ag04b3-valoraquisicao").value = b.valorAquisicao || "";
+          tr.querySelector(".ag04b3-despesas").value = b.despesasEncargos || "";
+          tr.querySelector(".ag04b3-freguesia").value = b.freguesia || "";
+          if (b.tipoPredio) tr.querySelector(".ag04b3-tipo").value = b.tipoPredio;
+          tr.querySelector(".ag04b3-artigo").value = b.artigo || "";
+          tr.querySelector(".ag04b3-fracao").value = b.fracao || "";
+          tr.querySelector(".ag04b3-quota").value = b.quotaParte || "";
+        });
+        (q4.alienacaoEGF || []).forEach(c => {
+          adicionarLinhaAnexoG04C();
+          const tr = document.querySelector("#tabelaAnexoG04C tbody tr:last-child");
+          tr.querySelector(".ag04c-campo").value = c.campoQ4 || "";
+          tr.querySelector(".ag04c-nif").value = c.nif || "";
+        });
+        (q4.apoioNaoReembolsavel || []).forEach(d => {
+          adicionarLinhaAnexoG04D();
+          const tr = document.querySelector("#tabelaAnexoG04D tbody tr:last-child");
+          tr.querySelector(".ag04d-campo").value = d.campoQ4 || "";
+          tr.querySelector(".ag04d-finalidade").value = d.finalidade || "";
+          tr.querySelector(".ag04d-ano").value = d.anoApoio || "";
+          tr.querySelector(".ag04d-mes").value = d.mesApoio || "";
+          tr.querySelector(".ag04d-valorapoio").value = d.valorApoio || "";
+          tr.querySelector(".ag04d-valorpatrimonial").value = d.valorPatrimonialTributario || "";
+        });
+        (q4.afetosAtividade3anos || []).forEach(e2 => {
+          adicionarLinhaAnexoG04E();
+          const tr = document.querySelector("#tabelaAnexoG04E tbody tr:last-child");
+          if (e2.titular) tr.querySelector(".ag04e-titular").value = e2.titular;
+          tr.querySelector(".ag04e-anotransferencia").value = e2.anoTransferencia || "";
+          tr.querySelector(".ag04e-mestransferencia").value = e2.mesTransferencia || "";
+          tr.querySelector(".ag04e-diatransferencia").value = e2.diaTransferencia || "";
+          tr.querySelector(".ag04e-anorealizacao").value = e2.anoRealizacao || "";
+          tr.querySelector(".ag04e-mesrealizacao").value = e2.mesRealizacao || "";
+          tr.querySelector(".ag04e-diarealizacao").value = e2.diaRealizacao || "";
+          tr.querySelector(".ag04e-valorrealizacao").value = e2.valorRealizacao || "";
+          tr.querySelector(".ag04e-anoaquisicao").value = e2.anoAquisicao || "";
+          tr.querySelector(".ag04e-mesaquisicao").value = e2.mesAquisicao || "";
+          tr.querySelector(".ag04e-diaaquisicao").value = e2.diaAquisicao || "";
+          tr.querySelector(".ag04e-valoraquisicao").value = e2.valorAquisicao || "";
+          tr.querySelector(".ag04e-freguesia").value = e2.freguesia || "";
+          if (e2.tipoPredio) tr.querySelector(".ag04e-tipo").value = e2.tipoPredio;
+          tr.querySelector(".ag04e-artigo").value = e2.artigo || "";
+          tr.querySelector(".ag04e-fracao").value = e2.fracao || "";
+          tr.querySelector(".ag04e-quota").value = e2.quotaParte || "";
+        });
+        (q4.alienacaoEstado || []).forEach(f => {
+          adicionarLinhaAnexoG04F();
+          const tr = document.querySelector("#tabelaAnexoG04F tbody tr:last-child");
+          tr.querySelector(".ag04f-campo").value = f.campoQ4 || "";
+          tr.querySelector(".ag04f-nif").value = f.nifAdquirente || "";
         });
       }
 
@@ -3555,6 +4227,7 @@ if (typeof module !== "undefined" && module.exports) {
         anexoBExtrasQ03,
         anexoBAtivo: !!dados.anexoBTemDados,
         anexoBPassthrough: dados.anexoBPassthrough || {},
+        anexoGPassthrough: dados.anexoGPassthrough || {},
         anexoHPassthrough: dados.anexoHPassthrough || {},
         rostoPassthrough: dados.rostoPassthrough || {},
         anexosPassthrough: dados.anexosPassthrough || {}
@@ -3562,6 +4235,7 @@ if (typeof module !== "undefined" && module.exports) {
 
       const secoesPreservadas = Object.keys(dadosPreservados.anexosPassthrough);
       const quadrosBPreservados = Object.keys(dadosPreservados.anexoBPassthrough);
+      const quadrosGPreservados = Object.keys(dadosPreservados.anexoGPassthrough);
       const quadrosHPreservados = Object.keys(dadosPreservados.anexoHPassthrough);
       const aviso = document.getElementById("avisoImportacao");
       aviso.style.display = "block";
@@ -3571,6 +4245,10 @@ if (typeof module !== "undefined" && module.exports) {
         (dados.anexoH ? `, ${(dados.anexoH.pensoesAlimentos || []).length} pensão(ões) de alimentos no Anexo H` : "") + `.` +
         (quadrosBPreservados.length
           ? `<br>Nota: os quadros ${quadrosBPreservados.map(q => q.replace("Quadro", "")).join(", ")} do Anexo B ` +
+            `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
+          : "") +
+        (quadrosGPreservados.length
+          ? `<br>Nota: ${quadrosGPreservados.map(q => q.replace("Quadro", "Quadro ")).join(", ")} do Anexo G ` +
             `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
           : "") +
         (quadrosHPreservados.length
