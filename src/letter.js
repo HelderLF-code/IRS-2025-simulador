@@ -33,6 +33,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
   const categoriaE = resultado.categoriaE || {};
   const temCategoriaE = categoriaE.rendimentoBrutoTaxasEspeciais > 0 || categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
+  const categoriaG = resultado.categoriaG || {};
+  const temCategoriaG = (categoriaG.detalhe || []).length > 0;
 
   return `<!doctype html>
 <html lang="pt">
@@ -73,6 +75,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${temCategoriaE ? (categoriaE.optaEnglobamento
       ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
       : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
+    ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
@@ -81,6 +84,12 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   ${temCategoriaE && !categoriaE.optaEnglobamento ? `<p class="nota">Os rendimentos de capitais (Categoria E)
   não englobados são tributados à parte, à taxa especial de ${(categoriaE.taxaEspecial * 100).toFixed(0)}%
   (a confirmar consoante o tipo de rendimento), somando-se diretamente à coleta líquida.</p>` : ""}
+  ${temCategoriaG ? `<p class="nota">Mais-valias imobiliárias (Anexo G, Quadro 4): saldo de
+  ${formatarMoeda(categoriaG.saldo)} € entre valor de realização e valor de aquisição corrigido pela
+  desvalorização monetária, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do CIRS).
+  ${categoriaG.linhasExcluidas > 0 ? `${categoriaG.linhasExcluidas} imóvel(is) do Quadro 4 não entra(m)
+  neste cálculo (reabilitação/EGF-UGF/alienação isenta ao Estado — tratamento próprio ainda não
+  implementado).` : ""} Não considera ainda a isenção por reinvestimento em habitação própria.</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>

@@ -2613,9 +2613,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const anexoA = lerAnexoA();
     const anexoB = lerAnexoB();
     const anexoE = lerAnexoE();
+    const anexoG = lerAnexoG();
     const anexoH = lerAnexoH();
     const despesasEFatura = lerDespesasEFatura();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros });
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoG, anexoH, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -2625,6 +2626,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const temCategoriaB = !!resultado.rendimentoBrutoB;
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
     const temCategoriaE = resultado.categoriaE.rendimentoBrutoTaxasEspeciais > 0 || resultado.categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
+    const temCategoriaG = resultado.categoriaG.detalhe.length > 0;
     const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
       .filter(c => c.despesa > 0)
       .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
@@ -2642,6 +2644,11 @@ indicares, assume-se o escalão mais baixo.</small></p>
       <strong>Categoria E — rendimento englobado:</strong> ${formatarMoeda(resultado.categoriaE.rendimentoEnglobado)} €<br>` : `
       <strong>Categoria E — rendimento sujeito a taxa especial:</strong> ${formatarMoeda(resultado.categoriaE.rendimentoBrutoTaxasEspeciais)} €<br>
       <strong>Categoria E — coleta especial (taxa ${(resultado.categoriaE.taxaEspecial * 100).toFixed(0)}%, a confirmar):</strong> ${formatarMoeda(resultado.categoriaE.coletaEspecial)} €<br>`)
+      : "") +
+      (temCategoriaG ? `
+      <strong>Categoria G — saldo de mais/menos-valias (Anexo G, Quadro 4):</strong> ${formatarMoeda(resultado.categoriaG.saldo)} €<br>
+      <strong>Categoria G — rendimento tributável (50% do saldo positivo):</strong> ${formatarMoeda(resultado.categoriaG.rendimentoTributavel)} €<br>` +
+      (resultado.categoriaG.linhasExcluidas > 0 ? `<small>${resultado.categoriaG.linhasExcluidas} linha(s) do Quadro 4 excluída(s) deste cálculo (reabilitação/EGF-UGF/isentas — tratamento próprio ainda não implementado).</small><br>` : "")
       : "") +
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>

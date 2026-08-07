@@ -208,6 +208,89 @@
     };
   }
 
+  // Devolve o coeficiente de desvalorização da moeda (Portaria em vigor, art.º 50.º do
+  // CIRS) para o ano de aquisição indicado. Anos fora da tabela (ex: o próprio ano da
+  // alienação) devolvem 1 — sem correção, que é o resultado correto quando não há 24 meses
+  // de diferença entre aquisição e realização.
+  function coeficienteDesvalorizacaoMoeda(anoAquisicao, parametros) {
+    const ano = Number(anoAquisicao);
+    if (!ano) return 1;
+    const tabela = parametros.coeficientesDesvalorizacaoMoeda || [];
+    for (const linha of tabela) {
+      const de = linha.de === undefined ? -Infinity : linha.de;
+      if (ano >= de && ano <= linha.ate) return linha.coeficiente;
+    }
+    return 1;
+  }
+
+  // A correção monetária só se aplica quando tiverem decorrido mais de 24 meses entre a
+  // data de aquisição e a data de realização (art.º 50.º, n.º 1, do CIRS). Mês/dia em falta
+  // assumem-se como o início do período (dia/mês 1), o que é conservador (não sobrestima os
+  // meses decorridos).
+  function decorreramMaisDe24Meses(anoA, mesA, diaA, anoR, mesR, diaR) {
+    if (!anoA || !anoR) return false;
+    const dataA = new Date(Number(anoA), (Number(mesA) || 1) - 1, Number(diaA) || 1);
+    const dataR = new Date(Number(anoR), (Number(mesR) || 1) - 1, Number(diaR) || 1);
+    let meses = (dataR.getFullYear() - dataA.getFullYear()) * 12 + (dataR.getMonth() - dataA.getMonth());
+    if (dataR.getDate() < dataA.getDate()) meses -= 1;
+    return meses > 24;
+  }
+
+  // Anexo G, Quadro 4 (alienação onerosa de imóveis, art.º 10.º do CIRS): mais-valia/
+  // menos-valia de cada linha = valor de realização - (valor de aquisição × coeficiente de
+  // desvalorização da moeda, quando aplicável) - despesas e encargos. O saldo global das
+  // linhas "normais" só é tributado em 50% para residentes (art.º 43.º, n.º 2, do CIRS) e
+  // entra no rendimento global por englobamento (as mais-valias imobiliárias não têm opção
+  // de tributação autónoma, ao contrário das do Quadro 4A/4C).
+  //
+  // Ficam de fora deste cálculo (tratamento próprio, ainda não implementado — não somam ao
+  // saldo nem entram no rendimento tributável):
+  //  - linhas referenciadas no Quadro 4A (imóveis recuperados/reabilitação) — sujeitas a
+  //    tributação autónoma, salvo opção pelo englobamento no Quadro 15;
+  //  - linhas referenciadas no Quadro 4C (alienação a EGF/UGF) — também tributação autónoma;
+  //  - linhas referenciadas no Quadro 4F (alienação ao Estado/RA/entidades públicas) —
+  //    isentas de tributação (art.º 71.º-A, n.º 7, do EBF).
+  // A isenção por reinvestimento em habitação própria (Quadro 5, art.º 10.º, n.º 5, do
+  // CIRS) também ainda não é considerada — o saldo tributável pode ficar sobrestimado
+  // quando há reinvestimento.
+  function calcularSaldoQuadro4AnexoG(quadro04, parametros) {
+    const q4 = quadro04 || {};
+    const imoveis = q4.imoveis || [];
+    const camposExcluidos = new Set(
+      [
+        ...(q4.reabilitacao || []).map(r => r.campoQ4),
+        ...(q4.alienacaoEGF || []).map(c => c.campoQ4),
+        ...(q4.alienacaoEstado || []).map(f => f.campoQ4)
+      ]
+        .filter(v => v !== undefined && v !== "")
+        .map(String)
+    );
+
+    const comCampo = imoveis.map((i, idx) => ({ ...i, campo: String(i.nlinha || (4001 + idx)) }));
+    const linhasTributaveis = comCampo.filter(i => !camposExcluidos.has(i.campo));
+
+    const detalhe = linhasTributaveis.map(i => {
+      const temCorrecao = decorreramMaisDe24Meses(i.anoAquisicao, i.mesAquisicao, i.diaAquisicao, i.anoRealizacao, i.mesRealizacao, i.diaRealizacao);
+      const coeficiente = temCorrecao ? coeficienteDesvalorizacaoMoeda(i.anoAquisicao, parametros) : 1;
+      const valorRealizacao = Number(i.valorRealizacao) || 0;
+      const valorAquisicao = Number(i.valorAquisicao) || 0;
+      const despesasEncargos = Number(i.despesasEncargos) || 0;
+      const valorAquisicaoCorrigido = valorAquisicao * coeficiente;
+      const resultado = valorRealizacao - valorAquisicaoCorrigido - despesasEncargos;
+      return { campo: i.campo, valorRealizacao, valorAquisicao, coeficiente, valorAquisicaoCorrigido, despesasEncargos, resultado };
+    });
+
+    const saldo = detalhe.reduce((acc, l) => acc + l.resultado, 0);
+    const rendimentoTributavel = saldo > 0 ? saldo * 0.5 : 0;
+
+    return {
+      detalhe,
+      saldo,
+      rendimentoTributavel,
+      linhasExcluidas: imoveis.length - linhasTributaveis.length
+    };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -220,7 +303,7 @@
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoG, anexoH, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
@@ -228,12 +311,14 @@
     const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
     const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
+    const categoriaG = calcularSaldoQuadro4AnexoG(anexoG && anexoG.quadro04, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A
     // Categoria E só entra aqui quando se opta pelo englobamento (senão é tributada à parte,
-    // na coleta especial abaixo).
-    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado;
+    // na coleta especial abaixo). A Categoria G (mais-valias do Quadro 4 do Anexo G) entra
+    // sempre por englobamento, já com a exclusão de 50% aplicada.
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado + categoriaG.rendimentoTributavel;
     const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
@@ -270,6 +355,7 @@
       valorMinimoDespesasB: categoriaB.valorMinimoDespesas,
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
       categoriaE,
+      categoriaG,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoGlobal,
       rendimentoLiquido,
@@ -295,6 +381,8 @@
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
     calcularRendimentoCategoriaE,
+    calcularSaldoQuadro4AnexoG,
+    coeficienteDesvalorizacaoMoeda,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
     calcularDeducaoBeneficiosDeficiencia,

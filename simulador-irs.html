@@ -1137,7 +1137,90 @@ const PARAMETROS_2025 = {
     605: { label: "Seguros de vida / contribuições (pessoas com deficiência)", taxa: 0.25, limite: null },
     606: { label: "Despesas de educação e reabilitação (pessoas com deficiência)", taxa: 0.30, limite: null },
     607: { label: "Encargos com reabilitação urbana", taxa: 0.30, limite: 500 }
-  }
+  },
+  // Coeficientes de desvalorização da moeda a aplicar aos bens e direitos alienados durante
+  // o ano de 2025 (Portaria n.º 382/2025/1, de 11 de novembro — art.ºs 47.º do CIRC e 50.º
+  // do CIRS). Usados na correção monetária do valor de aquisição de imóveis (Anexo G,
+  // Quadro 4) quando tiverem decorrido mais de 24 meses entre a aquisição e a realização.
+  // "de" em falta significa "sem limite inferior" (anos até 1903).
+  coeficientesDesvalorizacaoMoeda: [
+    { ate: 1903, coeficiente: 5585.78 },
+    { de: 1904, ate: 1910, coeficiente: 5199.71 },
+    { de: 1911, ate: 1914, coeficiente: 4987.11 },
+    { de: 1915, ate: 1915, coeficiente: 4437.01 },
+    { de: 1916, ate: 1916, coeficiente: 3631.71 },
+    { de: 1917, ate: 1917, coeficiente: 2899.18 },
+    { de: 1918, ate: 1918, coeficiente: 2068.48 },
+    { de: 1919, ate: 1919, coeficiente: 1585.26 },
+    { de: 1920, ate: 1920, coeficiente: 1047.47 },
+    { de: 1921, ate: 1921, coeficiente: 683.44 },
+    { de: 1922, ate: 1922, coeficiente: 506.14 },
+    { de: 1923, ate: 1923, coeficiente: 309.74 },
+    { de: 1924, ate: 1924, coeficiente: 260.75 },
+    { de: 1925, ate: 1936, coeficiente: 224.73 },
+    { de: 1937, ate: 1939, coeficiente: 218.25 },
+    { de: 1940, ate: 1940, coeficiente: 183.66 },
+    { de: 1941, ate: 1941, coeficiente: 163.12 },
+    { de: 1942, ate: 1942, coeficiente: 140.83 },
+    { de: 1943, ate: 1943, coeficiente: 119.93 },
+    { de: 1944, ate: 1950, coeficiente: 101.78 },
+    { de: 1951, ate: 1957, coeficiente: 93.40 },
+    { de: 1958, ate: 1963, coeficiente: 87.82 },
+    { de: 1964, ate: 1964, coeficiente: 83.92 },
+    { de: 1965, ate: 1965, coeficiente: 80.83 },
+    { de: 1966, ate: 1966, coeficiente: 77.26 },
+    { de: 1967, ate: 1969, coeficiente: 72.24 },
+    { de: 1970, ate: 1970, coeficiente: 66.89 },
+    { de: 1971, ate: 1971, coeficiente: 63.67 },
+    { de: 1972, ate: 1972, coeficiente: 59.52 },
+    { de: 1973, ate: 1973, coeficiente: 54.11 },
+    { de: 1974, ate: 1974, coeficiente: 41.50 },
+    { de: 1975, ate: 1975, coeficiente: 35.46 },
+    { de: 1976, ate: 1976, coeficiente: 29.71 },
+    { de: 1977, ate: 1977, coeficiente: 22.76 },
+    { de: 1978, ate: 1978, coeficiente: 17.83 },
+    { de: 1979, ate: 1979, coeficiente: 14.07 },
+    { de: 1980, ate: 1980, coeficiente: 12.68 },
+    { de: 1981, ate: 1981, coeficiente: 10.37 },
+    { de: 1982, ate: 1982, coeficiente: 8.61 },
+    { de: 1983, ate: 1983, coeficiente: 6.89 },
+    { de: 1984, ate: 1984, coeficiente: 5.35 },
+    { de: 1985, ate: 1985, coeficiente: 4.48 },
+    { de: 1986, ate: 1986, coeficiente: 4.04 },
+    { de: 1987, ate: 1987, coeficiente: 3.71 },
+    { de: 1988, ate: 1988, coeficiente: 3.33 },
+    { de: 1989, ate: 1989, coeficiente: 3.00 },
+    { de: 1990, ate: 1990, coeficiente: 2.69 },
+    { de: 1991, ate: 1991, coeficiente: 2.38 },
+    { de: 1992, ate: 1992, coeficiente: 2.18 },
+    { de: 1993, ate: 1993, coeficiente: 2.01 },
+    { de: 1994, ate: 1994, coeficiente: 1.92 },
+    { de: 1995, ate: 1995, coeficiente: 1.84 },
+    { de: 1996, ate: 1996, coeficiente: 1.80 },
+    { de: 1997, ate: 1997, coeficiente: 1.77 },
+    { de: 1998, ate: 1998, coeficiente: 1.72 },
+    { de: 1999, ate: 1999, coeficiente: 1.70 },
+    { de: 2000, ate: 2000, coeficiente: 1.67 },
+    { de: 2001, ate: 2001, coeficiente: 1.55 },
+    { de: 2002, ate: 2002, coeficiente: 1.49 },
+    { de: 2003, ate: 2003, coeficiente: 1.45 },
+    { de: 2004, ate: 2004, coeficiente: 1.43 },
+    { de: 2005, ate: 2005, coeficiente: 1.40 },
+    { de: 2006, ate: 2006, coeficiente: 1.34 },
+    { de: 2007, ate: 2007, coeficiente: 1.32 },
+    { de: 2008, ate: 2008, coeficiente: 1.28 },
+    { de: 2009, ate: 2009, coeficiente: 1.30 },
+    { de: 2010, ate: 2010, coeficiente: 1.28 },
+    { de: 2011, ate: 2011, coeficiente: 1.24 },
+    { de: 2012, ate: 2015, coeficiente: 1.20 },
+    { de: 2016, ate: 2016, coeficiente: 1.19 },
+    { de: 2017, ate: 2017, coeficiente: 1.18 },
+    { de: 2018, ate: 2020, coeficiente: 1.17 },
+    { de: 2021, ate: 2021, coeficiente: 1.16 },
+    { de: 2022, ate: 2022, coeficiente: 1.06 },
+    { de: 2023, ate: 2023, coeficiente: 1.02 },
+    { de: 2024, ate: 2024, coeficiente: 1.00 }
+  ]
 };
 
 if (typeof module !== "undefined" && module.exports) {
@@ -1360,6 +1443,89 @@ if (typeof module !== "undefined" && module.exports) {
     };
   }
 
+  // Devolve o coeficiente de desvalorização da moeda (Portaria em vigor, art.º 50.º do
+  // CIRS) para o ano de aquisição indicado. Anos fora da tabela (ex: o próprio ano da
+  // alienação) devolvem 1 — sem correção, que é o resultado correto quando não há 24 meses
+  // de diferença entre aquisição e realização.
+  function coeficienteDesvalorizacaoMoeda(anoAquisicao, parametros) {
+    const ano = Number(anoAquisicao);
+    if (!ano) return 1;
+    const tabela = parametros.coeficientesDesvalorizacaoMoeda || [];
+    for (const linha of tabela) {
+      const de = linha.de === undefined ? -Infinity : linha.de;
+      if (ano >= de && ano <= linha.ate) return linha.coeficiente;
+    }
+    return 1;
+  }
+
+  // A correção monetária só se aplica quando tiverem decorrido mais de 24 meses entre a
+  // data de aquisição e a data de realização (art.º 50.º, n.º 1, do CIRS). Mês/dia em falta
+  // assumem-se como o início do período (dia/mês 1), o que é conservador (não sobrestima os
+  // meses decorridos).
+  function decorreramMaisDe24Meses(anoA, mesA, diaA, anoR, mesR, diaR) {
+    if (!anoA || !anoR) return false;
+    const dataA = new Date(Number(anoA), (Number(mesA) || 1) - 1, Number(diaA) || 1);
+    const dataR = new Date(Number(anoR), (Number(mesR) || 1) - 1, Number(diaR) || 1);
+    let meses = (dataR.getFullYear() - dataA.getFullYear()) * 12 + (dataR.getMonth() - dataA.getMonth());
+    if (dataR.getDate() < dataA.getDate()) meses -= 1;
+    return meses > 24;
+  }
+
+  // Anexo G, Quadro 4 (alienação onerosa de imóveis, art.º 10.º do CIRS): mais-valia/
+  // menos-valia de cada linha = valor de realização - (valor de aquisição × coeficiente de
+  // desvalorização da moeda, quando aplicável) - despesas e encargos. O saldo global das
+  // linhas "normais" só é tributado em 50% para residentes (art.º 43.º, n.º 2, do CIRS) e
+  // entra no rendimento global por englobamento (as mais-valias imobiliárias não têm opção
+  // de tributação autónoma, ao contrário das do Quadro 4A/4C).
+  //
+  // Ficam de fora deste cálculo (tratamento próprio, ainda não implementado — não somam ao
+  // saldo nem entram no rendimento tributável):
+  //  - linhas referenciadas no Quadro 4A (imóveis recuperados/reabilitação) — sujeitas a
+  //    tributação autónoma, salvo opção pelo englobamento no Quadro 15;
+  //  - linhas referenciadas no Quadro 4C (alienação a EGF/UGF) — também tributação autónoma;
+  //  - linhas referenciadas no Quadro 4F (alienação ao Estado/RA/entidades públicas) —
+  //    isentas de tributação (art.º 71.º-A, n.º 7, do EBF).
+  // A isenção por reinvestimento em habitação própria (Quadro 5, art.º 10.º, n.º 5, do
+  // CIRS) também ainda não é considerada — o saldo tributável pode ficar sobrestimado
+  // quando há reinvestimento.
+  function calcularSaldoQuadro4AnexoG(quadro04, parametros) {
+    const q4 = quadro04 || {};
+    const imoveis = q4.imoveis || [];
+    const camposExcluidos = new Set(
+      [
+        ...(q4.reabilitacao || []).map(r => r.campoQ4),
+        ...(q4.alienacaoEGF || []).map(c => c.campoQ4),
+        ...(q4.alienacaoEstado || []).map(f => f.campoQ4)
+      ]
+        .filter(v => v !== undefined && v !== "")
+        .map(String)
+    );
+
+    const comCampo = imoveis.map((i, idx) => ({ ...i, campo: String(i.nlinha || (4001 + idx)) }));
+    const linhasTributaveis = comCampo.filter(i => !camposExcluidos.has(i.campo));
+
+    const detalhe = linhasTributaveis.map(i => {
+      const temCorrecao = decorreramMaisDe24Meses(i.anoAquisicao, i.mesAquisicao, i.diaAquisicao, i.anoRealizacao, i.mesRealizacao, i.diaRealizacao);
+      const coeficiente = temCorrecao ? coeficienteDesvalorizacaoMoeda(i.anoAquisicao, parametros) : 1;
+      const valorRealizacao = Number(i.valorRealizacao) || 0;
+      const valorAquisicao = Number(i.valorAquisicao) || 0;
+      const despesasEncargos = Number(i.despesasEncargos) || 0;
+      const valorAquisicaoCorrigido = valorAquisicao * coeficiente;
+      const resultado = valorRealizacao - valorAquisicaoCorrigido - despesasEncargos;
+      return { campo: i.campo, valorRealizacao, valorAquisicao, coeficiente, valorAquisicaoCorrigido, despesasEncargos, resultado };
+    });
+
+    const saldo = detalhe.reduce((acc, l) => acc + l.resultado, 0);
+    const rendimentoTributavel = saldo > 0 ? saldo * 0.5 : 0;
+
+    return {
+      detalhe,
+      saldo,
+      rendimentoTributavel,
+      linhasExcluidas: imoveis.length - linhasTributaveis.length
+    };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -1372,7 +1538,7 @@ if (typeof module !== "undefined" && module.exports) {
     }, 0);
   }
 
-  function calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros }) {
+  function calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoG, anexoH, despesasEFatura, parametros }) {
     const somaA = somaRendimentosCategoriaA(anexoA.linhas);
     const dedEspecifica = deducaoEspecificaCategoriaA(somaA.rendimentos, somaA.contribuicoes, parametros);
     const rendimentoLiquidoA = Math.max(0, somaA.rendimentos - dedEspecifica);
@@ -1380,12 +1546,14 @@ if (typeof module !== "undefined" && module.exports) {
     const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
     const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
+    const categoriaG = calcularSaldoQuadro4AnexoG(anexoG && anexoG.quadro04, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A
     // Categoria E só entra aqui quando se opta pelo englobamento (senão é tributada à parte,
-    // na coleta especial abaixo).
-    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado;
+    // na coleta especial abaixo). A Categoria G (mais-valias do Quadro 4 do Anexo G) entra
+    // sempre por englobamento, já com a exclusão de 50% aplicada.
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado + categoriaG.rendimentoTributavel;
     const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
@@ -1422,6 +1590,7 @@ if (typeof module !== "undefined" && module.exports) {
       valorMinimoDespesasB: categoriaB.valorMinimoDespesas,
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
       categoriaE,
+      categoriaG,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoGlobal,
       rendimentoLiquido,
@@ -1447,6 +1616,8 @@ if (typeof module !== "undefined" && module.exports) {
     deducaoEspecificaCategoriaA,
     calcularRendimentoCategoriaB,
     calcularRendimentoCategoriaE,
+    calcularSaldoQuadro4AnexoG,
+    coeficienteDesvalorizacaoMoeda,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
     calcularDeducaoBeneficiosDeficiencia,
@@ -3622,6 +3793,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
   const categoriaE = resultado.categoriaE || {};
   const temCategoriaE = categoriaE.rendimentoBrutoTaxasEspeciais > 0 || categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
+  const categoriaG = resultado.categoriaG || {};
+  const temCategoriaG = (categoriaG.detalhe || []).length > 0;
 
   return `<!doctype html>
 <html lang="pt">
@@ -3662,6 +3835,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
     ${temCategoriaE ? (categoriaE.optaEnglobamento
       ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
       : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
+    ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
@@ -3670,6 +3844,12 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   ${temCategoriaE && !categoriaE.optaEnglobamento ? `<p class="nota">Os rendimentos de capitais (Categoria E)
   não englobados são tributados à parte, à taxa especial de ${(categoriaE.taxaEspecial * 100).toFixed(0)}%
   (a confirmar consoante o tipo de rendimento), somando-se diretamente à coleta líquida.</p>` : ""}
+  ${temCategoriaG ? `<p class="nota">Mais-valias imobiliárias (Anexo G, Quadro 4): saldo de
+  ${formatarMoeda(categoriaG.saldo)} € entre valor de realização e valor de aquisição corrigido pela
+  desvalorização monetária, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do CIRS).
+  ${categoriaG.linhasExcluidas > 0 ? `${categoriaG.linhasExcluidas} imóvel(is) do Quadro 4 não entra(m)
+  neste cálculo (reabilitação/EGF-UGF/alienação isenta ao Estado — tratamento próprio ainda não
+  implementado).` : ""} Não considera ainda a isenção por reinvestimento em habitação própria.</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
@@ -5314,9 +5494,10 @@ if (typeof module !== "undefined" && module.exports) {
     const anexoA = lerAnexoA();
     const anexoB = lerAnexoB();
     const anexoE = lerAnexoE();
+    const anexoG = lerAnexoG();
     const anexoH = lerAnexoH();
     const despesasEFatura = lerDespesasEFatura();
-    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoH, despesasEFatura, parametros });
+    const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoG, anexoH, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
 
@@ -5326,6 +5507,7 @@ if (typeof module !== "undefined" && module.exports) {
     const temCategoriaB = !!resultado.rendimentoBrutoB;
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
     const temCategoriaE = resultado.categoriaE.rendimentoBrutoTaxasEspeciais > 0 || resultado.categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
+    const temCategoriaG = resultado.categoriaG.detalhe.length > 0;
     const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
       .filter(c => c.despesa > 0)
       .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
@@ -5343,6 +5525,11 @@ if (typeof module !== "undefined" && module.exports) {
       <strong>Categoria E — rendimento englobado:</strong> ${formatarMoeda(resultado.categoriaE.rendimentoEnglobado)} €<br>` : `
       <strong>Categoria E — rendimento sujeito a taxa especial:</strong> ${formatarMoeda(resultado.categoriaE.rendimentoBrutoTaxasEspeciais)} €<br>
       <strong>Categoria E — coleta especial (taxa ${(resultado.categoriaE.taxaEspecial * 100).toFixed(0)}%, a confirmar):</strong> ${formatarMoeda(resultado.categoriaE.coletaEspecial)} €<br>`)
+      : "") +
+      (temCategoriaG ? `
+      <strong>Categoria G — saldo de mais/menos-valias (Anexo G, Quadro 4):</strong> ${formatarMoeda(resultado.categoriaG.saldo)} €<br>
+      <strong>Categoria G — rendimento tributável (50% do saldo positivo):</strong> ${formatarMoeda(resultado.categoriaG.rendimentoTributavel)} €<br>` +
+      (resultado.categoriaG.linhasExcluidas > 0 ? `<small>${resultado.categoriaG.linhasExcluidas} linha(s) do Quadro 4 excluída(s) deste cálculo (reabilitação/EGF-UGF/isentas — tratamento próprio ainda não implementado).</small><br>` : "")
       : "") +
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>

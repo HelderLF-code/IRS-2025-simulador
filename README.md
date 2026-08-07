@@ -94,13 +94,24 @@ regenerar o `simulador-irs.html`.
   art.º 10.º-A CIRS) e Quadro 14 (outros incrementos patrimoniais, códigos G61-G63, com
   anos anteriores 14A.1/14A.2). Nomes de campo confirmados contra um exemplo real — este é o
   anexo mais extenso do Modelo 3 (19 quadros) e está **totalmente implementado** em termos
-  de captura/exportação de dados. **O cálculo de mais-valias ainda não está implementado**
-  — regras próprias e complexas (correção monetária, exclusão de 50% do saldo entre mais e
-  menos-valias, reinvestimento em habitação própria) — os dados ficam capturados e
-  exportados corretamente, mas não entram na estimativa. No Quadro 12, o campo da
-  modalidade de pagamento (B11, valores 1/2/3 para imediato/diferido/fracionado) foi
-  extrapolado por analogia com o padrão usado no Q11B01 do Rosto — não totalmente
-  confirmado.
+  de captura/exportação de dados. No Quadro 12, o campo da modalidade de pagamento (B11,
+  valores 1/2/3 para imediato/diferido/fracionado) foi extrapolado por analogia com o padrão
+  usado no Q11B01 do Rosto — não totalmente confirmado.
+  **Cálculo de mais-valias — só o Quadro 4 (alienação onerosa de imóveis) está
+  implementado**: por linha, mais-valia/menos-valia = valor de realização - (valor de
+  aquisição × coeficiente de desvalorização da moeda, quando decorreram mais de 24 meses
+  entre aquisição e realização, art.º 50.º CIRS) - despesas e encargos; o saldo global só é
+  tributado em 50% quando positivo (art.º 43.º, n.º 2, CIRS) e entra no rendimento global
+  por englobamento. Os coeficientes de desvalorização da moeda são os da Portaria n.º
+  382/2025/1, de 11 de novembro (bens alienados em 2025) — confirmados pelo utilizador.
+  Ficam de fora deste cálculo (tratamento próprio, ainda não implementado): linhas
+  referenciadas no Quadro 4A (imóveis recuperados/reabilitação — tributação autónoma),
+  linhas referenciadas no Quadro 4C (alienação a EGF/UGF — tributação autónoma) e linhas
+  referenciadas no Quadro 4F (alienação ao Estado/RA — isentas, corretamente excluídas do
+  saldo). **Não considera ainda a isenção por reinvestimento em habitação própria (Quadro
+  5)** — o saldo tributável pode ficar sobrestimado quando há reinvestimento. Os restantes
+  quadros do Anexo G (6, 7, 8, 9, 10, 11, 12, 13, 14, 18, etc.) continuam capturados e
+  exportados no XML, mas sem entrar na estimativa.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -176,15 +187,19 @@ interface) e mantidos ao exportar de novo — para não haver perda de informaç
    Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
    Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
    implementar.
-5. **Anexo G — cálculo de mais-valias** — todos os 19 quadros estão implementados em termos
-   de captura/exportação de dados, mas nenhum ainda entra no cálculo da estimativa. É um
-   dos maiores blocos de trabalho que resta: regras próprias e complexas por categoria de
-   incremento patrimonial (correção monetária ao valor de aquisição após 24 meses, exclusão
-   de 50% do saldo entre mais e menos-valias para imóveis residentes, isenção por
-   reinvestimento em habitação própria, taxas especiais de tributação autónoma para
-   imóveis recuperados/reabilitação e alienações a EGF/UGF, etc.). Cada anexo novo por
-   implementar do zero (G1, J, L, SS) vai precisar de um exemplo XML preenchido + as
-   respetivas instruções de preenchimento, tal como foi feito para os Anexos A, B, E, G e H.
+5. **Anexo G — cálculo de mais-valias** — só o Quadro 4 (imóveis) entra na estimativa, com
+   correção monetária e exclusão de 50%, mas **sem a isenção por reinvestimento em
+   habitação própria** (Quadro 5) e sem tratar os imóveis do Quadro 4A/4C (tributação
+   autónoma) nem os isentos do Quadro 4F (corretamente excluídos do saldo, mas sem cálculo
+   próprio). Os coeficientes de desvalorização da moeda usados são os da Portaria n.º
+   382/2025/1 (bens alienados em 2025) — fornecidos pelo utilizador. Ainda por implementar:
+   isenção por reinvestimento (Quadro 5), tributação autónoma do Quadro 4A/4C, e os
+   restantes quadros do anexo (6, 7, 8, 9, 10, 11, 12, 13, 14, 18 — cada um com regras
+   próprias: exclusão de 50% para propriedade intelectual/cessões, correção monetária só
+   após 24 meses para partes sociais, isenção de criptoativos detidos >365 dias, etc.).
+   Cada anexo novo por implementar do zero (G1, J, L, SS) vai precisar de um exemplo XML
+   preenchido + as respetivas instruções de preenchimento, tal como foi feito para os
+   Anexos A, B, E, G e H.
 6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
