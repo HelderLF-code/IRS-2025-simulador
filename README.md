@@ -86,15 +86,21 @@ regenerar o `simulador-irs.html`.
   rendimentos no estrangeiro, para não residentes), Quadro 18 (alienação onerosa de
   criptoativos — grupo A, detidos <365 dias/perda de residência; grupo B, contraparte não
   residente fora da UE/EEE sem ADT) e Quadro 19 (amortização de crédito à habitação em
-  transmissão de terrenos/imóveis não destinados a HPP, Lei n.º 56/2023). Nomes de campo
-  confirmados contra um exemplo real. Este é o anexo mais extenso do Modelo 3 (19 quadros)
-  — os Quadros 9, 11, 12 e 14 (partes sociais e outros valores mobiliários, organismos de
-  investimento alternativo imobiliário, perda da qualidade de residente, outros incrementos
-  patrimoniais) ainda sem interface própria. **O cálculo de mais-valias ainda não está
-  implementado** — regras próprias e complexas (correção
-  monetária, exclusão de 50% do saldo entre mais e menos-valias, reinvestimento em
-  habitação própria) — os dados destes quadros ficam capturados e exportados corretamente,
-  mas não entram na estimativa.
+  transmissão de terrenos/imóveis não destinados a HPP, Lei n.º 56/2023); Quadro 9
+  (alienação onerosa de partes sociais e outros valores mobiliários, códigos G01-G26, com
+  sub-quadros A a E — micro/pequenas empresas, neutralidade fiscal, permuta/fusão/cisão,
+  recapitalização, EGF/UGF), Quadro 11 (organismos de investimento alternativo imobiliário,
+  códigos G40-G45), Quadro 12 (perda da qualidade de residente em território português,
+  art.º 10.º-A CIRS) e Quadro 14 (outros incrementos patrimoniais, códigos G61-G63, com
+  anos anteriores 14A.1/14A.2). Nomes de campo confirmados contra um exemplo real — este é o
+  anexo mais extenso do Modelo 3 (19 quadros) e está **totalmente implementado** em termos
+  de captura/exportação de dados. **O cálculo de mais-valias ainda não está implementado**
+  — regras próprias e complexas (correção monetária, exclusão de 50% do saldo entre mais e
+  menos-valias, reinvestimento em habitação própria) — os dados ficam capturados e
+  exportados corretamente, mas não entram na estimativa. No Quadro 12, o campo da
+  modalidade de pagamento (B11, valores 1/2/3 para imediato/diferido/fracionado) foi
+  extrapolado por analogia com o padrão usado no Q11B01 do Rosto — não totalmente
+  confirmado.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -137,10 +143,10 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
-Quadros 9, 11, 12 e 14 do Anexo G, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10
-do Anexo H. Ao **importar** uma declaração que já tenha dados nessas secções, esses dados
-são preservados tal como estavam (mas ainda não podem ser vistos/editados na interface) e
-mantidos ao exportar de novo — para não haver perda de informação.
+Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H (o Anexo G está
+totalmente mapeado). Ao **importar** uma declaração que já tenha dados nessas secções,
+esses dados são preservados tal como estavam (mas ainda não podem ser vistos/editados na
+interface) e mantidos ao exportar de novo — para não haver perda de informação.
 
 ## Por confirmar / próximos passos
 
@@ -170,13 +176,15 @@ mantidos ao exportar de novo — para não haver perda de informação.
    Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
    Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
    implementar.
-5. **Anexo G, Quadros 9, 11, 12 e 14** (partes sociais e outros valores mobiliários,
-   organismos de investimento alternativo imobiliário, perda da qualidade de residente,
-   outros incrementos patrimoniais incl. anos anteriores) — já tenho as instruções e um
-   exemplo preenchido, falta implementar. Cada anexo por implementar do zero (G1, J, L, SS)
-   vai precisar de um
-   exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
-   para os Anexos A, B, E, G e H.
+5. **Anexo G — cálculo de mais-valias** — todos os 19 quadros estão implementados em termos
+   de captura/exportação de dados, mas nenhum ainda entra no cálculo da estimativa. É um
+   dos maiores blocos de trabalho que resta: regras próprias e complexas por categoria de
+   incremento patrimonial (correção monetária ao valor de aquisição após 24 meses, exclusão
+   de 50% do saldo entre mais e menos-valias para imóveis residentes, isenção por
+   reinvestimento em habitação própria, taxas especiais de tributação autónoma para
+   imóveis recuperados/reabilitação e alienações a EGF/UGF, etc.). Cada anexo novo por
+   implementar do zero (G1, J, L, SS) vai precisar de um exemplo XML preenchido + as
+   respetivas instruções de preenchimento, tal como foi feito para os Anexos A, B, E, G e H.
 6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.

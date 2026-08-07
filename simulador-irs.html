@@ -451,12 +451,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <div class="painel" id="painel-anexoG">
 <h2>Anexo G — Mais-Valias e Outros Incrementos Patrimoniais</h2>
 <p class="aviso-topo">
-  Este é o anexo mais extenso de todos (19 quadros). Por agora estão implementados os
-  Quadros 4, 5, 6, 7, 8, 10, 13, 15, 16, 17, 18 e 19 — nomes de campo confirmados contra um
-  exemplo real. Os Quadros 9, 11, 12 e 14 (partes sociais, organismos de investimento
-  alternativo imobiliário, perda de residência, outros incrementos patrimoniais) ainda não
-  têm interface própria; se importares uma declaração com dados nesses quadros, ficam
-  preservados tal como estavam.
+  Este é o anexo mais extenso de todos (19 quadros) — estão todos implementados, com nomes
+  de campo confirmados contra um exemplo real.
   <strong>O cálculo de mais-valias ainda não está implementado</strong> — regras próprias e
   complexas (correção monetária, exclusão de 50% do saldo, reinvestimento, etc.) — os dados
   ficam guardados e exportados no XML, mas a estimativa não os usa.
@@ -666,6 +662,68 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG08()">+ Adicionar</button>
 
+<h3>Alienação onerosa de partes sociais e outros valores mobiliários (Quadro 9)</h3>
+<datalist id="listaCodigoG09">
+  <option value="G01">G01 — Alienação onerosa de ações</option>
+  <option value="G02">G02 — Alienação onerosa de quotas</option>
+  <option value="G03">G03 — Alienação onerosa de outros valores mobiliários não especificamente previstos</option>
+  <option value="G04">G04 — Remição e amortização com redução de capital de partes sociais</option>
+  <option value="G05">G05 — Extinção/entrega de partes sociais das sociedades fundidas/cindidas/adquiridas (fusão/cisão/permuta)</option>
+  <option value="G06">G06 — Valor atribuído em resultado da partilha/liquidação/revogação/extinção de estruturas fiduciárias</option>
+  <option value="G10">G10 — Reembolso de obrigações e outros títulos de dívida</option>
+  <option value="G21">G21 — UP's em fundos/sociedades de investimento imobiliário (regime até 30/06/2015)</option>
+  <option value="G22">G22 — UP's ou participações sociais em OIC em valores mobiliários</option>
+  <option value="G23">G23 — UP's ou ações em organismos de investimento alternativo (capital de risco/créditos/recursos florestais/reabilitação urbana)</option>
+  <option value="G24">G24 — UP's em fundos/sociedades de investimento imobiliário para arrendamento habitacional (FIIAH/SIIAH)</option>
+  <option value="G25">G25 — Alienação onerosa de criptoativos que constituam valores mobiliários</option>
+  <option value="G26">G26 — UP's em fundos/sociedades de investimento imobiliário de arrendamento habitacional a custos acessíveis</option>
+</datalist>
+<table id="tabelaAnexoG09">
+  <thead><tr>
+    <th>Titular</th><th>NIF</th><th>Código</th>
+    <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
+    <th>Despesas/encargos (€)</th><th>País contraparte</th><th>Valores mob. admitidos/OIC abertos?</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG09()">+ Adicionar</button>
+
+<h4>A — Partes sociais de micro e pequenas empresas</h4>
+<table id="tabelaAnexoG09A">
+  <thead><tr><th>Campo do Q9 (ex: 9001)</th><th>NIF da sociedade</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG09A()">+ Adicionar</button>
+
+<h4>B — Partes sociais adquiridas ao abrigo de regimes de neutralidade fiscal</h4>
+<table id="tabelaAnexoG09B">
+  <thead><tr><th>Campo do Q9</th><th>NIF da sociedade</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG09B()">+ Adicionar</button>
+
+<h4>C — Importâncias em dinheiro recebidas na permuta/fusão/cisão de sociedades</h4>
+<table id="tabelaAnexoG09C">
+  <thead><tr><th>Titular</th><th>NIF da entidade</th><th>Ano</th><th>Mês</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG09C()">+ Adicionar</button>
+
+<h4>D — Incentivos à recapitalização das empresas</h4>
+<table id="tabelaAnexoG09D">
+  <thead><tr><th>Campo do Q9</th><th>NIF da sociedade</th><th>% de participação</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG09D()">+ Adicionar</button>
+
+<h4>E — Alienação de participações sociais em EGF/UGF</h4>
+<table id="tabelaAnexoG09E">
+  <thead><tr><th>Campo do Q9</th><th>NIF da EGF/UGF</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG09E()">+ Adicionar</button>
+
 <h3>Organismos de investimento coletivo — resgate/liquidação, opção pelo englobamento (Quadro 10)</h3>
 <datalist id="listaCodigoG10">
   <option value="G30">G30 — Resgate/liquidação até 30/06/2015 (art.º 22.º EBF)</option>
@@ -681,6 +739,75 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG10()">+ Adicionar</button>
 
+<h3>Organismos de investimento alternativo imobiliário (Quadro 11)</h3>
+<datalist id="listaCodigoG11">
+  <option value="G40">G40 — Alienação de UP's/participações sociais em OIAI</option>
+  <option value="G41">G41 — Resgate e liquidação de UP's/participações sociais em OIAI</option>
+  <option value="G42">G42 — Resgate/liquidação em OIC de apoio ao arrendamento, exclusão de 2,5%</option>
+  <option value="G43">G43 — Resgate/liquidação em OIC de apoio ao arrendamento, exclusão de 5%</option>
+  <option value="G44">G44 — Resgate/liquidação em OIC de apoio ao arrendamento, exclusão de 7,5%</option>
+  <option value="G45">G45 — Resgate/liquidação em OIC de apoio ao arrendamento, exclusão de 10%</option>
+</datalist>
+<h4>A — Alienação (declaração/englobamento obrigatórios)</h4>
+<table id="tabelaAnexoG11A">
+  <thead><tr>
+    <th>Titular</th><th>NIF entidade emitente</th><th>Código</th>
+    <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
+    <th>Despesas/encargos (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG11A()">+ Adicionar</button>
+
+<h4>B — Resgate, opção pelo englobamento</h4>
+<table id="tabelaAnexoG11B">
+  <thead><tr><th>Titular</th><th>NIF entidade emitente</th><th>Código</th><th>Rendimento (€)</th><th>Retenções na fonte (€)</th><th>NIF entidade retentora</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG11B()">+ Adicionar</button>
+
+<h3>Perda da qualidade de residente em território português (Quadro 12)</h3>
+<p class="aviso-topo">
+  Aplicável a titulares de partes sociais adquiridas no âmbito de operações abrangidas por
+  regimes de neutralidade fiscal, no ano em que ocorreu a transferência de residência para
+  fora do território português.
+</p>
+<div class="row">
+  <div><label>Permuta de partes sociais (art.º 10.º, n.º 10) <small class="hint">(B01)</small></label>
+    <select id="ag12PermutaPartesSociais"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+  <div><label>Fusão e/ou cisão de sociedades (art.º 10.º, n.º 11) <small class="hint">(B03)</small></label>
+    <select id="ag12FusaoOuCisao"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+  <div><label>Entrada de patrimônio (art.º 38.º) <small class="hint">(B05)</small></label>
+    <select id="ag12EntradaPatrimonio"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+  <div><label>Decorridos 5 anos desde a entrada de patrimônio? <small class="hint">(B07)</small></label>
+    <select id="ag12Decorridos5Anos"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h4>B — Mais/menos-valias relativas a partes sociais abrangidas por regime de neutralidade fiscal</h4>
+<table id="tabelaAnexoG12B">
+  <thead><tr>
+    <th>Titular</th><th>NIF entidade emitente</th><th>N.º títulos</th><th>% Capital social</th>
+    <th>Ano realiz.</th><th>Mês</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Valor aquisição (€)</th><th>Despesas/encargos (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG12B()">+ Adicionar</button>
+
+<h4>C — Local da transferência da residência</h4>
+<div class="row">
+  <div><label>País — Estado membro UE/EEE <small class="hint">(C09)</small></label><input id="ag12PaisUE" size="4"></div>
+  <div><label>País — outro território <small class="hint">(C10)</small></label><input id="ag12PaisOutro" size="4"></div>
+  <div><label>Modalidade de pagamento <small class="hint">(B11/12/13 — a confirmar)</small></label>
+    <select id="ag12Modalidade"><option value="">-</option><option value="1">1 — Imediato</option><option value="2">2 — Diferido</option><option value="3">3 — Fracionado</option></select>
+  </div>
+</div>
+
 <h3>Instrumentos financeiros derivados, warrants e certificados (Quadro 13)</h3>
 <datalist id="listaCodigoOperacaoG13">
   <option value="G51">G51 — Instrumentos financeiros derivados</option>
@@ -693,6 +820,32 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG13()">+ Adicionar</button>
+
+<h3>Outros incrementos patrimoniais (Quadro 14)</h3>
+<datalist id="listaCodigoG14">
+  <option value="G61">G61 — Indemnizações por danos patrimoniais, danos não patrimoniais e lucros cessantes</option>
+  <option value="G62">G62 — Importâncias auferidas em virtude da assunção de obrigações de não concorrência</option>
+  <option value="G63">G63 — Indemnizações pela renúncia onerosa a posições contratuais/direitos sobre bens imóveis</option>
+</datalist>
+<table id="tabelaAnexoG14">
+  <thead><tr><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenções (€)</th><th>NIF entidade retentora</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG14()">+ Adicionar</button>
+
+<h4>A.1 — Incrementos patrimoniais de anos anteriores (regime do n.º 1 do art.º 74.º)</h4>
+<table id="tabelaAnexoG14A1">
+  <thead><tr><th>Quadro/Campo</th><th>N.º linha</th><th>Ano a que respeitam</th><th>Rendimento (€)</th><th>N.º anos (2019 e anteriores)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG14A1()">+ Adicionar</button>
+
+<h4>A.2 — Incrementos patrimoniais de anos anteriores (opção pelo regime do n.º 3 do art.º 74.º)</h4>
+<table id="tabelaAnexoG14A2">
+  <thead><tr><th>Quadro/Campo</th><th>N.º linha</th><th>Ano a que respeitam</th><th>Rendimento (€)</th><th>Retenções (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG14A2()">+ Adicionar</button>
 
 <h3>Pagamentos por conta (Quadro 16)</h3>
 <table id="tabelaAnexoG16">
@@ -1717,6 +1870,163 @@ function temDadosQuadro05AnexoG(q05) {
       q05.amortizacaoEmprestimo.valorCapitalDivida !== undefined || q05.amortizacaoEmprestimo.valorAmortizacao !== undefined));
 }
 
+// Anexo G, Quadro 9 (alienação onerosa de partes sociais e outros valores mobiliários,
+// art.º 10.º, n.º 1, al. b), do CIRS). Códigos G01-G26. Nota: o campo do código da operação
+// tem o nome "CodEncargos" no XML, apesar do rótulo no papel ser "Código da operação" —
+// confirmado contra um exemplo real, tal como os restantes campos.
+function buildQuadro09AnexoG(q09) {
+  if (!q09) return `<Quadro09/>`;
+  const linhas = q09.linhas || [];
+  const microPequenas = q09.microPequenas || [];
+  const neutralidadeFiscal = q09.neutralidadeFiscal || [];
+  const permutaFusaoCisao = q09.permutaFusaoCisao || [];
+  const recapitalizacao = q09.recapitalizacao || [];
+  const egfUgf = q09.egfUgf || [];
+  if (!linhas.length && !microPequenas.length && !neutralidadeFiscal.length &&
+    !permutaFusaoCisao.length && !recapitalizacao.length && !egfUgf.length) {
+    return `<Quadro09/>`;
+  }
+
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+
+  const listaCampoNif = (container, itens) => listaComLinhas(container, itens.map(i => ({ CampoQ9: i.campoQ9, NIF: i.nif })));
+
+  return `<Quadro09>` +
+    listaComLinhas("AnexoGq09T01", linhas.map((l, idx) => ({
+      NLinha: l.nlinha || (9001 + idx), Titular: l.titular, NIF: l.nif, CodEncargos: l.codigo,
+      AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, DiaRealizacao: l.diaRealizacao, ValorRealizacao: moeda(l.valorRealizacao),
+      AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, DiaAquisicao: l.diaAquisicao, ValorAquisicao: moeda(l.valorAquisicao),
+      DespesasEncargos: moeda(l.despesasEncargos), PaisContraparte: l.paisContraparte,
+      RespeitaValoresMobiliarios: l.respeitaValoresMobiliarios === undefined ? undefined : (l.respeitaValoresMobiliarios ? "S" : "N")
+    }))) +
+    (linhas.length ? el("AnexoGq09T01SomaC01", moeda(somaC01)) + el("AnexoGq09T01SomaC02", moeda(somaC02)) + el("AnexoGq09T01SomaC03", moeda(somaC03)) : "") +
+    listaCampoNif("AnexoGq09AT01", microPequenas) +
+    listaCampoNif("AnexoGq09BT01", neutralidadeFiscal) +
+    listaComLinhas("AnexoGq09CT01", permutaFusaoCisao.map(c => ({
+      Titular: c.titular, NIFEntidade: c.nifEntidade, Ano: c.ano, Mes: c.mes, Valor: moeda(c.valor)
+    }))) +
+    listaComLinhas("AnexoGq09DT01", recapitalizacao.map(d => ({
+      CampoQ9: d.campoQ9, NIF: d.nif, Participacao: d.participacao
+    }))) +
+    listaCampoNif("AnexoGq09ET01", egfUgf) +
+    `</Quadro09>`;
+}
+
+function temDadosQuadro09AnexoG(q09) {
+  if (!q09) return false;
+  return (q09.linhas && q09.linhas.length > 0) || (q09.microPequenas && q09.microPequenas.length > 0) ||
+    (q09.neutralidadeFiscal && q09.neutralidadeFiscal.length > 0) || (q09.permutaFusaoCisao && q09.permutaFusaoCisao.length > 0) ||
+    (q09.recapitalizacao && q09.recapitalizacao.length > 0) || (q09.egfUgf && q09.egfUgf.length > 0);
+}
+
+// Anexo G, Quadro 11 (organismos de investimento alternativo imobiliário — alienação e
+// resgate/liquidação de UP's e de participações sociais, regime aplicável a partir de 1 de
+// julho de 2015). Códigos G40-G45. Nenhum dos dois grupos tem linha de soma (confirmado
+// contra um exemplo real).
+function buildQuadro11AnexoG(q11) {
+  if (!q11) return `<Quadro11/>`;
+  const grupoA = q11.grupoA || [];
+  const grupoB = q11.grupoB || [];
+  if (!grupoA.length && !grupoB.length) return `<Quadro11/>`;
+  return `<Quadro11>` +
+    listaComLinhas("AnexoGq11AT01", grupoA.map(l => ({
+      Titular: l.titular, NIFEntidadeEmitente: l.nifEntidadeEmitente, Codigo: l.codigo,
+      AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, DiaRealizacao: l.diaRealizacao, ValorRealizacao: moeda(l.valorRealizacao),
+      AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, DiaAquisicao: l.diaAquisicao, ValorAquisicao: moeda(l.valorAquisicao),
+      DespesasEncargos: moeda(l.despesasEncargos)
+    }))) +
+    listaComLinhas("AnexoGq11BT01", grupoB.map(l => ({
+      Titular: l.titular, NIFEntidadeEmitente: l.nifEntidadeEmitente, Codigo: l.codigo,
+      Rendimento: moeda(l.rendimento), RetencoesFonte: moeda(l.retencoesFonte), NIFEntidadeRetentora: l.nifEntidadeRetentora
+    }))) +
+    `</Quadro11>`;
+}
+
+// Anexo G, Quadro 12 (perda da qualidade de residente em território português, art.º
+// 10.º-A do CIRS). Indicadores A (regimes de neutralidade fiscal na aquisição das partes
+// sociais), B (mais/menos-valias dessas partes sociais), C (local da transferência e
+// modalidade de pagamento). Campos C09/C10 (código do país UE/EEE ou outro) confirmados;
+// campo B11 (modalidade de pagamento 1=imediato/2=diferido/3=fracionado, um único campo
+// para os 3 valores possíveis, por analogia com o padrão do Q11B01 do Rosto) extrapolado —
+// não totalmente confirmado. Restantes campos confirmados contra um exemplo real.
+function buildQuadro12AnexoG(q12) {
+  if (!q12) return `<Quadro12/>`;
+  const linhas = q12.partesSociais || [];
+  const temIndicadores = q12.permutaPartesSociais !== undefined || q12.fusaoOuCisao !== undefined ||
+    q12.entradaPatrimonio !== undefined || q12.decorridos5Anos !== undefined;
+  if (!temIndicadores && !linhas.length && q12.paisTransferenciaUE === undefined &&
+    q12.paisTransferenciaOutro === undefined && q12.modalidadePagamento === undefined) {
+    return `<Quadro12/>`;
+  }
+
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+
+  return `<Quadro12>` +
+    el("AnexoGq12B01", q12.permutaPartesSociais === undefined ? undefined : (q12.permutaPartesSociais ? "S" : "N")) +
+    el("AnexoGq12B03", q12.fusaoOuCisao === undefined ? undefined : (q12.fusaoOuCisao ? "S" : "N")) +
+    el("AnexoGq12B05", q12.entradaPatrimonio === undefined ? undefined : (q12.entradaPatrimonio ? "S" : "N")) +
+    el("AnexoGq12B07", q12.decorridos5Anos === undefined ? undefined : (q12.decorridos5Anos ? "S" : "N")) +
+    listaComLinhas("AnexoGq12BT01", linhas.map(l => ({
+      Titular: l.titular, NIFEntidadeEmitente: l.nifEntidadeEmitente, NTitulos: l.numeroTitulos, CapitalSocial: l.capitalSocial,
+      AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, ValorRealizacao: moeda(l.valorRealizacao),
+      AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, ValorAquisicao: moeda(l.valorAquisicao),
+      DespesasEncargos: moeda(l.despesasEncargos)
+    }))) +
+    (linhas.length ? el("AnexoGq12BT01SomaC01", moeda(somaC01)) + el("AnexoGq12BT01SomaC02", moeda(somaC02)) + el("AnexoGq12BT01SomaC03", moeda(somaC03)) : "") +
+    el("AnexoGq12C09", q12.paisTransferenciaUE) +
+    el("AnexoGq12C10", q12.paisTransferenciaOutro) +
+    el("AnexoGq12B11", q12.modalidadePagamento) +
+    `</Quadro12>`;
+}
+
+function temDadosQuadro12AnexoG(q12) {
+  if (!q12) return false;
+  return q12.permutaPartesSociais !== undefined || q12.fusaoOuCisao !== undefined ||
+    q12.entradaPatrimonio !== undefined || q12.decorridos5Anos !== undefined ||
+    (q12.partesSociais && q12.partesSociais.length > 0) ||
+    q12.paisTransferenciaUE !== undefined || q12.paisTransferenciaOutro !== undefined || q12.modalidadePagamento !== undefined;
+}
+
+// Anexo G, Quadro 14 (outros incrementos patrimoniais, art.º 9.º, n.º 1, als. b), c) e e),
+// do CIRS). Códigos G61-G63. Quadros 14A.1 (incrementos de anos anteriores, regime do n.º 1
+// do art.º 74.º) e 14A.2 (opção pelo regime do n.º 3 do art.º 74.º) usam os mesmos nomes de
+// campo (Quadro/NLinha/AnoRendimentos/Rendimento[/Retencoes]) já confirmados no Quadro 5 do
+// Anexo E. Nomes de campo confirmados contra um exemplo real.
+function buildQuadro14AnexoG(q14) {
+  if (!q14) return `<Quadro14/>`;
+  const linhas = q14.linhas || [];
+  const anosAnteriores1 = q14.anosAnteriores1 || [];
+  const anosAnteriores2 = q14.anosAnteriores2 || [];
+  if (!linhas.length && !anosAnteriores1.length && !anosAnteriores2.length) return `<Quadro14/>`;
+
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimento) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.retencoes) || 0), 0);
+
+  return `<Quadro14>` +
+    listaComLinhas("AnexoGq14T01", linhas.map((l, idx) => ({
+      NLinha: l.nlinha || (14001 + idx), CodigoOperacao: l.codigoOperacao, Titular: l.titular,
+      Rendimento: moeda(l.rendimento), Retencoes: moeda(l.retencoes), NIFEntidadeRetentora: l.nifEntidadeRetentora
+    }))) +
+    (linhas.length ? el("AnexoGq14T01SomaC01", moeda(somaC01)) + el("AnexoGq14T01SomaC02", moeda(somaC02)) : "") +
+    listaComLinhas("AnexoGq14AT01", anosAnteriores1.map(l => ({
+      Quadro: l.quadro || "Q14", NLinha: l.nlinha, AnoRendimentos: l.anoRendimentos, Rendimento: moeda(l.rendimento), Nanos: l.nanos
+    }))) +
+    listaComLinhas("AnexoGq14AT02", anosAnteriores2.map(l => ({
+      Quadro: l.quadro || "Q14", NLinha: l.nlinha, AnoRendimentos: l.anoRendimentos, Rendimento: moeda(l.rendimento), Retencoes: moeda(l.retencoes)
+    }))) +
+    `</Quadro14>`;
+}
+
+function temDadosQuadro14AnexoG(q14) {
+  if (!q14) return false;
+  return (q14.linhas && q14.linhas.length > 0) || (q14.anosAnteriores1 && q14.anosAnteriores1.length > 0) ||
+    (q14.anosAnteriores2 && q14.anosAnteriores2.length > 0);
+}
+
 // Anexo G, Quadro 6 (alienação onerosa da propriedade intelectual, art.º 10.º, n.º 1, al. c),
 // do CIRS). Nomes de campo confirmados contra um exemplo real.
 function buildQuadro06AnexoG(linhas) {
@@ -1903,8 +2213,12 @@ function buildAnexoG(model) {
     ? buildQuadro18AnexoG(g.quadro18)
     : (pass.Quadro18 || `<Quadro18/>`);
   const quadro19 = (g.quadro19 && g.quadro19.length > 0) ? buildQuadro19AnexoG(g.quadro19) : (pass.Quadro19 || `<Quadro19/>`);
-
-  const passthrough = numero => pass[`Quadro${String(numero).padStart(2, "0")}`] || `<Quadro${String(numero).padStart(2, "0")}/>`;
+  const quadro09 = temDadosQuadro09AnexoG(g.quadro09) ? buildQuadro09AnexoG(g.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
+  const quadro11 = (g.quadro11 && ((g.quadro11.grupoA && g.quadro11.grupoA.length) || (g.quadro11.grupoB && g.quadro11.grupoB.length)))
+    ? buildQuadro11AnexoG(g.quadro11)
+    : (pass.Quadro11 || `<Quadro11/>`);
+  const quadro12 = temDadosQuadro12AnexoG(g.quadro12) ? buildQuadro12AnexoG(g.quadro12) : (pass.Quadro12 || `<Quadro12/>`);
+  const quadro14 = temDadosQuadro14AnexoG(g.quadro14) ? buildQuadro14AnexoG(g.quadro14) : (pass.Quadro14 || `<Quadro14/>`);
 
   return `<AnexoG>` +
     `<Quadro02>${el("AnexoGq02C01", ano)}</Quadro02>` +
@@ -1914,12 +2228,12 @@ function buildAnexoG(model) {
     quadro06 +
     quadro07 +
     quadro08 +
-    passthrough(9) +
+    quadro09 +
     quadro10 +
-    passthrough(11) +
-    passthrough(12) +
+    quadro11 +
+    quadro12 +
     quadro13 +
-    passthrough(14) +
+    quadro14 +
     quadro15 +
     quadro16 +
     quadro17 +
@@ -2705,6 +3019,78 @@ function parseQuadro05AnexoG(q05) {
   };
 }
 
+// Anexo G, Quadro 9 (alienação onerosa de partes sociais e outros valores mobiliários).
+function parseQuadro09AnexoG(q09) {
+  const listaCampoNif = container => parseLinhasGenerico(filho(q09, container)).map(l => ({ campoQ9: l.CampoQ9, nif: l.NIF }));
+  return {
+    linhas: parseLinhasGenerico(filho(q09, "AnexoGq09T01")).map(l => ({
+      nlinha: l.NLinha, titular: l.Titular, nif: l.NIF, codigo: l.CodEncargos,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos, paisContraparte: l.PaisContraparte,
+      respeitaValoresMobiliarios: l.RespeitaValoresMobiliarios === undefined ? undefined : l.RespeitaValoresMobiliarios === "S"
+    })),
+    microPequenas: listaCampoNif("AnexoGq09AT01"),
+    neutralidadeFiscal: listaCampoNif("AnexoGq09BT01"),
+    permutaFusaoCisao: parseLinhasGenerico(filho(q09, "AnexoGq09CT01")).map(l => ({
+      titular: l.Titular, nifEntidade: l.NIFEntidade, ano: l.Ano, mes: l.Mes, valor: l.Valor
+    })),
+    recapitalizacao: parseLinhasGenerico(filho(q09, "AnexoGq09DT01")).map(l => ({ campoQ9: l.CampoQ9, nif: l.NIF, participacao: l.Participacao })),
+    egfUgf: listaCampoNif("AnexoGq09ET01")
+  };
+}
+
+// Anexo G, Quadro 11 (organismos de investimento alternativo imobiliário).
+function parseQuadro11AnexoG(q11) {
+  return {
+    grupoA: parseLinhasGenerico(filho(q11, "AnexoGq11AT01")).map(l => ({
+      titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, codigo: l.Codigo,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos
+    })),
+    grupoB: parseLinhasGenerico(filho(q11, "AnexoGq11BT01")).map(l => ({
+      titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, codigo: l.Codigo,
+      rendimento: l.Rendimento, retencoesFonte: l.RetencoesFonte, nifEntidadeRetentora: l.NIFEntidadeRetentora
+    }))
+  };
+}
+
+// Anexo G, Quadro 12 (perda da qualidade de residente em território português).
+function parseQuadro12AnexoG(q12) {
+  const bool = tag => texto(q12, tag) !== undefined ? texto(q12, tag) === "S" : undefined;
+  return {
+    permutaPartesSociais: bool("AnexoGq12B01"),
+    fusaoOuCisao: bool("AnexoGq12B03"),
+    entradaPatrimonio: bool("AnexoGq12B05"),
+    decorridos5Anos: bool("AnexoGq12B07"),
+    partesSociais: parseLinhasGenerico(filho(q12, "AnexoGq12BT01")).map(l => ({
+      titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, numeroTitulos: l.NTitulos, capitalSocial: l.CapitalSocial,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos
+    })),
+    paisTransferenciaUE: texto(q12, "AnexoGq12C09"),
+    paisTransferenciaOutro: texto(q12, "AnexoGq12C10"),
+    modalidadePagamento: texto(q12, "AnexoGq12B11")
+  };
+}
+
+// Anexo G, Quadro 14 (outros incrementos patrimoniais).
+function parseQuadro14AnexoG(q14) {
+  return {
+    linhas: parseLinhasGenerico(filho(q14, "AnexoGq14T01")).map(l => ({
+      nlinha: l.NLinha, codigoOperacao: l.CodigoOperacao, titular: l.Titular,
+      rendimento: l.Rendimento, retencoes: l.Retencoes, nifEntidadeRetentora: l.NIFEntidadeRetentora
+    })),
+    anosAnteriores1: parseLinhasGenerico(filho(q14, "AnexoGq14AT01")).map(l => ({
+      quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, nanos: l.Nanos
+    })),
+    anosAnteriores2: parseLinhasGenerico(filho(q14, "AnexoGq14AT02")).map(l => ({
+      quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, retencoes: l.Retencoes
+    }))
+  };
+}
+
 // Anexo G, Quadro 6 (alienação onerosa da propriedade intelectual).
 function parseQuadro06AnexoG(q06) {
   return parseLinhasGenerico(filho(q06, "AnexoGq06T01")).map(l => ({
@@ -2774,6 +3160,25 @@ function parseQuadro19AnexoG(q19) {
   }));
 }
 
+function temDadosQuadro09AnexoGParse(q) {
+  return !!(q.linhas.length || q.microPequenas.length || q.neutralidadeFiscal.length ||
+    q.permutaFusaoCisao.length || q.recapitalizacao.length || q.egfUgf.length);
+}
+
+function temDadosQuadro11AnexoGParse(q) {
+  return !!(q.grupoA.length || q.grupoB.length);
+}
+
+function temDadosQuadro12AnexoGParse(q) {
+  return q.permutaPartesSociais !== undefined || q.fusaoOuCisao !== undefined ||
+    q.entradaPatrimonio !== undefined || q.decorridos5Anos !== undefined || q.partesSociais.length > 0 ||
+    q.paisTransferenciaUE !== undefined || q.paisTransferenciaOutro !== undefined || q.modalidadePagamento !== undefined;
+}
+
+function temDadosQuadro14AnexoGParse(q) {
+  return !!(q.linhas.length || q.anosAnteriores1.length || q.anosAnteriores2.length);
+}
+
 function parseAnexoG(anexoG) {
   if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
   const q04 = filho(anexoG, "Quadro04");
@@ -2781,8 +3186,12 @@ function parseAnexoG(anexoG) {
   const q06 = filho(anexoG, "Quadro06");
   const q07 = filho(anexoG, "Quadro07");
   const q08 = filho(anexoG, "Quadro08");
+  const q09 = filho(anexoG, "Quadro09");
   const q10 = filho(anexoG, "Quadro10");
+  const q11 = filho(anexoG, "Quadro11");
+  const q12 = filho(anexoG, "Quadro12");
   const q13 = filho(anexoG, "Quadro13");
+  const q14 = filho(anexoG, "Quadro14");
   const q15 = filho(anexoG, "Quadro15");
   const q16 = filho(anexoG, "Quadro16");
   const q17 = filho(anexoG, "Quadro17");
@@ -2793,8 +3202,12 @@ function parseAnexoG(anexoG) {
   const quadro06 = temConteudo(q06) ? parseQuadro06AnexoG(q06) : undefined;
   const quadro07 = temConteudo(q07) ? parseQuadro07AnexoG(q07) : undefined;
   const quadro08 = temConteudo(q08) ? parseQuadro08AnexoG(q08) : undefined;
+  const quadro09 = temConteudo(q09) ? parseQuadro09AnexoG(q09) : undefined;
   const quadro10 = temConteudo(q10) ? parseQuadro10AnexoG(q10) : undefined;
+  const quadro11 = temConteudo(q11) ? parseQuadro11AnexoG(q11) : undefined;
+  const quadro12 = temConteudo(q12) ? parseQuadro12AnexoG(q12) : undefined;
   const quadro13 = temConteudo(q13) ? parseQuadro13AnexoG(q13) : undefined;
+  const quadro14 = temConteudo(q14) ? parseQuadro14AnexoG(q14) : undefined;
   const quadro15OptaEnglobamento = texto(q15, "AnexoGq15B01") !== undefined ? texto(q15, "AnexoGq15B01") === "S" : undefined;
   const quadro16 = temConteudo(q16) ? parseQuadro16AnexoG(q16) : undefined;
   const quadro17TotalEstrangeiro = texto(q17, "AnexoGq17C01");
@@ -2802,16 +3215,15 @@ function parseAnexoG(anexoG) {
   const quadro19 = temConteudo(q19) ? parseQuadro19AnexoG(q19) : undefined;
 
   const passthrough = {};
-  for (const i of [9, 11, 12, 14]) {
-    const numero = String(i).padStart(2, "0");
-    const elQ = filho(anexoG, `Quadro${numero}`);
-    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
-  }
   if (temConteudo(q06) && !(quadro06 && quadro06.length)) passthrough.Quadro06 = serializar(q06);
   if (temConteudo(q07) && !(quadro07 && quadro07.length)) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !(quadro08 && quadro08.length)) passthrough.Quadro08 = serializar(q08);
+  if (temConteudo(q09) && !(quadro09 && temDadosQuadro09AnexoGParse(quadro09))) passthrough.Quadro09 = serializar(q09);
   if (temConteudo(q10) && !(quadro10 && quadro10.length)) passthrough.Quadro10 = serializar(q10);
+  if (temConteudo(q11) && !(quadro11 && temDadosQuadro11AnexoGParse(quadro11))) passthrough.Quadro11 = serializar(q11);
+  if (temConteudo(q12) && !(quadro12 && temDadosQuadro12AnexoGParse(quadro12))) passthrough.Quadro12 = serializar(q12);
   if (temConteudo(q13) && !(quadro13 && quadro13.length)) passthrough.Quadro13 = serializar(q13);
+  if (temConteudo(q14) && !(quadro14 && temDadosQuadro14AnexoGParse(quadro14))) passthrough.Quadro14 = serializar(q14);
   if (temConteudo(q15) && quadro15OptaEnglobamento === undefined) passthrough.Quadro15 = serializar(q15);
   if (temConteudo(q16) && !(quadro16 && quadro16.length)) passthrough.Quadro16 = serializar(q16);
   if (temConteudo(q17) && quadro17TotalEstrangeiro === undefined) passthrough.Quadro17 = serializar(q17);
@@ -2819,7 +3231,9 @@ function parseAnexoG(anexoG) {
   if (temConteudo(q19) && !(quadro19 && quadro19.length)) passthrough.Quadro19 = serializar(q19);
 
   const anexoGModel = (quadro04 || quadro05 || (quadro06 && quadro06.length) || (quadro07 && quadro07.length) ||
-    (quadro08 && quadro08.length) || (quadro10 && quadro10.length) || (quadro13 && quadro13.length) ||
+    (quadro08 && quadro08.length) || (quadro09 && temDadosQuadro09AnexoGParse(quadro09)) || (quadro10 && quadro10.length) ||
+    (quadro11 && temDadosQuadro11AnexoGParse(quadro11)) || (quadro12 && temDadosQuadro12AnexoGParse(quadro12)) ||
+    (quadro13 && quadro13.length) || (quadro14 && temDadosQuadro14AnexoGParse(quadro14)) ||
     quadro15OptaEnglobamento !== undefined || (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined ||
     (quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length)) || (quadro19 && quadro19.length)) ? {} : undefined;
   if (anexoGModel) {
@@ -2828,8 +3242,12 @@ function parseAnexoG(anexoG) {
     if (quadro06 && quadro06.length) anexoGModel.quadro06 = quadro06;
     if (quadro07 && quadro07.length) anexoGModel.quadro07 = quadro07;
     if (quadro08 && quadro08.length) anexoGModel.quadro08 = quadro08;
+    if (quadro09 && temDadosQuadro09AnexoGParse(quadro09)) anexoGModel.quadro09 = quadro09;
     if (quadro10 && quadro10.length) anexoGModel.quadro10 = quadro10;
+    if (quadro11 && temDadosQuadro11AnexoGParse(quadro11)) anexoGModel.quadro11 = quadro11;
+    if (quadro12 && temDadosQuadro12AnexoGParse(quadro12)) anexoGModel.quadro12 = quadro12;
     if (quadro13 && quadro13.length) anexoGModel.quadro13 = quadro13;
+    if (quadro14 && temDadosQuadro14AnexoGParse(quadro14)) anexoGModel.quadro14 = quadro14;
     if (quadro15OptaEnglobamento !== undefined) anexoGModel.quadro15OptaEnglobamento = quadro15OptaEnglobamento;
     if (quadro16 && quadro16.length) anexoGModel.quadro16 = quadro16;
     if (quadro17TotalEstrangeiro !== undefined) anexoGModel.quadro17TotalEstrangeiro = quadro17TotalEstrangeiro;
@@ -4482,14 +4900,317 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  window.adicionarLinhaAnexoG09 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG09 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag09-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag09-nif" size="10"></td>
+      <td><input class="ag09-codigo" size="4" list="listaCodigoG09"></td>
+      <td><input class="ag09-anorealizacao" type="number" size="6"></td>
+      <td><input class="ag09-mesrealizacao" type="number" size="4"></td>
+      <td><input class="ag09-diarealizacao" type="number" size="4"></td>
+      <td><input class="ag09-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag09-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag09-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag09-diaaquisicao" type="number" size="4"></td>
+      <td><input class="ag09-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag09-despesas" type="number" step="0.01"></td>
+      <td><input class="ag09-pais" size="4"></td>
+      <td><input class="ag09-respeitavm" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro09AnexoGLinhas() {
+    return [...document.querySelectorAll("#tabelaAnexoG09 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag09-titular").value,
+      nif: tr.querySelector(".ag09-nif").value,
+      codigo: tr.querySelector(".ag09-codigo").value,
+      anoRealizacao: tr.querySelector(".ag09-anorealizacao").value,
+      mesRealizacao: tr.querySelector(".ag09-mesrealizacao").value,
+      diaRealizacao: tr.querySelector(".ag09-diarealizacao").value,
+      valorRealizacao: tr.querySelector(".ag09-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag09-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag09-mesaquisicao").value,
+      diaAquisicao: tr.querySelector(".ag09-diaaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag09-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag09-despesas").value || 0,
+      paisContraparte: tr.querySelector(".ag09-pais").value || undefined,
+      respeitaValoresMobiliarios: tr.querySelector(".ag09-respeitavm").checked
+    }));
+  }
+
+  function criarLinhaCampoNif(tabelaId, prefixoClasse) {
+    const tbody = document.querySelector(`#${tabelaId} tbody`);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="${prefixoClasse}-campo" size="6"></td>
+      <td><input class="${prefixoClasse}-nif" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function lerLinhasCampoNif(tabelaId, prefixoClasse) {
+    return [...document.querySelectorAll(`#${tabelaId} tbody tr`)].map(tr => ({
+      campoQ9: tr.querySelector(`.${prefixoClasse}-campo`).value,
+      nif: tr.querySelector(`.${prefixoClasse}-nif`).value
+    }));
+  }
+
+  window.adicionarLinhaAnexoG09A = function () { criarLinhaCampoNif("tabelaAnexoG09A", "ag09a"); };
+  window.adicionarLinhaAnexoG09B = function () { criarLinhaCampoNif("tabelaAnexoG09B", "ag09b"); };
+  window.adicionarLinhaAnexoG09E = function () { criarLinhaCampoNif("tabelaAnexoG09E", "ag09e"); };
+
+  window.adicionarLinhaAnexoG09C = function () {
+    const tbody = document.querySelector("#tabelaAnexoG09C tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag09c-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag09c-nifentidade" size="10"></td>
+      <td><input class="ag09c-ano" type="number" size="6"></td>
+      <td><input class="ag09c-mes" type="number" size="4"></td>
+      <td><input class="ag09c-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG09D = function () {
+    const tbody = document.querySelector("#tabelaAnexoG09D tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag09d-campo" size="6"></td>
+      <td><input class="ag09d-nif" size="10"></td>
+      <td><input class="ag09d-participacao" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro09AnexoG() {
+    const linhas = lerQuadro09AnexoGLinhas();
+    const microPequenas = lerLinhasCampoNif("tabelaAnexoG09A", "ag09a");
+    const neutralidadeFiscal = lerLinhasCampoNif("tabelaAnexoG09B", "ag09b");
+    const permutaFusaoCisao = [...document.querySelectorAll("#tabelaAnexoG09C tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag09c-titular").value,
+      nifEntidade: tr.querySelector(".ag09c-nifentidade").value,
+      ano: tr.querySelector(".ag09c-ano").value,
+      mes: tr.querySelector(".ag09c-mes").value,
+      valor: tr.querySelector(".ag09c-valor").value || 0
+    }));
+    const recapitalizacao = [...document.querySelectorAll("#tabelaAnexoG09D tbody tr")].map(tr => ({
+      campoQ9: tr.querySelector(".ag09d-campo").value,
+      nif: tr.querySelector(".ag09d-nif").value,
+      participacao: tr.querySelector(".ag09d-participacao").value || undefined
+    }));
+    const egfUgf = lerLinhasCampoNif("tabelaAnexoG09E", "ag09e");
+
+    const temDados = linhas.length || microPequenas.length || neutralidadeFiscal.length ||
+      permutaFusaoCisao.length || recapitalizacao.length || egfUgf.length;
+    if (!temDados) return undefined;
+
+    return { linhas, microPequenas, neutralidadeFiscal, permutaFusaoCisao, recapitalizacao, egfUgf };
+  }
+
+  window.adicionarLinhaAnexoG11A = function () {
+    const tbody = document.querySelector("#tabelaAnexoG11A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag11a-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag11a-nifemitente" size="10"></td>
+      <td><input class="ag11a-codigo" size="4" list="listaCodigoG11"></td>
+      <td><input class="ag11a-anorealizacao" type="number" size="6"></td>
+      <td><input class="ag11a-mesrealizacao" type="number" size="4"></td>
+      <td><input class="ag11a-diarealizacao" type="number" size="4"></td>
+      <td><input class="ag11a-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag11a-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag11a-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag11a-diaaquisicao" type="number" size="4"></td>
+      <td><input class="ag11a-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag11a-despesas" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG11B = function () {
+    const tbody = document.querySelector("#tabelaAnexoG11B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag11b-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag11b-nifemitente" size="10"></td>
+      <td><input class="ag11b-codigo" size="4" list="listaCodigoG11"></td>
+      <td><input class="ag11b-rendimento" type="number" step="0.01"></td>
+      <td><input class="ag11b-retencoes" type="number" step="0.01"></td>
+      <td><input class="ag11b-nifretentora" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro11AnexoG() {
+    const grupoA = [...document.querySelectorAll("#tabelaAnexoG11A tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag11a-titular").value,
+      nifEntidadeEmitente: tr.querySelector(".ag11a-nifemitente").value,
+      codigo: tr.querySelector(".ag11a-codigo").value,
+      anoRealizacao: tr.querySelector(".ag11a-anorealizacao").value,
+      mesRealizacao: tr.querySelector(".ag11a-mesrealizacao").value,
+      diaRealizacao: tr.querySelector(".ag11a-diarealizacao").value,
+      valorRealizacao: tr.querySelector(".ag11a-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag11a-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag11a-mesaquisicao").value,
+      diaAquisicao: tr.querySelector(".ag11a-diaaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag11a-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag11a-despesas").value || 0
+    }));
+    const grupoB = [...document.querySelectorAll("#tabelaAnexoG11B tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag11b-titular").value,
+      nifEntidadeEmitente: tr.querySelector(".ag11b-nifemitente").value,
+      codigo: tr.querySelector(".ag11b-codigo").value,
+      rendimento: tr.querySelector(".ag11b-rendimento").value || 0,
+      retencoesFonte: tr.querySelector(".ag11b-retencoes").value || 0,
+      nifEntidadeRetentora: tr.querySelector(".ag11b-nifretentora").value || undefined
+    }));
+    return (grupoA.length || grupoB.length) ? { grupoA, grupoB } : undefined;
+  }
+
+  window.adicionarLinhaAnexoG12B = function () {
+    const tbody = document.querySelector("#tabelaAnexoG12B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag12b-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag12b-nifemitente" size="10"></td>
+      <td><input class="ag12b-ntitulos" type="number"></td>
+      <td><input class="ag12b-capitalsocial" type="number" step="0.01"></td>
+      <td><input class="ag12b-anorealizacao" type="number" size="6"></td>
+      <td><input class="ag12b-mesrealizacao" type="number" size="4"></td>
+      <td><input class="ag12b-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag12b-anoaquisicao" type="number" size="6"></td>
+      <td><input class="ag12b-mesaquisicao" type="number" size="4"></td>
+      <td><input class="ag12b-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag12b-despesas" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro12AnexoG() {
+    const selectBool = id => { const v = document.getElementById(id).value; return v === "" ? undefined : v === "S"; };
+    const permutaPartesSociais = selectBool("ag12PermutaPartesSociais");
+    const fusaoOuCisao = selectBool("ag12FusaoOuCisao");
+    const entradaPatrimonio = selectBool("ag12EntradaPatrimonio");
+    const decorridos5Anos = selectBool("ag12Decorridos5Anos");
+    const partesSociais = [...document.querySelectorAll("#tabelaAnexoG12B tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag12b-titular").value,
+      nifEntidadeEmitente: tr.querySelector(".ag12b-nifemitente").value,
+      numeroTitulos: tr.querySelector(".ag12b-ntitulos").value || undefined,
+      capitalSocial: tr.querySelector(".ag12b-capitalsocial").value || undefined,
+      anoRealizacao: tr.querySelector(".ag12b-anorealizacao").value,
+      mesRealizacao: tr.querySelector(".ag12b-mesrealizacao").value,
+      valorRealizacao: tr.querySelector(".ag12b-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".ag12b-anoaquisicao").value,
+      mesAquisicao: tr.querySelector(".ag12b-mesaquisicao").value,
+      valorAquisicao: tr.querySelector(".ag12b-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag12b-despesas").value || 0
+    }));
+    const paisTransferenciaUE = document.getElementById("ag12PaisUE").value || undefined;
+    const paisTransferenciaOutro = document.getElementById("ag12PaisOutro").value || undefined;
+    const modalidadePagamento = document.getElementById("ag12Modalidade").value || undefined;
+
+    const temDados = permutaPartesSociais !== undefined || fusaoOuCisao !== undefined || entradaPatrimonio !== undefined ||
+      decorridos5Anos !== undefined || partesSociais.length || paisTransferenciaUE !== undefined ||
+      paisTransferenciaOutro !== undefined || modalidadePagamento !== undefined;
+    if (!temDados) return undefined;
+
+    return { permutaPartesSociais, fusaoOuCisao, entradaPatrimonio, decorridos5Anos, partesSociais, paisTransferenciaUE, paisTransferenciaOutro, modalidadePagamento };
+  }
+
+  window.adicionarLinhaAnexoG14 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG14 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag14-codigo" size="4" list="listaCodigoG14"></td>
+      <td><select class="ag14-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag14-rendimento" type="number" step="0.01"></td>
+      <td><input class="ag14-retencoes" type="number" step="0.01"></td>
+      <td><input class="ag14-nifretentora" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG14A1 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG14A1 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag14a1-quadro" size="6"></td>
+      <td><input class="ag14a1-nlinha" size="6"></td>
+      <td><input class="ag14a1-ano" type="number" size="6"></td>
+      <td><input class="ag14a1-rendimento" type="number" step="0.01"></td>
+      <td><input class="ag14a1-nanos" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  window.adicionarLinhaAnexoG14A2 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG14A2 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag14a2-quadro" size="6"></td>
+      <td><input class="ag14a2-nlinha" size="6"></td>
+      <td><input class="ag14a2-ano" type="number" size="6"></td>
+      <td><input class="ag14a2-rendimento" type="number" step="0.01"></td>
+      <td><input class="ag14a2-retencoes" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro14AnexoG() {
+    const linhas = [...document.querySelectorAll("#tabelaAnexoG14 tbody tr")].map(tr => ({
+      codigoOperacao: tr.querySelector(".ag14-codigo").value,
+      titular: tr.querySelector(".ag14-titular").value,
+      rendimento: tr.querySelector(".ag14-rendimento").value || 0,
+      retencoes: tr.querySelector(".ag14-retencoes").value || 0,
+      nifEntidadeRetentora: tr.querySelector(".ag14-nifretentora").value || undefined
+    }));
+    const anosAnteriores1 = [...document.querySelectorAll("#tabelaAnexoG14A1 tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".ag14a1-quadro").value || undefined,
+      nlinha: tr.querySelector(".ag14a1-nlinha").value || undefined,
+      anoRendimentos: tr.querySelector(".ag14a1-ano").value,
+      rendimento: tr.querySelector(".ag14a1-rendimento").value || 0,
+      nanos: tr.querySelector(".ag14a1-nanos").value || undefined
+    }));
+    const anosAnteriores2 = [...document.querySelectorAll("#tabelaAnexoG14A2 tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".ag14a2-quadro").value || undefined,
+      nlinha: tr.querySelector(".ag14a2-nlinha").value || undefined,
+      anoRendimentos: tr.querySelector(".ag14a2-ano").value,
+      rendimento: tr.querySelector(".ag14a2-rendimento").value || 0,
+      retencoes: tr.querySelector(".ag14a2-retencoes").value || 0
+    }));
+
+    const temDados = linhas.length || anosAnteriores1.length || anosAnteriores2.length;
+    if (!temDados) return undefined;
+
+    return { linhas, anosAnteriores1, anosAnteriores2 };
+  }
+
   function lerAnexoG() {
     const quadro04 = lerQuadro04AnexoG();
     const quadro05 = lerQuadro05AnexoG();
     const quadro06 = lerQuadro06AnexoG();
     const quadro07 = lerQuadro07AnexoGDireitos();
     const quadro08 = lerQuadro08AnexoGCreditos();
+    const quadro09 = lerQuadro09AnexoG();
     const quadro10 = lerQuadro10AnexoGOIC();
+    const quadro11 = lerQuadro11AnexoG();
+    const quadro12 = lerQuadro12AnexoG();
     const quadro13 = lerQuadro13AnexoG();
+    const quadro14 = lerQuadro14AnexoG();
     const quadro15Valor = document.getElementById("ag15OptaEnglobamento").value;
     const quadro15OptaEnglobamento = quadro15Valor === "" ? undefined : quadro15Valor === "S";
     const quadro16 = lerQuadro16AnexoG();
@@ -4498,12 +5219,13 @@ if (typeof module !== "undefined" && module.exports) {
     const quadro19 = lerQuadro19AnexoG();
 
     const temDados = quadro04 || quadro05 || quadro06.length || quadro07.length || quadro08.length ||
-      quadro10.length || quadro13.length || quadro15OptaEnglobamento !== undefined || quadro16.length ||
+      quadro09 || quadro10.length || quadro11 || quadro12 || quadro13.length || quadro14 ||
+      quadro15OptaEnglobamento !== undefined || quadro16.length ||
       quadro17TotalEstrangeiro !== undefined || quadro18 || quadro19.length;
     if (!temDados) return undefined;
 
     return {
-      quadro04, quadro05, quadro06, quadro07, quadro08, quadro10, quadro13,
+      quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro10, quadro11, quadro12, quadro13, quadro14,
       quadro15OptaEnglobamento, quadro16, quadro17TotalEstrangeiro, quadro18, quadro19
     };
   }
@@ -4855,6 +5577,25 @@ if (typeof module !== "undefined" && module.exports) {
       document.querySelector("#tabelaAnexoG18A tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoG18B tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoG19 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG09 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG09A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG09B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG09C tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG09D tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG09E tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG11A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG11B tbody").innerHTML = "";
+      document.getElementById("ag12PermutaPartesSociais").value = "";
+      document.getElementById("ag12FusaoOuCisao").value = "";
+      document.getElementById("ag12EntradaPatrimonio").value = "";
+      document.getElementById("ag12Decorridos5Anos").value = "";
+      document.querySelector("#tabelaAnexoG12B tbody").innerHTML = "";
+      document.getElementById("ag12PaisUE").value = "";
+      document.getElementById("ag12PaisOutro").value = "";
+      document.getElementById("ag12Modalidade").value = "";
+      document.querySelector("#tabelaAnexoG14 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG14A1 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG14A2 tbody").innerHTML = "";
 
       if (dados.anexoG && dados.anexoG.quadro04) {
         const q4 = dados.anexoG.quadro04;
@@ -5129,6 +5870,148 @@ if (typeof module !== "undefined" && module.exports) {
         tr.querySelector(".ag19-fracao").value = l.fraccao || "";
         tr.querySelector(".ag19-quota").value = l.quotaParte || "";
       });
+
+      if (dados.anexoG && dados.anexoG.quadro09) {
+        const q9 = dados.anexoG.quadro09;
+        (q9.linhas || []).forEach(l => {
+          adicionarLinhaAnexoG09();
+          const tr = document.querySelector("#tabelaAnexoG09 tbody tr:last-child");
+          if (l.titular) tr.querySelector(".ag09-titular").value = l.titular;
+          tr.querySelector(".ag09-nif").value = l.nif || "";
+          tr.querySelector(".ag09-codigo").value = l.codigo || "";
+          tr.querySelector(".ag09-anorealizacao").value = l.anoRealizacao || "";
+          tr.querySelector(".ag09-mesrealizacao").value = l.mesRealizacao || "";
+          tr.querySelector(".ag09-diarealizacao").value = l.diaRealizacao || "";
+          tr.querySelector(".ag09-valorrealizacao").value = l.valorRealizacao || "";
+          tr.querySelector(".ag09-anoaquisicao").value = l.anoAquisicao || "";
+          tr.querySelector(".ag09-mesaquisicao").value = l.mesAquisicao || "";
+          tr.querySelector(".ag09-diaaquisicao").value = l.diaAquisicao || "";
+          tr.querySelector(".ag09-valoraquisicao").value = l.valorAquisicao || "";
+          tr.querySelector(".ag09-despesas").value = l.despesasEncargos || "";
+          tr.querySelector(".ag09-pais").value = l.paisContraparte || "";
+          if (l.respeitaValoresMobiliarios !== undefined) tr.querySelector(".ag09-respeitavm").checked = l.respeitaValoresMobiliarios;
+        });
+        (q9.microPequenas || []).forEach(i => {
+          adicionarLinhaAnexoG09A();
+          const tr = document.querySelector("#tabelaAnexoG09A tbody tr:last-child");
+          tr.querySelector(".ag09a-campo").value = i.campoQ9 || "";
+          tr.querySelector(".ag09a-nif").value = i.nif || "";
+        });
+        (q9.neutralidadeFiscal || []).forEach(i => {
+          adicionarLinhaAnexoG09B();
+          const tr = document.querySelector("#tabelaAnexoG09B tbody tr:last-child");
+          tr.querySelector(".ag09b-campo").value = i.campoQ9 || "";
+          tr.querySelector(".ag09b-nif").value = i.nif || "";
+        });
+        (q9.permutaFusaoCisao || []).forEach(c => {
+          adicionarLinhaAnexoG09C();
+          const tr = document.querySelector("#tabelaAnexoG09C tbody tr:last-child");
+          if (c.titular) tr.querySelector(".ag09c-titular").value = c.titular;
+          tr.querySelector(".ag09c-nifentidade").value = c.nifEntidade || "";
+          tr.querySelector(".ag09c-ano").value = c.ano || "";
+          tr.querySelector(".ag09c-mes").value = c.mes || "";
+          tr.querySelector(".ag09c-valor").value = c.valor || "";
+        });
+        (q9.recapitalizacao || []).forEach(d => {
+          adicionarLinhaAnexoG09D();
+          const tr = document.querySelector("#tabelaAnexoG09D tbody tr:last-child");
+          tr.querySelector(".ag09d-campo").value = d.campoQ9 || "";
+          tr.querySelector(".ag09d-nif").value = d.nif || "";
+          tr.querySelector(".ag09d-participacao").value = d.participacao || "";
+        });
+        (q9.egfUgf || []).forEach(i => {
+          adicionarLinhaAnexoG09E();
+          const tr = document.querySelector("#tabelaAnexoG09E tbody tr:last-child");
+          tr.querySelector(".ag09e-campo").value = i.campoQ9 || "";
+          tr.querySelector(".ag09e-nif").value = i.nif || "";
+        });
+      }
+
+      if (dados.anexoG && dados.anexoG.quadro11) {
+        (dados.anexoG.quadro11.grupoA || []).forEach(l => {
+          adicionarLinhaAnexoG11A();
+          const tr = document.querySelector("#tabelaAnexoG11A tbody tr:last-child");
+          if (l.titular) tr.querySelector(".ag11a-titular").value = l.titular;
+          tr.querySelector(".ag11a-nifemitente").value = l.nifEntidadeEmitente || "";
+          tr.querySelector(".ag11a-codigo").value = l.codigo || "";
+          tr.querySelector(".ag11a-anorealizacao").value = l.anoRealizacao || "";
+          tr.querySelector(".ag11a-mesrealizacao").value = l.mesRealizacao || "";
+          tr.querySelector(".ag11a-diarealizacao").value = l.diaRealizacao || "";
+          tr.querySelector(".ag11a-valorrealizacao").value = l.valorRealizacao || "";
+          tr.querySelector(".ag11a-anoaquisicao").value = l.anoAquisicao || "";
+          tr.querySelector(".ag11a-mesaquisicao").value = l.mesAquisicao || "";
+          tr.querySelector(".ag11a-diaaquisicao").value = l.diaAquisicao || "";
+          tr.querySelector(".ag11a-valoraquisicao").value = l.valorAquisicao || "";
+          tr.querySelector(".ag11a-despesas").value = l.despesasEncargos || "";
+        });
+        (dados.anexoG.quadro11.grupoB || []).forEach(l => {
+          adicionarLinhaAnexoG11B();
+          const tr = document.querySelector("#tabelaAnexoG11B tbody tr:last-child");
+          if (l.titular) tr.querySelector(".ag11b-titular").value = l.titular;
+          tr.querySelector(".ag11b-nifemitente").value = l.nifEntidadeEmitente || "";
+          tr.querySelector(".ag11b-codigo").value = l.codigo || "";
+          tr.querySelector(".ag11b-rendimento").value = l.rendimento || "";
+          tr.querySelector(".ag11b-retencoes").value = l.retencoesFonte || "";
+          tr.querySelector(".ag11b-nifretentora").value = l.nifEntidadeRetentora || "";
+        });
+      }
+
+      if (dados.anexoG && dados.anexoG.quadro12) {
+        const q12 = dados.anexoG.quadro12;
+        if (q12.permutaPartesSociais !== undefined) document.getElementById("ag12PermutaPartesSociais").value = q12.permutaPartesSociais ? "S" : "N";
+        if (q12.fusaoOuCisao !== undefined) document.getElementById("ag12FusaoOuCisao").value = q12.fusaoOuCisao ? "S" : "N";
+        if (q12.entradaPatrimonio !== undefined) document.getElementById("ag12EntradaPatrimonio").value = q12.entradaPatrimonio ? "S" : "N";
+        if (q12.decorridos5Anos !== undefined) document.getElementById("ag12Decorridos5Anos").value = q12.decorridos5Anos ? "S" : "N";
+        (q12.partesSociais || []).forEach(l => {
+          adicionarLinhaAnexoG12B();
+          const tr = document.querySelector("#tabelaAnexoG12B tbody tr:last-child");
+          if (l.titular) tr.querySelector(".ag12b-titular").value = l.titular;
+          tr.querySelector(".ag12b-nifemitente").value = l.nifEntidadeEmitente || "";
+          tr.querySelector(".ag12b-ntitulos").value = l.numeroTitulos || "";
+          tr.querySelector(".ag12b-capitalsocial").value = l.capitalSocial || "";
+          tr.querySelector(".ag12b-anorealizacao").value = l.anoRealizacao || "";
+          tr.querySelector(".ag12b-mesrealizacao").value = l.mesRealizacao || "";
+          tr.querySelector(".ag12b-valorrealizacao").value = l.valorRealizacao || "";
+          tr.querySelector(".ag12b-anoaquisicao").value = l.anoAquisicao || "";
+          tr.querySelector(".ag12b-mesaquisicao").value = l.mesAquisicao || "";
+          tr.querySelector(".ag12b-valoraquisicao").value = l.valorAquisicao || "";
+          tr.querySelector(".ag12b-despesas").value = l.despesasEncargos || "";
+        });
+        document.getElementById("ag12PaisUE").value = q12.paisTransferenciaUE || "";
+        document.getElementById("ag12PaisOutro").value = q12.paisTransferenciaOutro || "";
+        document.getElementById("ag12Modalidade").value = q12.modalidadePagamento || "";
+      }
+
+      if (dados.anexoG && dados.anexoG.quadro14) {
+        const q14 = dados.anexoG.quadro14;
+        (q14.linhas || []).forEach(l => {
+          adicionarLinhaAnexoG14();
+          const tr = document.querySelector("#tabelaAnexoG14 tbody tr:last-child");
+          tr.querySelector(".ag14-codigo").value = l.codigoOperacao || "";
+          if (l.titular) tr.querySelector(".ag14-titular").value = l.titular;
+          tr.querySelector(".ag14-rendimento").value = l.rendimento || "";
+          tr.querySelector(".ag14-retencoes").value = l.retencoes || "";
+          tr.querySelector(".ag14-nifretentora").value = l.nifEntidadeRetentora || "";
+        });
+        (q14.anosAnteriores1 || []).forEach(l => {
+          adicionarLinhaAnexoG14A1();
+          const tr = document.querySelector("#tabelaAnexoG14A1 tbody tr:last-child");
+          tr.querySelector(".ag14a1-quadro").value = l.quadro || "";
+          tr.querySelector(".ag14a1-nlinha").value = l.nlinha || "";
+          tr.querySelector(".ag14a1-ano").value = l.anoRendimentos || "";
+          tr.querySelector(".ag14a1-rendimento").value = l.rendimento || "";
+          tr.querySelector(".ag14a1-nanos").value = l.nanos || "";
+        });
+        (q14.anosAnteriores2 || []).forEach(l => {
+          adicionarLinhaAnexoG14A2();
+          const tr = document.querySelector("#tabelaAnexoG14A2 tbody tr:last-child");
+          tr.querySelector(".ag14a2-quadro").value = l.quadro || "";
+          tr.querySelector(".ag14a2-nlinha").value = l.nlinha || "";
+          tr.querySelector(".ag14a2-ano").value = l.anoRendimentos || "";
+          tr.querySelector(".ag14a2-rendimento").value = l.rendimento || "";
+          tr.querySelector(".ag14a2-retencoes").value = l.retencoes || "";
+        });
+      }
 
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHIsentos tbody").innerHTML = "";

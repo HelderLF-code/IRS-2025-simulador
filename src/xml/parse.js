@@ -273,6 +273,78 @@ function parseQuadro05AnexoG(q05) {
   };
 }
 
+// Anexo G, Quadro 9 (alienação onerosa de partes sociais e outros valores mobiliários).
+function parseQuadro09AnexoG(q09) {
+  const listaCampoNif = container => parseLinhasGenerico(filho(q09, container)).map(l => ({ campoQ9: l.CampoQ9, nif: l.NIF }));
+  return {
+    linhas: parseLinhasGenerico(filho(q09, "AnexoGq09T01")).map(l => ({
+      nlinha: l.NLinha, titular: l.Titular, nif: l.NIF, codigo: l.CodEncargos,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos, paisContraparte: l.PaisContraparte,
+      respeitaValoresMobiliarios: l.RespeitaValoresMobiliarios === undefined ? undefined : l.RespeitaValoresMobiliarios === "S"
+    })),
+    microPequenas: listaCampoNif("AnexoGq09AT01"),
+    neutralidadeFiscal: listaCampoNif("AnexoGq09BT01"),
+    permutaFusaoCisao: parseLinhasGenerico(filho(q09, "AnexoGq09CT01")).map(l => ({
+      titular: l.Titular, nifEntidade: l.NIFEntidade, ano: l.Ano, mes: l.Mes, valor: l.Valor
+    })),
+    recapitalizacao: parseLinhasGenerico(filho(q09, "AnexoGq09DT01")).map(l => ({ campoQ9: l.CampoQ9, nif: l.NIF, participacao: l.Participacao })),
+    egfUgf: listaCampoNif("AnexoGq09ET01")
+  };
+}
+
+// Anexo G, Quadro 11 (organismos de investimento alternativo imobiliário).
+function parseQuadro11AnexoG(q11) {
+  return {
+    grupoA: parseLinhasGenerico(filho(q11, "AnexoGq11AT01")).map(l => ({
+      titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, codigo: l.Codigo,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+      despesasEncargos: l.DespesasEncargos
+    })),
+    grupoB: parseLinhasGenerico(filho(q11, "AnexoGq11BT01")).map(l => ({
+      titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, codigo: l.Codigo,
+      rendimento: l.Rendimento, retencoesFonte: l.RetencoesFonte, nifEntidadeRetentora: l.NIFEntidadeRetentora
+    }))
+  };
+}
+
+// Anexo G, Quadro 12 (perda da qualidade de residente em território português).
+function parseQuadro12AnexoG(q12) {
+  const bool = tag => texto(q12, tag) !== undefined ? texto(q12, tag) === "S" : undefined;
+  return {
+    permutaPartesSociais: bool("AnexoGq12B01"),
+    fusaoOuCisao: bool("AnexoGq12B03"),
+    entradaPatrimonio: bool("AnexoGq12B05"),
+    decorridos5Anos: bool("AnexoGq12B07"),
+    partesSociais: parseLinhasGenerico(filho(q12, "AnexoGq12BT01")).map(l => ({
+      titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, numeroTitulos: l.NTitulos, capitalSocial: l.CapitalSocial,
+      anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, valorRealizacao: l.ValorRealizacao,
+      anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos
+    })),
+    paisTransferenciaUE: texto(q12, "AnexoGq12C09"),
+    paisTransferenciaOutro: texto(q12, "AnexoGq12C10"),
+    modalidadePagamento: texto(q12, "AnexoGq12B11")
+  };
+}
+
+// Anexo G, Quadro 14 (outros incrementos patrimoniais).
+function parseQuadro14AnexoG(q14) {
+  return {
+    linhas: parseLinhasGenerico(filho(q14, "AnexoGq14T01")).map(l => ({
+      nlinha: l.NLinha, codigoOperacao: l.CodigoOperacao, titular: l.Titular,
+      rendimento: l.Rendimento, retencoes: l.Retencoes, nifEntidadeRetentora: l.NIFEntidadeRetentora
+    })),
+    anosAnteriores1: parseLinhasGenerico(filho(q14, "AnexoGq14AT01")).map(l => ({
+      quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, nanos: l.Nanos
+    })),
+    anosAnteriores2: parseLinhasGenerico(filho(q14, "AnexoGq14AT02")).map(l => ({
+      quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos, rendimento: l.Rendimento, retencoes: l.Retencoes
+    }))
+  };
+}
+
 // Anexo G, Quadro 6 (alienação onerosa da propriedade intelectual).
 function parseQuadro06AnexoG(q06) {
   return parseLinhasGenerico(filho(q06, "AnexoGq06T01")).map(l => ({
@@ -342,6 +414,25 @@ function parseQuadro19AnexoG(q19) {
   }));
 }
 
+function temDadosQuadro09AnexoGParse(q) {
+  return !!(q.linhas.length || q.microPequenas.length || q.neutralidadeFiscal.length ||
+    q.permutaFusaoCisao.length || q.recapitalizacao.length || q.egfUgf.length);
+}
+
+function temDadosQuadro11AnexoGParse(q) {
+  return !!(q.grupoA.length || q.grupoB.length);
+}
+
+function temDadosQuadro12AnexoGParse(q) {
+  return q.permutaPartesSociais !== undefined || q.fusaoOuCisao !== undefined ||
+    q.entradaPatrimonio !== undefined || q.decorridos5Anos !== undefined || q.partesSociais.length > 0 ||
+    q.paisTransferenciaUE !== undefined || q.paisTransferenciaOutro !== undefined || q.modalidadePagamento !== undefined;
+}
+
+function temDadosQuadro14AnexoGParse(q) {
+  return !!(q.linhas.length || q.anosAnteriores1.length || q.anosAnteriores2.length);
+}
+
 function parseAnexoG(anexoG) {
   if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
   const q04 = filho(anexoG, "Quadro04");
@@ -349,8 +440,12 @@ function parseAnexoG(anexoG) {
   const q06 = filho(anexoG, "Quadro06");
   const q07 = filho(anexoG, "Quadro07");
   const q08 = filho(anexoG, "Quadro08");
+  const q09 = filho(anexoG, "Quadro09");
   const q10 = filho(anexoG, "Quadro10");
+  const q11 = filho(anexoG, "Quadro11");
+  const q12 = filho(anexoG, "Quadro12");
   const q13 = filho(anexoG, "Quadro13");
+  const q14 = filho(anexoG, "Quadro14");
   const q15 = filho(anexoG, "Quadro15");
   const q16 = filho(anexoG, "Quadro16");
   const q17 = filho(anexoG, "Quadro17");
@@ -361,8 +456,12 @@ function parseAnexoG(anexoG) {
   const quadro06 = temConteudo(q06) ? parseQuadro06AnexoG(q06) : undefined;
   const quadro07 = temConteudo(q07) ? parseQuadro07AnexoG(q07) : undefined;
   const quadro08 = temConteudo(q08) ? parseQuadro08AnexoG(q08) : undefined;
+  const quadro09 = temConteudo(q09) ? parseQuadro09AnexoG(q09) : undefined;
   const quadro10 = temConteudo(q10) ? parseQuadro10AnexoG(q10) : undefined;
+  const quadro11 = temConteudo(q11) ? parseQuadro11AnexoG(q11) : undefined;
+  const quadro12 = temConteudo(q12) ? parseQuadro12AnexoG(q12) : undefined;
   const quadro13 = temConteudo(q13) ? parseQuadro13AnexoG(q13) : undefined;
+  const quadro14 = temConteudo(q14) ? parseQuadro14AnexoG(q14) : undefined;
   const quadro15OptaEnglobamento = texto(q15, "AnexoGq15B01") !== undefined ? texto(q15, "AnexoGq15B01") === "S" : undefined;
   const quadro16 = temConteudo(q16) ? parseQuadro16AnexoG(q16) : undefined;
   const quadro17TotalEstrangeiro = texto(q17, "AnexoGq17C01");
@@ -370,16 +469,15 @@ function parseAnexoG(anexoG) {
   const quadro19 = temConteudo(q19) ? parseQuadro19AnexoG(q19) : undefined;
 
   const passthrough = {};
-  for (const i of [9, 11, 12, 14]) {
-    const numero = String(i).padStart(2, "0");
-    const elQ = filho(anexoG, `Quadro${numero}`);
-    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
-  }
   if (temConteudo(q06) && !(quadro06 && quadro06.length)) passthrough.Quadro06 = serializar(q06);
   if (temConteudo(q07) && !(quadro07 && quadro07.length)) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !(quadro08 && quadro08.length)) passthrough.Quadro08 = serializar(q08);
+  if (temConteudo(q09) && !(quadro09 && temDadosQuadro09AnexoGParse(quadro09))) passthrough.Quadro09 = serializar(q09);
   if (temConteudo(q10) && !(quadro10 && quadro10.length)) passthrough.Quadro10 = serializar(q10);
+  if (temConteudo(q11) && !(quadro11 && temDadosQuadro11AnexoGParse(quadro11))) passthrough.Quadro11 = serializar(q11);
+  if (temConteudo(q12) && !(quadro12 && temDadosQuadro12AnexoGParse(quadro12))) passthrough.Quadro12 = serializar(q12);
   if (temConteudo(q13) && !(quadro13 && quadro13.length)) passthrough.Quadro13 = serializar(q13);
+  if (temConteudo(q14) && !(quadro14 && temDadosQuadro14AnexoGParse(quadro14))) passthrough.Quadro14 = serializar(q14);
   if (temConteudo(q15) && quadro15OptaEnglobamento === undefined) passthrough.Quadro15 = serializar(q15);
   if (temConteudo(q16) && !(quadro16 && quadro16.length)) passthrough.Quadro16 = serializar(q16);
   if (temConteudo(q17) && quadro17TotalEstrangeiro === undefined) passthrough.Quadro17 = serializar(q17);
@@ -387,7 +485,9 @@ function parseAnexoG(anexoG) {
   if (temConteudo(q19) && !(quadro19 && quadro19.length)) passthrough.Quadro19 = serializar(q19);
 
   const anexoGModel = (quadro04 || quadro05 || (quadro06 && quadro06.length) || (quadro07 && quadro07.length) ||
-    (quadro08 && quadro08.length) || (quadro10 && quadro10.length) || (quadro13 && quadro13.length) ||
+    (quadro08 && quadro08.length) || (quadro09 && temDadosQuadro09AnexoGParse(quadro09)) || (quadro10 && quadro10.length) ||
+    (quadro11 && temDadosQuadro11AnexoGParse(quadro11)) || (quadro12 && temDadosQuadro12AnexoGParse(quadro12)) ||
+    (quadro13 && quadro13.length) || (quadro14 && temDadosQuadro14AnexoGParse(quadro14)) ||
     quadro15OptaEnglobamento !== undefined || (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined ||
     (quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length)) || (quadro19 && quadro19.length)) ? {} : undefined;
   if (anexoGModel) {
@@ -396,8 +496,12 @@ function parseAnexoG(anexoG) {
     if (quadro06 && quadro06.length) anexoGModel.quadro06 = quadro06;
     if (quadro07 && quadro07.length) anexoGModel.quadro07 = quadro07;
     if (quadro08 && quadro08.length) anexoGModel.quadro08 = quadro08;
+    if (quadro09 && temDadosQuadro09AnexoGParse(quadro09)) anexoGModel.quadro09 = quadro09;
     if (quadro10 && quadro10.length) anexoGModel.quadro10 = quadro10;
+    if (quadro11 && temDadosQuadro11AnexoGParse(quadro11)) anexoGModel.quadro11 = quadro11;
+    if (quadro12 && temDadosQuadro12AnexoGParse(quadro12)) anexoGModel.quadro12 = quadro12;
     if (quadro13 && quadro13.length) anexoGModel.quadro13 = quadro13;
+    if (quadro14 && temDadosQuadro14AnexoGParse(quadro14)) anexoGModel.quadro14 = quadro14;
     if (quadro15OptaEnglobamento !== undefined) anexoGModel.quadro15OptaEnglobamento = quadro15OptaEnglobamento;
     if (quadro16 && quadro16.length) anexoGModel.quadro16 = quadro16;
     if (quadro17TotalEstrangeiro !== undefined) anexoGModel.quadro17TotalEstrangeiro = quadro17TotalEstrangeiro;
