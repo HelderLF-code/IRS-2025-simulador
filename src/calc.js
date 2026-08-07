@@ -336,6 +336,27 @@
     };
   }
 
+  // Anexo G, Quadro 7 (cessão onerosa de posições contratuais ou outros direitos relativos
+  // a bens imóveis, e cessão onerosa de direitos sobre estruturas fiduciárias — códigos G71/
+  // G72, art.º 10.º, n.º 1, als. d) e j), do CIRS): ganho de cada linha = valor de
+  // realização do direito - valor de aquisição do direito (sem despesas/encargos nem
+  // correção monetária — não previstos para este quadro, confirmado contra um exemplo
+  // real). O saldo global só é tributado em 50% quando positivo (art.º 43.º, n.º 2, do
+  // CIRS) e entra sempre no rendimento global por englobamento — ao contrário dos Quadros
+  // 6/8/9/12/13/18, este quadro não tem opção de tributação autónoma alternativa (não está
+  // na lista do Quadro 15).
+  function calcularSaldoQuadro07AnexoG(linhas) {
+    const detalhe = (linhas || []).map(l => {
+      const valorRealizacao = Number(l.valorRealizacao) || 0;
+      const valorAquisicao = Number(l.valorAquisicao) || 0;
+      const resultado = valorRealizacao - valorAquisicao;
+      return { codOperacao: l.codOperacao, valorRealizacao, valorAquisicao, resultado };
+    });
+    const saldo = detalhe.reduce((acc, l) => acc + l.resultado, 0);
+    const rendimentoTributavel = saldo > 0 ? saldo * 0.5 : 0;
+    return { detalhe, saldo, rendimentoTributavel };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -357,13 +378,15 @@
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
     const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
     const categoriaG = calcularSaldoQuadro4AnexoG(anexoG && anexoG.quadro04, anexoG && anexoG.quadro05, parametros);
+    const categoriaGQuadro07 = calcularSaldoQuadro07AnexoG(anexoG && anexoG.quadro07);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A
     // Categoria E só entra aqui quando se opta pelo englobamento (senão é tributada à parte,
-    // na coleta especial abaixo). A Categoria G (mais-valias do Quadro 4 do Anexo G) entra
-    // sempre por englobamento, já com a exclusão de 50% aplicada.
-    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado + categoriaG.rendimentoTributavel;
+    // na coleta especial abaixo). A Categoria G (mais-valias dos Quadros 4 e 7 do Anexo G)
+    // entra sempre por englobamento, já com a exclusão de 50% aplicada.
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado +
+      categoriaG.rendimentoTributavel + categoriaGQuadro07.rendimentoTributavel;
     const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
@@ -401,6 +424,7 @@
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
       categoriaE,
       categoriaG,
+      categoriaGQuadro07,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoGlobal,
       rendimentoLiquido,
@@ -427,6 +451,7 @@
     calcularRendimentoCategoriaB,
     calcularRendimentoCategoriaE,
     calcularSaldoQuadro4AnexoG,
+    calcularSaldoQuadro07AnexoG,
     coeficienteDesvalorizacaoMoeda,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,

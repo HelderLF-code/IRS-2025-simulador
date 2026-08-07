@@ -1571,6 +1571,27 @@ if (typeof module !== "undefined" && module.exports) {
     };
   }
 
+  // Anexo G, Quadro 7 (cessão onerosa de posições contratuais ou outros direitos relativos
+  // a bens imóveis, e cessão onerosa de direitos sobre estruturas fiduciárias — códigos G71/
+  // G72, art.º 10.º, n.º 1, als. d) e j), do CIRS): ganho de cada linha = valor de
+  // realização do direito - valor de aquisição do direito (sem despesas/encargos nem
+  // correção monetária — não previstos para este quadro, confirmado contra um exemplo
+  // real). O saldo global só é tributado em 50% quando positivo (art.º 43.º, n.º 2, do
+  // CIRS) e entra sempre no rendimento global por englobamento — ao contrário dos Quadros
+  // 6/8/9/12/13/18, este quadro não tem opção de tributação autónoma alternativa (não está
+  // na lista do Quadro 15).
+  function calcularSaldoQuadro07AnexoG(linhas) {
+    const detalhe = (linhas || []).map(l => {
+      const valorRealizacao = Number(l.valorRealizacao) || 0;
+      const valorAquisicao = Number(l.valorAquisicao) || 0;
+      const resultado = valorRealizacao - valorAquisicao;
+      return { codOperacao: l.codOperacao, valorRealizacao, valorAquisicao, resultado };
+    });
+    const saldo = detalhe.reduce((acc, l) => acc + l.resultado, 0);
+    const rendimentoTributavel = saldo > 0 ? saldo * 0.5 : 0;
+    return { detalhe, saldo, rendimentoTributavel };
+  }
+
   function deducaoPorDependentes(dependentes, parametros) {
     return dependentes.reduce((total, dep, idx) => {
       let valor = idx === 0
@@ -1592,13 +1613,15 @@ if (typeof module !== "undefined" && module.exports) {
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
     const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
     const categoriaG = calcularSaldoQuadro4AnexoG(anexoG && anexoG.quadro04, anexoG && anexoG.quadro05, parametros);
+    const categoriaGQuadro07 = calcularSaldoQuadro07AnexoG(anexoG && anexoG.quadro07);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A
     // Categoria E só entra aqui quando se opta pelo englobamento (senão é tributada à parte,
-    // na coleta especial abaixo). A Categoria G (mais-valias do Quadro 4 do Anexo G) entra
-    // sempre por englobamento, já com a exclusão de 50% aplicada.
-    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado + categoriaG.rendimentoTributavel;
+    // na coleta especial abaixo). A Categoria G (mais-valias dos Quadros 4 e 7 do Anexo G)
+    // entra sempre por englobamento, já com a exclusão de 50% aplicada.
+    const rendimentoGlobal = somaA.rendimentos + categoriaB.rendimentoTributavel + categoriaE.rendimentoEnglobado +
+      categoriaG.rendimentoTributavel + categoriaGQuadro07.rendimentoTributavel;
     const rendimentoLiquido = rendimentoGlobal - dedEspecifica; // = Rendimento Coletável
 
     const divisor = agregado.tributacaoConjunta
@@ -1636,6 +1659,7 @@ if (typeof module !== "undefined" && module.exports) {
       rendimentoTributavelB: categoriaB.rendimentoTributavel,
       categoriaE,
       categoriaG,
+      categoriaGQuadro07,
       rendimentoBruto: somaA.rendimentos + categoriaB.rendimentoBruto,
       rendimentoGlobal,
       rendimentoLiquido,
@@ -1662,6 +1686,7 @@ if (typeof module !== "undefined" && module.exports) {
     calcularRendimentoCategoriaB,
     calcularRendimentoCategoriaE,
     calcularSaldoQuadro4AnexoG,
+    calcularSaldoQuadro07AnexoG,
     coeficienteDesvalorizacaoMoeda,
     calcularDeducoesArt78,
     calcularDeducaoPensoesAlimentos,
@@ -3840,6 +3865,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const temCategoriaE = categoriaE.rendimentoBrutoTaxasEspeciais > 0 || categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
   const categoriaG = resultado.categoriaG || {};
   const temCategoriaG = (categoriaG.detalhe || []).length > 0;
+  const categoriaGQuadro07 = resultado.categoriaGQuadro07 || {};
+  const temCategoriaGQuadro07 = (categoriaGQuadro07.detalhe || []).length > 0;
 
   return `<!doctype html>
 <html lang="pt">
@@ -3881,6 +3908,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
       ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
       : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
     ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
+    ${temCategoriaGQuadro07 ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
@@ -3900,6 +3928,10 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   ${categoriaG.linhasExcluidas > 0 ? `${categoriaG.linhasExcluidas} imóvel(is) do Quadro 4 não entra(m)
   neste cálculo (reabilitação/EGF-UGF/alienação isenta ao Estado — tratamento próprio ainda não
   implementado).` : ""}</p>` : ""}
+  ${temCategoriaGQuadro07 ? `<p class="nota">Cessão de posições contratuais/direitos sobre bens imóveis
+  (Anexo G, Quadro 7): saldo de ${formatarMoeda(categoriaGQuadro07.saldo)} € entre valor de realização e
+  valor de aquisição do direito, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do
+  CIRS).</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
@@ -5558,6 +5590,7 @@ if (typeof module !== "undefined" && module.exports) {
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
     const temCategoriaE = resultado.categoriaE.rendimentoBrutoTaxasEspeciais > 0 || resultado.categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
     const temCategoriaG = resultado.categoriaG.detalhe.length > 0;
+    const temCategoriaGQuadro07 = resultado.categoriaGQuadro07.detalhe.length > 0;
     const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
       .filter(c => c.despesa > 0)
       .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
@@ -5582,6 +5615,10 @@ if (typeof module !== "undefined" && module.exports) {
       <strong>Categoria G — excluído por reinvestimento em habitação própria (Quadro 5):</strong> -${formatarMoeda(resultado.categoriaG.reinvestimento.ganhoExcluidoReinvestimento)} €<br>` : "") +
       `<strong>Categoria G — rendimento tributável (50% do saldo após reinvestimento):</strong> ${formatarMoeda(resultado.categoriaG.rendimentoTributavel)} €<br>` +
       (resultado.categoriaG.linhasExcluidas > 0 ? `<small>${resultado.categoriaG.linhasExcluidas} linha(s) do Quadro 4 excluída(s) deste cálculo (reabilitação/EGF-UGF/isentas — tratamento próprio ainda não implementado).</small><br>` : "")
+      : "") +
+      (temCategoriaGQuadro07 ? `
+      <strong>Categoria G — saldo cessão de posições contratuais (Anexo G, Quadro 7):</strong> ${formatarMoeda(resultado.categoriaGQuadro07.saldo)} €<br>
+      <strong>Categoria G — rendimento tributável (50% do saldo, Quadro 7):</strong> ${formatarMoeda(resultado.categoriaGQuadro07.rendimentoTributavel)} €<br>`
       : "") +
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>

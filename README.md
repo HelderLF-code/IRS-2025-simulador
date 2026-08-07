@@ -115,9 +115,17 @@ regenerar o `simulador-irs.html`.
   cálculo (tratamento próprio, ainda não implementado): linhas referenciadas no Quadro 4A
   (imóveis recuperados/reabilitação — tributação autónoma), linhas referenciadas no Quadro
   4C (alienação a EGF/UGF — tributação autónoma) e linhas referenciadas no Quadro 4F
-  (alienação ao Estado/RA — isentas, corretamente excluídas do saldo). Os restantes quadros
-  do Anexo G (6, 7, 8, 9, 10, 11, 12, 13, 14, 18, etc.) continuam capturados e exportados no
-  XML, mas sem entrar na estimativa.
+  (alienação ao Estado/RA — isentas, corretamente excluídas do saldo). **O Quadro 7 (cessão
+  onerosa de posições contratuais/direitos sobre bens imóveis e estruturas fiduciárias)
+  também está implementado**: ganho por linha = valor de realização do direito - valor de
+  aquisição do direito (sem despesas/encargos nem correção monetária — não previstos para
+  este quadro), com a mesma exclusão de 50% do saldo positivo; ao contrário dos Quadros 6,
+  8, 9, 12, 13 e 18, o Quadro 7 não tem opção de tributação autónoma alternativa (não consta
+  da lista do Quadro 15), por isso não depende de taxas por confirmar. Os restantes quadros
+  do Anexo G (6, 8, 9, 10, 11, 12, 13, 14, 18, etc.) continuam capturados e exportados no
+  XML, mas sem entrar na estimativa — vários deles (6, 8, 9, 12, 13, 18) dependem da opção
+  de englobamento do Quadro 15 e, quando não englobados, de taxas de tributação autónoma
+  (art.º 72.º CIRS) ainda por confirmar.
 - Anexo H: Quadro 4 (rendimentos isentos), Quadro 5 (propriedade intelectual isenta),
   Quadro 6A (pensões de alimentos — dedução direta à coleta, art.º 83.º-A) e Quadro 6B
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
@@ -193,19 +201,19 @@ interface) e mantidos ao exportar de novo — para não haver perda de informaç
    Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
    Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
    implementar.
-5. **Anexo G — cálculo de mais-valias** — só o Quadro 4 (imóveis) entra na estimativa, com
-   correção monetária, isenção por reinvestimento em habitação própria (Quadro 5) e
-   exclusão de 50%. Não trata ainda os imóveis do Quadro 4A/4C (tributação autónoma) nem os
-   isentos do Quadro 4F (corretamente excluídos do saldo, mas sem cálculo próprio). Os
-   coeficientes de desvalorização da moeda usados são os da Portaria n.º 382/2025/1 (bens
-   alienados em 2025) — fornecidos pelo utilizador. Ainda por implementar: tributação
-   autónoma do Quadro 4A/4C, e os restantes quadros do anexo (6, 7, 8, 9, 10, 11, 12, 13,
-   14, 18 — cada um com regras próprias: exclusão de 50% para propriedade intelectual/
-   cessões, correção monetária só após 24 meses para partes sociais, isenção de
-   criptoativos detidos >365 dias, etc.). Cada anexo novo por implementar do zero (G1, J, L,
-   SS) vai precisar de um exemplo XML preenchido + as respetivas instruções de
-   preenchimento, tal como foi feito para os
-   Anexos A, B, E, G e H.
+5. **Anexo G — cálculo de mais-valias** — os Quadros 4 (imóveis) e 7 (cessão de posições
+   contratuais) entram na estimativa, com correção monetária e isenção por reinvestimento
+   em habitação própria (só o Quadro 4) e exclusão de 50%. Não trata ainda os imóveis do
+   Quadro 4A/4C (tributação autónoma) nem os isentos do Quadro 4F (corretamente excluídos
+   do saldo, mas sem cálculo próprio). Os coeficientes de desvalorização da moeda usados são
+   os da Portaria n.º 382/2025/1 (bens alienados em 2025) — fornecidos pelo utilizador.
+   Ainda por implementar: tributação autónoma do Quadro 4A/4C, e os restantes quadros do
+   anexo (6, 8, 9, 10, 11, 12, 13, 14, 18 — vários dependem de taxas de tributação autónoma
+   do art.º 72.º CIRS ainda por confirmar, para quando não se opta pelo englobamento no
+   Quadro 15; os Quadros 10/11A/11B/14, sem essa dependência, são bons candidatos para a
+   próxima ronda). Cada anexo novo por implementar do zero (G1, J, L, SS) vai precisar de um
+   exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
+   para os Anexos A, B, E, G e H.
 6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.

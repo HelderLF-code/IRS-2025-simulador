@@ -2627,6 +2627,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const temAcrescimo = resultado.acrescimoAoRendimentoB > 0.005;
     const temCategoriaE = resultado.categoriaE.rendimentoBrutoTaxasEspeciais > 0 || resultado.categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
     const temCategoriaG = resultado.categoriaG.detalhe.length > 0;
+    const temCategoriaGQuadro07 = resultado.categoriaGQuadro07.detalhe.length > 0;
     const linhasDeducoesArt78 = resultado.deducoesArt78.porCategoria
       .filter(c => c.despesa > 0)
       .map(c => `<strong>${c.label}:</strong> despesa ${formatarMoeda(c.despesa)} € → dedução -${formatarMoeda(c.deducao)} €<br>`)
@@ -2651,6 +2652,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
       <strong>Categoria G — excluído por reinvestimento em habitação própria (Quadro 5):</strong> -${formatarMoeda(resultado.categoriaG.reinvestimento.ganhoExcluidoReinvestimento)} €<br>` : "") +
       `<strong>Categoria G — rendimento tributável (50% do saldo após reinvestimento):</strong> ${formatarMoeda(resultado.categoriaG.rendimentoTributavel)} €<br>` +
       (resultado.categoriaG.linhasExcluidas > 0 ? `<small>${resultado.categoriaG.linhasExcluidas} linha(s) do Quadro 4 excluída(s) deste cálculo (reabilitação/EGF-UGF/isentas — tratamento próprio ainda não implementado).</small><br>` : "")
+      : "") +
+      (temCategoriaGQuadro07 ? `
+      <strong>Categoria G — saldo cessão de posições contratuais (Anexo G, Quadro 7):</strong> ${formatarMoeda(resultado.categoriaGQuadro07.saldo)} €<br>
+      <strong>Categoria G — rendimento tributável (50% do saldo, Quadro 7):</strong> ${formatarMoeda(resultado.categoriaGQuadro07.rendimentoTributavel)} €<br>`
       : "") +
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
       <hr>

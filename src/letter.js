@@ -35,6 +35,8 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const temCategoriaE = categoriaE.rendimentoBrutoTaxasEspeciais > 0 || categoriaE.rendimentoBrutoTaxasLiberatorias > 0;
   const categoriaG = resultado.categoriaG || {};
   const temCategoriaG = (categoriaG.detalhe || []).length > 0;
+  const categoriaGQuadro07 = resultado.categoriaGQuadro07 || {};
+  const temCategoriaGQuadro07 = (categoriaGQuadro07.detalhe || []).length > 0;
 
   return `<!doctype html>
 <html lang="pt">
@@ -76,6 +78,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
       ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
       : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
     ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
+    ${temCategoriaGQuadro07 ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
@@ -95,6 +98,10 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   ${categoriaG.linhasExcluidas > 0 ? `${categoriaG.linhasExcluidas} imóvel(is) do Quadro 4 não entra(m)
   neste cálculo (reabilitação/EGF-UGF/alienação isenta ao Estado — tratamento próprio ainda não
   implementado).` : ""}</p>` : ""}
+  ${temCategoriaGQuadro07 ? `<p class="nota">Cessão de posições contratuais/direitos sobre bens imóveis
+  (Anexo G, Quadro 7): saldo de ${formatarMoeda(categoriaGQuadro07.saldo)} € entre valor de realização e
+  valor de aquisição do direito, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do
+  CIRS).</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>
