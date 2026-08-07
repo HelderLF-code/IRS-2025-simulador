@@ -452,10 +452,11 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <h2>Anexo G — Mais-Valias e Outros Incrementos Patrimoniais</h2>
 <p class="aviso-topo">
   Este é o anexo mais extenso de todos (19 quadros). Por agora estão implementados os
-  Quadros 4, 5, 6, 7, 8, 10, 13, 16 e 17 — nomes de campo confirmados contra um exemplo
-  real. Os Quadros 9, 11, 12, 14, 15, 18 e 19 (partes sociais, perda de residência,
-  criptoativos, etc.) ainda não têm interface própria; se importares uma declaração com
-  dados nesses quadros, ficam preservados tal como estavam.
+  Quadros 4, 5, 6, 7, 8, 10, 13, 15, 16, 17, 18 e 19 — nomes de campo confirmados contra um
+  exemplo real. Os Quadros 9, 11, 12 e 14 (partes sociais, organismos de investimento
+  alternativo imobiliário, perda de residência, outros incrementos patrimoniais) ainda não
+  têm interface própria; se importares uma declaração com dados nesses quadros, ficam
+  preservados tal como estavam.
   <strong>O cálculo de mais-valias ainda não está implementado</strong> — regras próprias e
   complexas (correção monetária, exclusão de 50% do saldo, reinvestimento, etc.) — os dados
   ficam guardados e exportados no XML, mas a estimativa não os usa.
@@ -708,6 +709,61 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <div class="row">
   <div><label>Total de rendimentos obtidos no estrangeiro (€) <small class="hint">(17.1)</small></label><input id="ag17TotalEstrangeiro" type="number" step="0.01"></div>
 </div>
+
+<h3>Opção pelo englobamento (Quadro 15)</h3>
+<p class="aviso-topo">
+  Opta pelo englobamento dos rendimentos incluídos nos Quadros 6, 8, 9, 12, 13 e 18, bem
+  como dos imóveis recuperados/reabilitação (Quadro 4A) e EGF/UGF (Quadro 4C). Se optar,
+  fica obrigado a englobar a totalidade dos rendimentos da Categoria G, incluindo os
+  Quadros 10 e 11B.
+</p>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(15.1)</small></label>
+    <select id="ag15OptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h3>Alienação onerosa de criptoativos (Quadro 18)</h3>
+<h4>A — Detidos há menos de 365 dias, ou perda de qualidade de residente</h4>
+<table id="tabelaAnexoG18A">
+  <thead><tr>
+    <th>Titular</th><th>NIF português</th><th>País ent. gestora</th>
+    <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
+    <th>Despesas/encargos (€)</th><th>País contraparte</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG18A()">+ Adicionar</button>
+
+<h4>B — Uma das partes não residente, fora da UE/EEE, sem ADT aplicável</h4>
+<table id="tabelaAnexoG18B">
+  <thead><tr>
+    <th>Titular</th><th>NIF português</th><th>País ent. gestora</th>
+    <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
+    <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
+    <th>Despesas/encargos (€)</th><th>País contraparte</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG18B()">+ Adicionar</button>
+
+<h3>Amortização de crédito à habitação em transmissão de terrenos/imóveis (Quadro 19)</h3>
+<p class="aviso-topo">
+  Amortização de capital em dívida a crédito à habitação destinada a habitação própria e
+  permanente do sujeito passivo, do seu agregado ou dos seus descendentes, com o valor de
+  realização de terrenos para construção ou de imóveis habitacionais não destinados a HPP
+  (Lei n.º 56/2023, de 6 de outubro — art.º 50.º, n.º 1).
+</p>
+<table id="tabelaAnexoG19">
+  <thead><tr>
+    <th>Campo do Q4</th><th>Valor amortiz. empréstimo (€)</th><th>Titular</th><th>NIF descendente</th>
+    <th>Valor amortização (€)</th><th>Ano</th><th>Mês</th><th>Dia</th>
+    <th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG19()">+ Adicionar</button>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -1751,6 +1807,74 @@ function buildQuadro17AnexoG(totalEstrangeiro) {
   return `<Quadro17>${el("AnexoGq17C01", moeda(totalEstrangeiro))}</Quadro17>`;
 }
 
+// Anexo G, Quadro 15 (opção pelo englobamento dos rendimentos incluídos nos Quadros 6, 8,
+// 9, 12, 13 e 18, e dos imóveis recuperados/reabilitação do Q4A e EGF/UGF do Q4C). Nome de
+// campo confirmado contra um exemplo real.
+function buildQuadro15AnexoG(optaEnglobamento) {
+  if (optaEnglobamento === undefined) return `<Quadro15/>`;
+  return `<Quadro15>${el("AnexoGq15B01", optaEnglobamento ? "S" : "N")}</Quadro15>`;
+}
+
+const ANEXOG_Q18_CAMPOS = [
+  ["nlinha", "NLinha"], ["titular", "Titular"], ["nifPortugues", "NIFPortugues"], ["codPaisEntGestora", "CodPaisEntGestora"],
+  ["anoRealizacao", "AnoRealizacao"], ["mesRealizacao", "MesRealizacao"], ["diaRealizacao", "DiaRealizacao"], ["valorRealizacao", "ValorRealizacao"],
+  ["anoAquisicao", "AnoAquisicao"], ["mesAquisicao", "MesAquisicao"], ["diaAquisicao", "DiaAquisicao"], ["valorAquisicao", "ValorAquisicao"],
+  ["despesasEncargos", "DespesasEncargos"], ["codPaisContraparte", "CodPaisContraparte"]
+];
+
+function buildGrupoQuadro18AnexoG(container, linhas, base) {
+  return listaComLinhas(container, linhas.map((l, idx) => {
+    const campos = {};
+    ANEXOG_Q18_CAMPOS.forEach(([chave, tag]) => {
+      if (tag === "NLinha") campos.NLinha = l.nlinha || (base + idx);
+      else if (tag === "ValorRealizacao" || tag === "ValorAquisicao" || tag === "DespesasEncargos") campos[tag] = moeda(l[chave]);
+      else campos[tag] = l[chave];
+    });
+    return campos;
+  }));
+}
+
+// Anexo G, Quadro 18 (alienação onerosa de criptoativos que não constituam valores
+// mobiliários): Grupo A (detidos < 365 dias ou perda de qualidade de residente), Grupo B
+// (uma das partes não residente, fora da UE/EEE, sem ADT aplicável). Nomes de campo
+// confirmados contra um exemplo real.
+function buildQuadro18AnexoG(q18) {
+  if (!q18) return `<Quadro18/>`;
+  const grupoA = q18.grupoA || [];
+  const grupoB = q18.grupoB || [];
+  if (!grupoA.length && !grupoB.length) return `<Quadro18/>`;
+
+  const somaA1 = grupoA.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaA2 = grupoA.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaA3 = grupoA.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaB1 = grupoB.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaB2 = grupoB.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaB3 = grupoB.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+
+  return `<Quadro18>` +
+    buildGrupoQuadro18AnexoG("AnexoGq18AT01", grupoA, 18001) +
+    (grupoA.length ? el("AnexoGq18AT01SomaC01", moeda(somaA1)) + el("AnexoGq18AT01SomaC02", moeda(somaA2)) + el("AnexoGq18AT01SomaC03", moeda(somaA3)) : "") +
+    buildGrupoQuadro18AnexoG("AnexoGq18BT01", grupoB, 18501) +
+    (grupoB.length ? el("AnexoGq18BT01SomaC01", moeda(somaB1)) + el("AnexoGq18BT01SomaC02", moeda(somaB2)) + el("AnexoGq18BT01SomaC03", moeda(somaB3)) : "") +
+    `</Quadro18>`;
+}
+
+// Anexo G, Quadro 19 (transmissão onerosa de terrenos para construção ou de imóveis
+// habitacionais não destinados a habitação própria e permanente — amortização de capital
+// em dívida a crédito à habitação destinada a HPP do sujeito passivo, agregado ou
+// descendentes, Lei n.º 56/2023). Não tem linha de soma (confirmado contra um exemplo real).
+function buildQuadro19AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro19/>`;
+  return `<Quadro19>` +
+    listaComLinhas("AnexoGq19T01", linhas.map((l, idx) => ({
+      NLinha: l.nlinha || (19001 + idx), CamposQuadro4: l.campoQ4, ValorAmortEmprestimo: moeda(l.valorAmortEmprestimo),
+      Titular: l.titular, NIFDescendente: l.nifDescendente, ValorAmortizacao: moeda(l.valorAmortizacao),
+      AnoAmortizacao: l.anoAmortizacao, MesAmortizacao: l.mesAmortizacao, DiaAmortizacao: l.diaAmortizacao,
+      Freguesia: l.freguesia, TipoPredio: l.tipoPredio, Artigo: l.artigo, Fraccao: l.fraccao, QuotaParte: l.quotaParte
+    }))) +
+    `</Quadro19>`;
+}
+
 function buildAnexoG(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const g = model.anexoG || {};
@@ -1774,6 +1898,11 @@ function buildAnexoG(model) {
   const quadro13 = (g.quadro13 && g.quadro13.length > 0) ? buildQuadro13AnexoG(g.quadro13) : (pass.Quadro13 || `<Quadro13/>`);
   const quadro16 = (g.quadro16 && g.quadro16.length > 0) ? buildQuadro16AnexoG(g.quadro16) : (pass.Quadro16 || `<Quadro16/>`);
   const quadro17 = g.quadro17TotalEstrangeiro !== undefined ? buildQuadro17AnexoG(g.quadro17TotalEstrangeiro) : (pass.Quadro17 || `<Quadro17/>`);
+  const quadro15 = g.quadro15OptaEnglobamento !== undefined ? buildQuadro15AnexoG(g.quadro15OptaEnglobamento) : (pass.Quadro15 || `<Quadro15/>`);
+  const quadro18 = (g.quadro18 && ((g.quadro18.grupoA && g.quadro18.grupoA.length) || (g.quadro18.grupoB && g.quadro18.grupoB.length)))
+    ? buildQuadro18AnexoG(g.quadro18)
+    : (pass.Quadro18 || `<Quadro18/>`);
+  const quadro19 = (g.quadro19 && g.quadro19.length > 0) ? buildQuadro19AnexoG(g.quadro19) : (pass.Quadro19 || `<Quadro19/>`);
 
   const passthrough = numero => pass[`Quadro${String(numero).padStart(2, "0")}`] || `<Quadro${String(numero).padStart(2, "0")}/>`;
 
@@ -1791,11 +1920,11 @@ function buildAnexoG(model) {
     passthrough(12) +
     quadro13 +
     passthrough(14) +
-    passthrough(15) +
+    quadro15 +
     quadro16 +
     quadro17 +
-    passthrough(18) +
-    passthrough(19) +
+    quadro18 +
+    quadro19 +
     `</AnexoG>`;
 }
 
@@ -2617,6 +2746,34 @@ function parseQuadro16AnexoG(q16) {
   return parseLinhasGenerico(filho(q16, "AnexoGq16T01")).map(l => ({ titular: l.Titular, valor: l.Valor }));
 }
 
+// Anexo G, Quadro 18 (alienação onerosa de criptoativos que não constituam valores mobiliários).
+function parseGrupoQuadro18AnexoG(container) {
+  return parseLinhasGenerico(container).map(l => ({
+    nlinha: l.NLinha, titular: l.Titular, nifPortugues: l.NIFPortugues, codPaisEntGestora: l.CodPaisEntGestora,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, codPaisContraparte: l.CodPaisContraparte
+  }));
+}
+
+function parseQuadro18AnexoG(q18) {
+  return {
+    grupoA: parseGrupoQuadro18AnexoG(filho(q18, "AnexoGq18AT01")),
+    grupoB: parseGrupoQuadro18AnexoG(filho(q18, "AnexoGq18BT01"))
+  };
+}
+
+// Anexo G, Quadro 19 (transmissão onerosa de terrenos/imóveis habitacionais não destinados
+// a HPP — amortização de crédito à habitação, Lei n.º 56/2023).
+function parseQuadro19AnexoG(q19) {
+  return parseLinhasGenerico(filho(q19, "AnexoGq19T01")).map(l => ({
+    nlinha: l.NLinha, campoQ4: l.CamposQuadro4, valorAmortEmprestimo: l.ValorAmortEmprestimo,
+    titular: l.Titular, nifDescendente: l.NIFDescendente, valorAmortizacao: l.ValorAmortizacao,
+    anoAmortizacao: l.AnoAmortizacao, mesAmortizacao: l.MesAmortizacao, diaAmortizacao: l.DiaAmortizacao,
+    freguesia: l.Freguesia, tipoPredio: l.TipoPredio, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte
+  }));
+}
+
 function parseAnexoG(anexoG) {
   if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
   const q04 = filho(anexoG, "Quadro04");
@@ -2626,8 +2783,11 @@ function parseAnexoG(anexoG) {
   const q08 = filho(anexoG, "Quadro08");
   const q10 = filho(anexoG, "Quadro10");
   const q13 = filho(anexoG, "Quadro13");
+  const q15 = filho(anexoG, "Quadro15");
   const q16 = filho(anexoG, "Quadro16");
   const q17 = filho(anexoG, "Quadro17");
+  const q18 = filho(anexoG, "Quadro18");
+  const q19 = filho(anexoG, "Quadro19");
   const quadro04 = parseQuadro04AnexoG(q04);
   const quadro05 = parseQuadro05AnexoG(q05);
   const quadro06 = temConteudo(q06) ? parseQuadro06AnexoG(q06) : undefined;
@@ -2635,11 +2795,14 @@ function parseAnexoG(anexoG) {
   const quadro08 = temConteudo(q08) ? parseQuadro08AnexoG(q08) : undefined;
   const quadro10 = temConteudo(q10) ? parseQuadro10AnexoG(q10) : undefined;
   const quadro13 = temConteudo(q13) ? parseQuadro13AnexoG(q13) : undefined;
+  const quadro15OptaEnglobamento = texto(q15, "AnexoGq15B01") !== undefined ? texto(q15, "AnexoGq15B01") === "S" : undefined;
   const quadro16 = temConteudo(q16) ? parseQuadro16AnexoG(q16) : undefined;
   const quadro17TotalEstrangeiro = texto(q17, "AnexoGq17C01");
+  const quadro18 = temConteudo(q18) ? parseQuadro18AnexoG(q18) : undefined;
+  const quadro19 = temConteudo(q19) ? parseQuadro19AnexoG(q19) : undefined;
 
   const passthrough = {};
-  for (const i of [9, 11, 12, 14, 15, 18, 19]) {
+  for (const i of [9, 11, 12, 14]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoG, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
@@ -2649,12 +2812,16 @@ function parseAnexoG(anexoG) {
   if (temConteudo(q08) && !(quadro08 && quadro08.length)) passthrough.Quadro08 = serializar(q08);
   if (temConteudo(q10) && !(quadro10 && quadro10.length)) passthrough.Quadro10 = serializar(q10);
   if (temConteudo(q13) && !(quadro13 && quadro13.length)) passthrough.Quadro13 = serializar(q13);
+  if (temConteudo(q15) && quadro15OptaEnglobamento === undefined) passthrough.Quadro15 = serializar(q15);
   if (temConteudo(q16) && !(quadro16 && quadro16.length)) passthrough.Quadro16 = serializar(q16);
   if (temConteudo(q17) && quadro17TotalEstrangeiro === undefined) passthrough.Quadro17 = serializar(q17);
+  if (temConteudo(q18) && !(quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length))) passthrough.Quadro18 = serializar(q18);
+  if (temConteudo(q19) && !(quadro19 && quadro19.length)) passthrough.Quadro19 = serializar(q19);
 
   const anexoGModel = (quadro04 || quadro05 || (quadro06 && quadro06.length) || (quadro07 && quadro07.length) ||
     (quadro08 && quadro08.length) || (quadro10 && quadro10.length) || (quadro13 && quadro13.length) ||
-    (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined) ? {} : undefined;
+    quadro15OptaEnglobamento !== undefined || (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined ||
+    (quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length)) || (quadro19 && quadro19.length)) ? {} : undefined;
   if (anexoGModel) {
     if (quadro04) anexoGModel.quadro04 = quadro04;
     if (quadro05) anexoGModel.quadro05 = quadro05;
@@ -2663,8 +2830,11 @@ function parseAnexoG(anexoG) {
     if (quadro08 && quadro08.length) anexoGModel.quadro08 = quadro08;
     if (quadro10 && quadro10.length) anexoGModel.quadro10 = quadro10;
     if (quadro13 && quadro13.length) anexoGModel.quadro13 = quadro13;
+    if (quadro15OptaEnglobamento !== undefined) anexoGModel.quadro15OptaEnglobamento = quadro15OptaEnglobamento;
     if (quadro16 && quadro16.length) anexoGModel.quadro16 = quadro16;
     if (quadro17TotalEstrangeiro !== undefined) anexoGModel.quadro17TotalEstrangeiro = quadro17TotalEstrangeiro;
+    if (quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length)) anexoGModel.quadro18 = quadro18;
+    if (quadro19 && quadro19.length) anexoGModel.quadro19 = quadro19;
   }
 
   return { anexoG: anexoGModel, anexoGPassthrough: passthrough };
@@ -4220,6 +4390,98 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  function criarLinhaAnexoG18(prefixoClasse) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="${prefixoClasse}-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="${prefixoClasse}-nifpt" size="10"></td>
+      <td><input class="${prefixoClasse}-paisgestora" size="4"></td>
+      <td><input class="${prefixoClasse}-anorealizacao" type="number" size="6"></td>
+      <td><input class="${prefixoClasse}-mesrealizacao" type="number" size="4"></td>
+      <td><input class="${prefixoClasse}-diarealizacao" type="number" size="4"></td>
+      <td><input class="${prefixoClasse}-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="${prefixoClasse}-anoaquisicao" type="number" size="6"></td>
+      <td><input class="${prefixoClasse}-mesaquisicao" type="number" size="4"></td>
+      <td><input class="${prefixoClasse}-diaaquisicao" type="number" size="4"></td>
+      <td><input class="${prefixoClasse}-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="${prefixoClasse}-despesas" type="number" step="0.01"></td>
+      <td><input class="${prefixoClasse}-paiscontraparte" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    return tr;
+  }
+
+  function lerLinhasAnexoG18(tabelaId, prefixoClasse) {
+    return [...document.querySelectorAll(`#${tabelaId} tbody tr`)].map(tr => ({
+      titular: tr.querySelector(`.${prefixoClasse}-titular`).value,
+      nifPortugues: tr.querySelector(`.${prefixoClasse}-nifpt`).value || undefined,
+      codPaisEntGestora: tr.querySelector(`.${prefixoClasse}-paisgestora`).value || undefined,
+      anoRealizacao: tr.querySelector(`.${prefixoClasse}-anorealizacao`).value,
+      mesRealizacao: tr.querySelector(`.${prefixoClasse}-mesrealizacao`).value,
+      diaRealizacao: tr.querySelector(`.${prefixoClasse}-diarealizacao`).value,
+      valorRealizacao: tr.querySelector(`.${prefixoClasse}-valorrealizacao`).value || 0,
+      anoAquisicao: tr.querySelector(`.${prefixoClasse}-anoaquisicao`).value,
+      mesAquisicao: tr.querySelector(`.${prefixoClasse}-mesaquisicao`).value,
+      diaAquisicao: tr.querySelector(`.${prefixoClasse}-diaaquisicao`).value,
+      valorAquisicao: tr.querySelector(`.${prefixoClasse}-valoraquisicao`).value || 0,
+      despesasEncargos: tr.querySelector(`.${prefixoClasse}-despesas`).value || 0,
+      codPaisContraparte: tr.querySelector(`.${prefixoClasse}-paiscontraparte`).value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoG18A = function () {
+    document.querySelector("#tabelaAnexoG18A tbody").appendChild(criarLinhaAnexoG18("ag18a"));
+  };
+  window.adicionarLinhaAnexoG18B = function () {
+    document.querySelector("#tabelaAnexoG18B tbody").appendChild(criarLinhaAnexoG18("ag18b"));
+  };
+
+  function lerQuadro18AnexoG() {
+    const grupoA = lerLinhasAnexoG18("tabelaAnexoG18A", "ag18a");
+    const grupoB = lerLinhasAnexoG18("tabelaAnexoG18B", "ag18b");
+    return (grupoA.length || grupoB.length) ? { grupoA, grupoB } : undefined;
+  }
+
+  window.adicionarLinhaAnexoG19 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG19 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag19-campoq4" size="6"></td>
+      <td><input class="ag19-valoramortemprestimo" type="number" step="0.01"></td>
+      <td><select class="ag19-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag19-nifdescendente" size="10"></td>
+      <td><input class="ag19-valoramortizacao" type="number" step="0.01"></td>
+      <td><input class="ag19-ano" type="number" size="6"></td>
+      <td><input class="ag19-mes" type="number" size="4"></td>
+      <td><input class="ag19-dia" type="number" size="4"></td>
+      <td><input class="ag19-freguesia" size="8"></td>
+      <td><select class="ag19-tipo"><option value="">-</option><option value="U">U</option><option value="R">R</option><option value="O">O</option></select></td>
+      <td><input class="ag19-artigo" size="8"></td>
+      <td><input class="ag19-fracao" size="6"></td>
+      <td><input class="ag19-quota" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro19AnexoG() {
+    return [...document.querySelectorAll("#tabelaAnexoG19 tbody tr")].map(tr => ({
+      campoQ4: tr.querySelector(".ag19-campoq4").value || undefined,
+      valorAmortEmprestimo: tr.querySelector(".ag19-valoramortemprestimo").value || 0,
+      titular: tr.querySelector(".ag19-titular").value,
+      nifDescendente: tr.querySelector(".ag19-nifdescendente").value || undefined,
+      valorAmortizacao: tr.querySelector(".ag19-valoramortizacao").value || 0,
+      anoAmortizacao: tr.querySelector(".ag19-ano").value,
+      mesAmortizacao: tr.querySelector(".ag19-mes").value,
+      diaAmortizacao: tr.querySelector(".ag19-dia").value,
+      freguesia: tr.querySelector(".ag19-freguesia").value || undefined,
+      tipoPredio: tr.querySelector(".ag19-tipo").value || undefined,
+      artigo: tr.querySelector(".ag19-artigo").value || undefined,
+      fraccao: tr.querySelector(".ag19-fracao").value || undefined,
+      quotaParte: tr.querySelector(".ag19-quota").value || undefined
+    }));
+  }
+
   function lerAnexoG() {
     const quadro04 = lerQuadro04AnexoG();
     const quadro05 = lerQuadro05AnexoG();
@@ -4228,14 +4490,22 @@ if (typeof module !== "undefined" && module.exports) {
     const quadro08 = lerQuadro08AnexoGCreditos();
     const quadro10 = lerQuadro10AnexoGOIC();
     const quadro13 = lerQuadro13AnexoG();
+    const quadro15Valor = document.getElementById("ag15OptaEnglobamento").value;
+    const quadro15OptaEnglobamento = quadro15Valor === "" ? undefined : quadro15Valor === "S";
     const quadro16 = lerQuadro16AnexoG();
     const quadro17TotalEstrangeiro = document.getElementById("ag17TotalEstrangeiro").value || undefined;
+    const quadro18 = lerQuadro18AnexoG();
+    const quadro19 = lerQuadro19AnexoG();
 
     const temDados = quadro04 || quadro05 || quadro06.length || quadro07.length || quadro08.length ||
-      quadro10.length || quadro13.length || quadro16.length || quadro17TotalEstrangeiro !== undefined;
+      quadro10.length || quadro13.length || quadro15OptaEnglobamento !== undefined || quadro16.length ||
+      quadro17TotalEstrangeiro !== undefined || quadro18 || quadro19.length;
     if (!temDados) return undefined;
 
-    return { quadro04, quadro05, quadro06, quadro07, quadro08, quadro10, quadro13, quadro16, quadro17TotalEstrangeiro };
+    return {
+      quadro04, quadro05, quadro06, quadro07, quadro08, quadro10, quadro13,
+      quadro15OptaEnglobamento, quadro16, quadro17TotalEstrangeiro, quadro18, quadro19
+    };
   }
 
   function lerAnexoH() {
@@ -4581,6 +4851,10 @@ if (typeof module !== "undefined" && module.exports) {
       document.querySelector("#tabelaAnexoG13 tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoG16 tbody").innerHTML = "";
       document.getElementById("ag17TotalEstrangeiro").value = "";
+      document.getElementById("ag15OptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoG18A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG18B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG19 tbody").innerHTML = "";
 
       if (dados.anexoG && dados.anexoG.quadro04) {
         const q4 = dados.anexoG.quadro04;
@@ -4806,6 +5080,55 @@ if (typeof module !== "undefined" && module.exports) {
       if (dados.anexoG && dados.anexoG.quadro17TotalEstrangeiro !== undefined) {
         document.getElementById("ag17TotalEstrangeiro").value = dados.anexoG.quadro17TotalEstrangeiro;
       }
+
+      if (dados.anexoG && dados.anexoG.quadro15OptaEnglobamento !== undefined) {
+        document.getElementById("ag15OptaEnglobamento").value = dados.anexoG.quadro15OptaEnglobamento ? "S" : "N";
+      }
+
+      const preencherLinhaAnexoG18 = (tr, l) => {
+        if (l.titular) tr.querySelector('[class$="-titular"]').value = l.titular;
+        const set = (sufixo, valor) => { tr.querySelector(`[class$="-${sufixo}"]`).value = valor || ""; };
+        set("nifpt", l.nifPortugues);
+        set("paisgestora", l.codPaisEntGestora);
+        set("anorealizacao", l.anoRealizacao);
+        set("mesrealizacao", l.mesRealizacao);
+        set("diarealizacao", l.diaRealizacao);
+        set("valorrealizacao", l.valorRealizacao);
+        set("anoaquisicao", l.anoAquisicao);
+        set("mesaquisicao", l.mesAquisicao);
+        set("diaaquisicao", l.diaAquisicao);
+        set("valoraquisicao", l.valorAquisicao);
+        set("despesas", l.despesasEncargos);
+        set("paiscontraparte", l.codPaisContraparte);
+      };
+      if (dados.anexoG && dados.anexoG.quadro18) {
+        (dados.anexoG.quadro18.grupoA || []).forEach(l => {
+          adicionarLinhaAnexoG18A();
+          preencherLinhaAnexoG18(document.querySelector("#tabelaAnexoG18A tbody tr:last-child"), l);
+        });
+        (dados.anexoG.quadro18.grupoB || []).forEach(l => {
+          adicionarLinhaAnexoG18B();
+          preencherLinhaAnexoG18(document.querySelector("#tabelaAnexoG18B tbody tr:last-child"), l);
+        });
+      }
+
+      (dados.anexoG && dados.anexoG.quadro19 || []).forEach(l => {
+        adicionarLinhaAnexoG19();
+        const tr = document.querySelector("#tabelaAnexoG19 tbody tr:last-child");
+        tr.querySelector(".ag19-campoq4").value = l.campoQ4 || "";
+        tr.querySelector(".ag19-valoramortemprestimo").value = l.valorAmortEmprestimo || "";
+        if (l.titular) tr.querySelector(".ag19-titular").value = l.titular;
+        tr.querySelector(".ag19-nifdescendente").value = l.nifDescendente || "";
+        tr.querySelector(".ag19-valoramortizacao").value = l.valorAmortizacao || "";
+        tr.querySelector(".ag19-ano").value = l.anoAmortizacao || "";
+        tr.querySelector(".ag19-mes").value = l.mesAmortizacao || "";
+        tr.querySelector(".ag19-dia").value = l.diaAmortizacao || "";
+        tr.querySelector(".ag19-freguesia").value = l.freguesia || "";
+        if (l.tipoPredio) tr.querySelector(".ag19-tipo").value = l.tipoPredio;
+        tr.querySelector(".ag19-artigo").value = l.artigo || "";
+        tr.querySelector(".ag19-fracao").value = l.fraccao || "";
+        tr.querySelector(".ag19-quota").value = l.quotaParte || "";
+      });
 
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoHIsentos tbody").innerHTML = "";

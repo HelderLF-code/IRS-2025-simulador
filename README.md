@@ -81,13 +81,17 @@ regenerar o `simulador-irs.html`.
   posições contratuais/estruturas fiduciárias — códigos G71/G72), Quadro 8 (cessão de
   créditos/prestações acessórias e suplementares), Quadro 10 (organismos de investimento
   coletivo — resgate/liquidação com opção pelo englobamento, códigos G30-G35), Quadro 13
-  (instrumentos financeiros derivados/warrants/certificados, códigos G51-G54), Quadro 16
-  (pagamentos por conta) e Quadro 17 (total de rendimentos no estrangeiro, para não
-  residentes). Nomes de campo confirmados contra um exemplo real. Este é o anexo mais
-  extenso do Modelo 3 (19 quadros) — os Quadros 9, 11, 12, 14, 15, 18 e 19 (partes sociais,
-  perda de residência, instrumentos financeiros derivados de anos anteriores, outros
-  incrementos patrimoniais, criptoativos, etc.) ainda sem interface própria. **O cálculo de
-  mais-valias ainda não está implementado** — regras próprias e complexas (correção
+  (instrumentos financeiros derivados/warrants/certificados, códigos G51-G54), Quadro 15
+  (opção pelo englobamento), Quadro 16 (pagamentos por conta), Quadro 17 (total de
+  rendimentos no estrangeiro, para não residentes), Quadro 18 (alienação onerosa de
+  criptoativos — grupo A, detidos <365 dias/perda de residência; grupo B, contraparte não
+  residente fora da UE/EEE sem ADT) e Quadro 19 (amortização de crédito à habitação em
+  transmissão de terrenos/imóveis não destinados a HPP, Lei n.º 56/2023). Nomes de campo
+  confirmados contra um exemplo real. Este é o anexo mais extenso do Modelo 3 (19 quadros)
+  — os Quadros 9, 11, 12 e 14 (partes sociais e outros valores mobiliários, organismos de
+  investimento alternativo imobiliário, perda da qualidade de residente, outros incrementos
+  patrimoniais) ainda sem interface própria. **O cálculo de mais-valias ainda não está
+  implementado** — regras próprias e complexas (correção
   monetária, exclusão de 50% do saldo entre mais e menos-valias, reinvestimento em
   habitação própria) — os dados destes quadros ficam capturados e exportados corretamente,
   mas não entram na estimativa.
@@ -133,7 +137,7 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos G1, J, L, SS ainda **não** está mapeada em detalhe — são
 emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
-Quadros 9, 11, 12, 14, 15, 18 e 19 do Anexo G, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10
+Quadros 9, 11, 12 e 14 do Anexo G, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10
 do Anexo H. Ao **importar** uma declaração que já tenha dados nessas secções, esses dados
 são preservados tal como estavam (mas ainda não podem ser vistos/editados na interface) e
 mantidos ao exportar de novo — para não haver perda de informação.
@@ -166,11 +170,11 @@ mantidos ao exportar de novo — para não haver perda de informação.
    Fiscais), por confirmar antes de uso real, principalmente os códigos 603 a 606.
    Quadro 6C (despesas declaradas em alternativa às da AT) e Quadros 7-10 também por
    implementar.
-5. **Anexo G, Quadros 9, 11, 12, 14, 15, 18 e 19** (partes sociais e outros valores
-   mobiliários, organismos de investimento alternativo imobiliário, perda da qualidade de
-   residente, outros incrementos patrimoniais, criptoativos, amortização de empréstimo em
-   transmissão de terrenos, etc.) — já tenho as instruções e um exemplo preenchido, falta
-   implementar. Cada anexo por implementar do zero (G1, J, L, SS) vai precisar de um
+5. **Anexo G, Quadros 9, 11, 12 e 14** (partes sociais e outros valores mobiliários,
+   organismos de investimento alternativo imobiliário, perda da qualidade de residente,
+   outros incrementos patrimoniais incl. anos anteriores) — já tenho as instruções e um
+   exemplo preenchido, falta implementar. Cada anexo por implementar do zero (G1, J, L, SS)
+   vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
    para os Anexos A, B, E, G e H.
 6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a

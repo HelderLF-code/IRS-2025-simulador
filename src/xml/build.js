@@ -493,6 +493,74 @@ function buildQuadro17AnexoG(totalEstrangeiro) {
   return `<Quadro17>${el("AnexoGq17C01", moeda(totalEstrangeiro))}</Quadro17>`;
 }
 
+// Anexo G, Quadro 15 (opção pelo englobamento dos rendimentos incluídos nos Quadros 6, 8,
+// 9, 12, 13 e 18, e dos imóveis recuperados/reabilitação do Q4A e EGF/UGF do Q4C). Nome de
+// campo confirmado contra um exemplo real.
+function buildQuadro15AnexoG(optaEnglobamento) {
+  if (optaEnglobamento === undefined) return `<Quadro15/>`;
+  return `<Quadro15>${el("AnexoGq15B01", optaEnglobamento ? "S" : "N")}</Quadro15>`;
+}
+
+const ANEXOG_Q18_CAMPOS = [
+  ["nlinha", "NLinha"], ["titular", "Titular"], ["nifPortugues", "NIFPortugues"], ["codPaisEntGestora", "CodPaisEntGestora"],
+  ["anoRealizacao", "AnoRealizacao"], ["mesRealizacao", "MesRealizacao"], ["diaRealizacao", "DiaRealizacao"], ["valorRealizacao", "ValorRealizacao"],
+  ["anoAquisicao", "AnoAquisicao"], ["mesAquisicao", "MesAquisicao"], ["diaAquisicao", "DiaAquisicao"], ["valorAquisicao", "ValorAquisicao"],
+  ["despesasEncargos", "DespesasEncargos"], ["codPaisContraparte", "CodPaisContraparte"]
+];
+
+function buildGrupoQuadro18AnexoG(container, linhas, base) {
+  return listaComLinhas(container, linhas.map((l, idx) => {
+    const campos = {};
+    ANEXOG_Q18_CAMPOS.forEach(([chave, tag]) => {
+      if (tag === "NLinha") campos.NLinha = l.nlinha || (base + idx);
+      else if (tag === "ValorRealizacao" || tag === "ValorAquisicao" || tag === "DespesasEncargos") campos[tag] = moeda(l[chave]);
+      else campos[tag] = l[chave];
+    });
+    return campos;
+  }));
+}
+
+// Anexo G, Quadro 18 (alienação onerosa de criptoativos que não constituam valores
+// mobiliários): Grupo A (detidos < 365 dias ou perda de qualidade de residente), Grupo B
+// (uma das partes não residente, fora da UE/EEE, sem ADT aplicável). Nomes de campo
+// confirmados contra um exemplo real.
+function buildQuadro18AnexoG(q18) {
+  if (!q18) return `<Quadro18/>`;
+  const grupoA = q18.grupoA || [];
+  const grupoB = q18.grupoB || [];
+  if (!grupoA.length && !grupoB.length) return `<Quadro18/>`;
+
+  const somaA1 = grupoA.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaA2 = grupoA.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaA3 = grupoA.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaB1 = grupoB.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaB2 = grupoB.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaB3 = grupoB.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+
+  return `<Quadro18>` +
+    buildGrupoQuadro18AnexoG("AnexoGq18AT01", grupoA, 18001) +
+    (grupoA.length ? el("AnexoGq18AT01SomaC01", moeda(somaA1)) + el("AnexoGq18AT01SomaC02", moeda(somaA2)) + el("AnexoGq18AT01SomaC03", moeda(somaA3)) : "") +
+    buildGrupoQuadro18AnexoG("AnexoGq18BT01", grupoB, 18501) +
+    (grupoB.length ? el("AnexoGq18BT01SomaC01", moeda(somaB1)) + el("AnexoGq18BT01SomaC02", moeda(somaB2)) + el("AnexoGq18BT01SomaC03", moeda(somaB3)) : "") +
+    `</Quadro18>`;
+}
+
+// Anexo G, Quadro 19 (transmissão onerosa de terrenos para construção ou de imóveis
+// habitacionais não destinados a habitação própria e permanente — amortização de capital
+// em dívida a crédito à habitação destinada a HPP do sujeito passivo, agregado ou
+// descendentes, Lei n.º 56/2023). Não tem linha de soma (confirmado contra um exemplo real).
+function buildQuadro19AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro19/>`;
+  return `<Quadro19>` +
+    listaComLinhas("AnexoGq19T01", linhas.map((l, idx) => ({
+      NLinha: l.nlinha || (19001 + idx), CamposQuadro4: l.campoQ4, ValorAmortEmprestimo: moeda(l.valorAmortEmprestimo),
+      Titular: l.titular, NIFDescendente: l.nifDescendente, ValorAmortizacao: moeda(l.valorAmortizacao),
+      AnoAmortizacao: l.anoAmortizacao, MesAmortizacao: l.mesAmortizacao, DiaAmortizacao: l.diaAmortizacao,
+      Freguesia: l.freguesia, TipoPredio: l.tipoPredio, Artigo: l.artigo, Fraccao: l.fraccao, QuotaParte: l.quotaParte
+    }))) +
+    `</Quadro19>`;
+}
+
 function buildAnexoG(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const g = model.anexoG || {};
@@ -516,6 +584,11 @@ function buildAnexoG(model) {
   const quadro13 = (g.quadro13 && g.quadro13.length > 0) ? buildQuadro13AnexoG(g.quadro13) : (pass.Quadro13 || `<Quadro13/>`);
   const quadro16 = (g.quadro16 && g.quadro16.length > 0) ? buildQuadro16AnexoG(g.quadro16) : (pass.Quadro16 || `<Quadro16/>`);
   const quadro17 = g.quadro17TotalEstrangeiro !== undefined ? buildQuadro17AnexoG(g.quadro17TotalEstrangeiro) : (pass.Quadro17 || `<Quadro17/>`);
+  const quadro15 = g.quadro15OptaEnglobamento !== undefined ? buildQuadro15AnexoG(g.quadro15OptaEnglobamento) : (pass.Quadro15 || `<Quadro15/>`);
+  const quadro18 = (g.quadro18 && ((g.quadro18.grupoA && g.quadro18.grupoA.length) || (g.quadro18.grupoB && g.quadro18.grupoB.length)))
+    ? buildQuadro18AnexoG(g.quadro18)
+    : (pass.Quadro18 || `<Quadro18/>`);
+  const quadro19 = (g.quadro19 && g.quadro19.length > 0) ? buildQuadro19AnexoG(g.quadro19) : (pass.Quadro19 || `<Quadro19/>`);
 
   const passthrough = numero => pass[`Quadro${String(numero).padStart(2, "0")}`] || `<Quadro${String(numero).padStart(2, "0")}/>`;
 
@@ -533,11 +606,11 @@ function buildAnexoG(model) {
     passthrough(12) +
     quadro13 +
     passthrough(14) +
-    passthrough(15) +
+    quadro15 +
     quadro16 +
     quadro17 +
-    passthrough(18) +
-    passthrough(19) +
+    quadro18 +
+    quadro19 +
     `</AnexoG>`;
 }
 

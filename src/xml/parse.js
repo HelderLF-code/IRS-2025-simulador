@@ -314,6 +314,34 @@ function parseQuadro16AnexoG(q16) {
   return parseLinhasGenerico(filho(q16, "AnexoGq16T01")).map(l => ({ titular: l.Titular, valor: l.Valor }));
 }
 
+// Anexo G, Quadro 18 (alienação onerosa de criptoativos que não constituam valores mobiliários).
+function parseGrupoQuadro18AnexoG(container) {
+  return parseLinhasGenerico(container).map(l => ({
+    nlinha: l.NLinha, titular: l.Titular, nifPortugues: l.NIFPortugues, codPaisEntGestora: l.CodPaisEntGestora,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao, valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao, valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, codPaisContraparte: l.CodPaisContraparte
+  }));
+}
+
+function parseQuadro18AnexoG(q18) {
+  return {
+    grupoA: parseGrupoQuadro18AnexoG(filho(q18, "AnexoGq18AT01")),
+    grupoB: parseGrupoQuadro18AnexoG(filho(q18, "AnexoGq18BT01"))
+  };
+}
+
+// Anexo G, Quadro 19 (transmissão onerosa de terrenos/imóveis habitacionais não destinados
+// a HPP — amortização de crédito à habitação, Lei n.º 56/2023).
+function parseQuadro19AnexoG(q19) {
+  return parseLinhasGenerico(filho(q19, "AnexoGq19T01")).map(l => ({
+    nlinha: l.NLinha, campoQ4: l.CamposQuadro4, valorAmortEmprestimo: l.ValorAmortEmprestimo,
+    titular: l.Titular, nifDescendente: l.NIFDescendente, valorAmortizacao: l.ValorAmortizacao,
+    anoAmortizacao: l.AnoAmortizacao, mesAmortizacao: l.MesAmortizacao, diaAmortizacao: l.DiaAmortizacao,
+    freguesia: l.Freguesia, tipoPredio: l.TipoPredio, artigo: l.Artigo, fraccao: l.Fraccao, quotaParte: l.QuotaParte
+  }));
+}
+
 function parseAnexoG(anexoG) {
   if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
   const q04 = filho(anexoG, "Quadro04");
@@ -323,8 +351,11 @@ function parseAnexoG(anexoG) {
   const q08 = filho(anexoG, "Quadro08");
   const q10 = filho(anexoG, "Quadro10");
   const q13 = filho(anexoG, "Quadro13");
+  const q15 = filho(anexoG, "Quadro15");
   const q16 = filho(anexoG, "Quadro16");
   const q17 = filho(anexoG, "Quadro17");
+  const q18 = filho(anexoG, "Quadro18");
+  const q19 = filho(anexoG, "Quadro19");
   const quadro04 = parseQuadro04AnexoG(q04);
   const quadro05 = parseQuadro05AnexoG(q05);
   const quadro06 = temConteudo(q06) ? parseQuadro06AnexoG(q06) : undefined;
@@ -332,11 +363,14 @@ function parseAnexoG(anexoG) {
   const quadro08 = temConteudo(q08) ? parseQuadro08AnexoG(q08) : undefined;
   const quadro10 = temConteudo(q10) ? parseQuadro10AnexoG(q10) : undefined;
   const quadro13 = temConteudo(q13) ? parseQuadro13AnexoG(q13) : undefined;
+  const quadro15OptaEnglobamento = texto(q15, "AnexoGq15B01") !== undefined ? texto(q15, "AnexoGq15B01") === "S" : undefined;
   const quadro16 = temConteudo(q16) ? parseQuadro16AnexoG(q16) : undefined;
   const quadro17TotalEstrangeiro = texto(q17, "AnexoGq17C01");
+  const quadro18 = temConteudo(q18) ? parseQuadro18AnexoG(q18) : undefined;
+  const quadro19 = temConteudo(q19) ? parseQuadro19AnexoG(q19) : undefined;
 
   const passthrough = {};
-  for (const i of [9, 11, 12, 14, 15, 18, 19]) {
+  for (const i of [9, 11, 12, 14]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoG, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
@@ -346,12 +380,16 @@ function parseAnexoG(anexoG) {
   if (temConteudo(q08) && !(quadro08 && quadro08.length)) passthrough.Quadro08 = serializar(q08);
   if (temConteudo(q10) && !(quadro10 && quadro10.length)) passthrough.Quadro10 = serializar(q10);
   if (temConteudo(q13) && !(quadro13 && quadro13.length)) passthrough.Quadro13 = serializar(q13);
+  if (temConteudo(q15) && quadro15OptaEnglobamento === undefined) passthrough.Quadro15 = serializar(q15);
   if (temConteudo(q16) && !(quadro16 && quadro16.length)) passthrough.Quadro16 = serializar(q16);
   if (temConteudo(q17) && quadro17TotalEstrangeiro === undefined) passthrough.Quadro17 = serializar(q17);
+  if (temConteudo(q18) && !(quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length))) passthrough.Quadro18 = serializar(q18);
+  if (temConteudo(q19) && !(quadro19 && quadro19.length)) passthrough.Quadro19 = serializar(q19);
 
   const anexoGModel = (quadro04 || quadro05 || (quadro06 && quadro06.length) || (quadro07 && quadro07.length) ||
     (quadro08 && quadro08.length) || (quadro10 && quadro10.length) || (quadro13 && quadro13.length) ||
-    (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined) ? {} : undefined;
+    quadro15OptaEnglobamento !== undefined || (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined ||
+    (quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length)) || (quadro19 && quadro19.length)) ? {} : undefined;
   if (anexoGModel) {
     if (quadro04) anexoGModel.quadro04 = quadro04;
     if (quadro05) anexoGModel.quadro05 = quadro05;
@@ -360,8 +398,11 @@ function parseAnexoG(anexoG) {
     if (quadro08 && quadro08.length) anexoGModel.quadro08 = quadro08;
     if (quadro10 && quadro10.length) anexoGModel.quadro10 = quadro10;
     if (quadro13 && quadro13.length) anexoGModel.quadro13 = quadro13;
+    if (quadro15OptaEnglobamento !== undefined) anexoGModel.quadro15OptaEnglobamento = quadro15OptaEnglobamento;
     if (quadro16 && quadro16.length) anexoGModel.quadro16 = quadro16;
     if (quadro17TotalEstrangeiro !== undefined) anexoGModel.quadro17TotalEstrangeiro = quadro17TotalEstrangeiro;
+    if (quadro18 && (quadro18.grupoA.length || quadro18.grupoB.length)) anexoGModel.quadro18 = quadro18;
+    if (quadro19 && quadro19.length) anexoGModel.quadro19 = quadro19;
   }
 
   return { anexoG: anexoGModel, anexoGPassthrough: passthrough };
