@@ -236,12 +236,50 @@
     return meses > 24;
   }
 
+  // Campos "efetivamente reinvestidos" do Quadro 5 do Anexo G (excluem os campos 5006/5012
+  // e 5026/5036, que são só a "intenção de reinvestimento" declarada, não o valor já
+  // concretizado — só este último conta para a isenção, art.º 10.º, n.º 5, do CIRS).
+  const CAMPOS_REINVESTIDO_EFETIVO = [
+    "reinvestido24MesesAntes", "reinvestidoMais24MesesAntesSuspensao",
+    "reinvestidoAnoAlienacao", "reinvestidoAnoSeguinte", "reinvestidoSegundoAnoSeguinte",
+    "reinvestidoTerceiroAnoSeguinte", "reinvestidoApos36MesesSuspensao",
+    "reinvestidoSeguroAnoAlienacao", "reinvestidoSeguroAnoSeguinte"
+  ];
+
+  // Isenção por reinvestimento em habitação própria e permanente (art.º 10.º, n.º 5, do
+  // CIRS): a fração do ganho que fica excluída de tributação é proporcional ao valor de
+  // realização efetivamente reinvestido, sobre o valor de realização líquido do empréstimo
+  // amortizado com o produto da venda —
+  //   ganho excluído = ganho da(s) linha(s) alienada(s) × [valor reinvestido / (valor de
+  //   realização - valor em dívida do empréstimo amortizado)]
+  // limitado a 100% (reinvestimento total ou superior exclui a totalidade do ganho). Só se
+  // aplica ao ganho (uma menos-valia não é "excluída" — não há nada a excluir).
+  function calcularExclusaoReinvestimento(r, linhasPorCampo) {
+    const semDados = { valorRealizacaoTotal: 0, valorReinvestido: 0, valorEmprestimoDivida: 0, ganhoDasLinhas: 0, racio: 0, ganhoExcluido: 0 };
+    if (!r || !(r.camposQ4 || []).length) return semDados;
+
+    const linhas = r.camposQ4.map(c => linhasPorCampo.get(String(c))).filter(Boolean);
+    if (!linhas.length) return semDados;
+
+    const valorRealizacaoTotal = linhas.reduce((acc, l) => acc + l.valorRealizacao, 0);
+    const ganhoDasLinhas = Math.max(0, linhas.reduce((acc, l) => acc + l.resultado, 0));
+    const valorReinvestido = CAMPOS_REINVESTIDO_EFETIVO.reduce((acc, campo) => acc + (Number(r[campo]) || 0), 0);
+    const valorEmprestimoDivida = Number(r.valorEmprestimoDivida) || 0;
+    const denominador = valorRealizacaoTotal - valorEmprestimoDivida;
+    const racio = denominador > 0 ? Math.min(1, valorReinvestido / denominador) : 0;
+    const ganhoExcluido = ganhoDasLinhas * racio;
+
+    return { valorRealizacaoTotal, valorReinvestido, valorEmprestimoDivida, ganhoDasLinhas, racio, ganhoExcluido };
+  }
+
   // Anexo G, Quadro 4 (alienação onerosa de imóveis, art.º 10.º do CIRS): mais-valia/
   // menos-valia de cada linha = valor de realização - (valor de aquisição × coeficiente de
-  // desvalorização da moeda, quando aplicável) - despesas e encargos. O saldo global das
-  // linhas "normais" só é tributado em 50% para residentes (art.º 43.º, n.º 2, do CIRS) e
-  // entra no rendimento global por englobamento (as mais-valias imobiliárias não têm opção
-  // de tributação autónoma, ao contrário das do Quadro 4A/4C).
+  // desvalorização da moeda, quando aplicável) - despesas e encargos. Ao saldo global das
+  // linhas "normais" é ainda subtraído o ganho excluído por reinvestimento em habitação
+  // própria (Quadro 5, quando aplicável); o que restar só é tributado em 50% quando
+  // positivo (art.º 43.º, n.º 2, do CIRS) e entra no rendimento global por englobamento (as
+  // mais-valias imobiliárias não têm opção de tributação autónoma, ao contrário das do
+  // Quadro 4A/4C).
   //
   // Ficam de fora deste cálculo (tratamento próprio, ainda não implementado — não somam ao
   // saldo nem entram no rendimento tributável):
@@ -250,10 +288,7 @@
   //  - linhas referenciadas no Quadro 4C (alienação a EGF/UGF) — também tributação autónoma;
   //  - linhas referenciadas no Quadro 4F (alienação ao Estado/RA/entidades públicas) —
   //    isentas de tributação (art.º 71.º-A, n.º 7, do EBF).
-  // A isenção por reinvestimento em habitação própria (Quadro 5, art.º 10.º, n.º 5, do
-  // CIRS) também ainda não é considerada — o saldo tributável pode ficar sobrestimado
-  // quando há reinvestimento.
-  function calcularSaldoQuadro4AnexoG(quadro04, parametros) {
+  function calcularSaldoQuadro4AnexoG(quadro04, quadro05, parametros) {
     const q4 = quadro04 || {};
     const imoveis = q4.imoveis || [];
     const camposExcluidos = new Set(
@@ -281,11 +316,21 @@
     });
 
     const saldo = detalhe.reduce((acc, l) => acc + l.resultado, 0);
-    const rendimentoTributavel = saldo > 0 ? saldo * 0.5 : 0;
+
+    const linhasPorCampo = new Map(detalhe.map(l => [l.campo, l]));
+    const q5 = quadro05 || {};
+    const exclusao1 = calcularExclusaoReinvestimento(q5.reinvestimento1, linhasPorCampo);
+    const exclusao2 = calcularExclusaoReinvestimento(q5.reinvestimento2, linhasPorCampo);
+    const ganhoExcluidoReinvestimento = exclusao1.ganhoExcluido + exclusao2.ganhoExcluido;
+
+    const saldoAposReinvestimento = saldo - ganhoExcluidoReinvestimento;
+    const rendimentoTributavel = saldoAposReinvestimento > 0 ? saldoAposReinvestimento * 0.5 : 0;
 
     return {
       detalhe,
       saldo,
+      reinvestimento: { exclusao1, exclusao2, ganhoExcluidoReinvestimento },
+      saldoAposReinvestimento,
       rendimentoTributavel,
       linhasExcluidas: imoveis.length - linhasTributaveis.length
     };
@@ -311,7 +356,7 @@
     const deducoesArt78 = calcularDeducoesArt78(despesasEFatura, agregado, parametros);
     const categoriaB = calcularRendimentoCategoriaB(anexoB, deducoesArt78.totalDespesas, parametros);
     const categoriaE = calcularRendimentoCategoriaE(anexoE, parametros);
-    const categoriaG = calcularSaldoQuadro4AnexoG(anexoG && anexoG.quadro04, parametros);
+    const categoriaG = calcularSaldoQuadro4AnexoG(anexoG && anexoG.quadro04, anexoG && anexoG.quadro05, parametros);
 
     // Rendimento Global (englobamento): soma dos rendimentos de cada categoria antes das
     // deduções específicas — a de categoria B já vem líquida do coeficiente/acréscimo. A

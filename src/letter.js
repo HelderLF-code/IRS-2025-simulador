@@ -86,10 +86,15 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   (a confirmar consoante o tipo de rendimento), somando-se diretamente à coleta líquida.</p>` : ""}
   ${temCategoriaG ? `<p class="nota">Mais-valias imobiliárias (Anexo G, Quadro 4): saldo de
   ${formatarMoeda(categoriaG.saldo)} € entre valor de realização e valor de aquisição corrigido pela
-  desvalorização monetária, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do CIRS).
+  desvalorização monetária.
+  ${categoriaG.reinvestimento && categoriaG.reinvestimento.ganhoExcluidoReinvestimento > 0
+    ? `Deste saldo, ${formatarMoeda(categoriaG.reinvestimento.ganhoExcluidoReinvestimento)} € ficam excluídos
+  de tributação por reinvestimento em habitação própria e permanente (Quadro 5, art.º 10.º, n.º 5, do CIRS).`
+    : ""}
+  Do que resta, apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do CIRS).
   ${categoriaG.linhasExcluidas > 0 ? `${categoriaG.linhasExcluidas} imóvel(is) do Quadro 4 não entra(m)
   neste cálculo (reabilitação/EGF-UGF/alienação isenta ao Estado — tratamento próprio ainda não
-  implementado).` : ""} Não considera ainda a isenção por reinvestimento em habitação própria.</p>` : ""}
+  implementado).` : ""}</p>` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>

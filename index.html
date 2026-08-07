@@ -2646,8 +2646,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
       <strong>Categoria E — coleta especial (taxa ${(resultado.categoriaE.taxaEspecial * 100).toFixed(0)}%, a confirmar):</strong> ${formatarMoeda(resultado.categoriaE.coletaEspecial)} €<br>`)
       : "") +
       (temCategoriaG ? `
-      <strong>Categoria G — saldo de mais/menos-valias (Anexo G, Quadro 4):</strong> ${formatarMoeda(resultado.categoriaG.saldo)} €<br>
-      <strong>Categoria G — rendimento tributável (50% do saldo positivo):</strong> ${formatarMoeda(resultado.categoriaG.rendimentoTributavel)} €<br>` +
+      <strong>Categoria G — saldo de mais/menos-valias (Anexo G, Quadro 4):</strong> ${formatarMoeda(resultado.categoriaG.saldo)} €<br>` +
+      (resultado.categoriaG.reinvestimento.ganhoExcluidoReinvestimento > 0 ? `
+      <strong>Categoria G — excluído por reinvestimento em habitação própria (Quadro 5):</strong> -${formatarMoeda(resultado.categoriaG.reinvestimento.ganhoExcluidoReinvestimento)} €<br>` : "") +
+      `<strong>Categoria G — rendimento tributável (50% do saldo após reinvestimento):</strong> ${formatarMoeda(resultado.categoriaG.rendimentoTributavel)} €<br>` +
       (resultado.categoriaG.linhasExcluidas > 0 ? `<small>${resultado.categoriaG.linhasExcluidas} linha(s) do Quadro 4 excluída(s) deste cálculo (reabilitação/EGF-UGF/isentas — tratamento próprio ainda não implementado).</small><br>` : "")
       : "") +
       `<strong>Rendimento coletável:</strong> ${formatarMoeda(resultado.rendimentoLiquido)} €<br>
