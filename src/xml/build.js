@@ -403,6 +403,96 @@ function temDadosQuadro05AnexoG(q05) {
       q05.amortizacaoEmprestimo.valorCapitalDivida !== undefined || q05.amortizacaoEmprestimo.valorAmortizacao !== undefined));
 }
 
+// Anexo G, Quadro 6 (alienação onerosa da propriedade intelectual, art.º 10.º, n.º 1, al. c),
+// do CIRS). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro06AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro06/>`;
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  return `<Quadro06>` +
+    listaComLinhas("AnexoGq06T01", linhas.map(l => ({
+      Titular: l.titular, ValorRealizacao: moeda(l.valorRealizacao), ValorAquisicao: moeda(l.valorAquisicao),
+      DespesasEncargos: moeda(l.despesasEncargos)
+    }))) +
+    el("AnexoGq06T01SomaC01", moeda(somaC01)) + el("AnexoGq06T01SomaC02", moeda(somaC02)) + el("AnexoGq06T01SomaC03", moeda(somaC03)) +
+    `</Quadro06>`;
+}
+
+// Anexo G, Quadro 7 (cessão onerosa de posições contratuais ou outros direitos relativos a
+// bens imóveis e cessão onerosa de direitos sobre estruturas fiduciárias, art.º 10.º, n.º 1,
+// als. d) e j), do CIRS). Códigos da operação: G71 (posições contratuais), G72 (estruturas
+// fiduciárias). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro07AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro07/>`;
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  return `<Quadro07>` +
+    listaComLinhas("AnexoGq07T01", linhas.map(l => ({
+      Titular: l.titular, CodOperacao: l.codOperacao, ValorRealizacao: moeda(l.valorRealizacao), ValorAquisicao: moeda(l.valorAquisicao)
+    }))) +
+    el("AnexoGq07T01SomaC01", moeda(somaC01)) + el("AnexoGq07T01SomaC02", moeda(somaC02)) +
+    `</Quadro07>`;
+}
+
+// Anexo G, Quadro 8 (cessão onerosa de créditos, prestações acessórias e prestações
+// suplementares, art.º 10.º, n.º 1, al. h), do CIRS). Nomes de campo confirmados contra um
+// exemplo real.
+function buildQuadro08AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro08/>`;
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.importanciaRecebida) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valor) || 0), 0);
+  return `<Quadro08>` +
+    listaComLinhas("AnexoGq08T01", linhas.map(l => ({
+      Titular: l.titular, ImportanciaRecebida: moeda(l.importanciaRecebida), Valor: moeda(l.valor)
+    }))) +
+    el("AnexoGq08T01SomaC01", moeda(somaC01)) + el("AnexoGq08T01SomaC02", moeda(somaC02)) +
+    `</Quadro08>`;
+}
+
+// Anexo G, Quadro 10 (organismos de investimento coletivo - resgate e liquidação de UP's e
+// de participações sociais, opção pelo englobamento). Códigos G30-G35 conforme instruções.
+// Não tem linha de soma (confirmado contra um exemplo real).
+function buildQuadro10AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro10/>`;
+  return `<Quadro10>` +
+    listaComLinhas("AnexoGq10T01", linhas.map(l => ({
+      Titular: l.titular, NIFEntidadeEmitente: l.nifEntidadeEmitente, Codigo: l.codigo,
+      Rendimento: moeda(l.rendimento), RetencoesFonte: moeda(l.retencoesFonte), NIFEntidadeRetentora: l.nifEntidadeRetentora
+    }))) +
+    `</Quadro10>`;
+}
+
+// Anexo G, Quadro 13 (instrumentos financeiros derivados, warrants autónomos e certificados,
+// art.º 10.º, n.º 1, als. e) a g), do CIRS). Códigos G51-G54. Nomes de campo confirmados
+// contra um exemplo real.
+function buildQuadro13AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro13/>`;
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoLiquido) || 0), 0);
+  return `<Quadro13>` +
+    listaComLinhas("AnexoGq13T01", linhas.map(l => ({
+      CodigoOperacao: l.codigoOperacao, Titular: l.titular, RendimentoLiquido: moeda(l.rendimentoLiquido), PaisContraparte: l.paisContraparte
+    }))) +
+    el("AnexoGq13T01SomaC01", moeda(somaC01)) +
+    `</Quadro13>`;
+}
+
+// Anexo G, Quadro 16 (pagamentos por conta). Não tem linha de soma (confirmado contra um
+// exemplo real).
+function buildQuadro16AnexoG(linhas) {
+  if (!linhas || !linhas.length) return `<Quadro16/>`;
+  return `<Quadro16>` +
+    listaComLinhas("AnexoGq16T01", linhas.map(l => ({ Titular: l.titular, Valor: moeda(l.valor) }))) +
+    `</Quadro16>`;
+}
+
+// Anexo G, Quadro 17 (informações complementares — total dos rendimentos obtidos no
+// estrangeiro por não residentes que assinalaram Q8B.C04 do rosto e preencheram o Q4 ou Q7).
+function buildQuadro17AnexoG(totalEstrangeiro) {
+  if (totalEstrangeiro === undefined) return `<Quadro17/>`;
+  return `<Quadro17>${el("AnexoGq17C01", moeda(totalEstrangeiro))}</Quadro17>`;
+}
+
 function buildAnexoG(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const g = model.anexoG || {};
@@ -419,17 +509,35 @@ function buildAnexoG(model) {
     ? buildQuadro05AnexoG(g.quadro05)
     : (pass.Quadro05 || `<Quadro05/>`);
 
-  const quadrosRestantes = Array.from({ length: 14 }, (_, i) => {
-    const numero = String(i + 6).padStart(2, "0");
-    return pass[`Quadro${numero}`] || `<Quadro${numero}/>`;
-  }).join("");
+  const quadro06 = (g.quadro06 && g.quadro06.length > 0) ? buildQuadro06AnexoG(g.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
+  const quadro07 = (g.quadro07 && g.quadro07.length > 0) ? buildQuadro07AnexoG(g.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
+  const quadro08 = (g.quadro08 && g.quadro08.length > 0) ? buildQuadro08AnexoG(g.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
+  const quadro10 = (g.quadro10 && g.quadro10.length > 0) ? buildQuadro10AnexoG(g.quadro10) : (pass.Quadro10 || `<Quadro10/>`);
+  const quadro13 = (g.quadro13 && g.quadro13.length > 0) ? buildQuadro13AnexoG(g.quadro13) : (pass.Quadro13 || `<Quadro13/>`);
+  const quadro16 = (g.quadro16 && g.quadro16.length > 0) ? buildQuadro16AnexoG(g.quadro16) : (pass.Quadro16 || `<Quadro16/>`);
+  const quadro17 = g.quadro17TotalEstrangeiro !== undefined ? buildQuadro17AnexoG(g.quadro17TotalEstrangeiro) : (pass.Quadro17 || `<Quadro17/>`);
+
+  const passthrough = numero => pass[`Quadro${String(numero).padStart(2, "0")}`] || `<Quadro${String(numero).padStart(2, "0")}/>`;
 
   return `<AnexoG>` +
     `<Quadro02>${el("AnexoGq02C01", ano)}</Quadro02>` +
     quadro03 +
     quadro04 +
     quadro05 +
-    quadrosRestantes +
+    quadro06 +
+    quadro07 +
+    quadro08 +
+    passthrough(9) +
+    quadro10 +
+    passthrough(11) +
+    passthrough(12) +
+    quadro13 +
+    passthrough(14) +
+    passthrough(15) +
+    quadro16 +
+    quadro17 +
+    passthrough(18) +
+    passthrough(19) +
     `</AnexoG>`;
 }
 

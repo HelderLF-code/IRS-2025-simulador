@@ -273,24 +273,95 @@ function parseQuadro05AnexoG(q05) {
   };
 }
 
+// Anexo G, Quadro 6 (alienação onerosa da propriedade intelectual).
+function parseQuadro06AnexoG(q06) {
+  return parseLinhasGenerico(filho(q06, "AnexoGq06T01")).map(l => ({
+    titular: l.Titular, valorRealizacao: l.ValorRealizacao, valorAquisicao: l.ValorAquisicao, despesasEncargos: l.DespesasEncargos
+  }));
+}
+
+// Anexo G, Quadro 7 (cessão onerosa de posições contratuais/estruturas fiduciárias).
+function parseQuadro07AnexoG(q07) {
+  return parseLinhasGenerico(filho(q07, "AnexoGq07T01")).map(l => ({
+    titular: l.Titular, codOperacao: l.CodOperacao, valorRealizacao: l.ValorRealizacao, valorAquisicao: l.ValorAquisicao
+  }));
+}
+
+// Anexo G, Quadro 8 (cessão onerosa de créditos, prestações acessórias e suplementares).
+function parseQuadro08AnexoG(q08) {
+  return parseLinhasGenerico(filho(q08, "AnexoGq08T01")).map(l => ({
+    titular: l.Titular, importanciaRecebida: l.ImportanciaRecebida, valor: l.Valor
+  }));
+}
+
+// Anexo G, Quadro 10 (organismos de investimento coletivo — resgate/liquidação, opção pelo englobamento).
+function parseQuadro10AnexoG(q10) {
+  return parseLinhasGenerico(filho(q10, "AnexoGq10T01")).map(l => ({
+    titular: l.Titular, nifEntidadeEmitente: l.NIFEntidadeEmitente, codigo: l.Codigo,
+    rendimento: l.Rendimento, retencoesFonte: l.RetencoesFonte, nifEntidadeRetentora: l.NIFEntidadeRetentora
+  }));
+}
+
+// Anexo G, Quadro 13 (instrumentos financeiros derivados, warrants autónomos e certificados).
+function parseQuadro13AnexoG(q13) {
+  return parseLinhasGenerico(filho(q13, "AnexoGq13T01")).map(l => ({
+    codigoOperacao: l.CodigoOperacao, titular: l.Titular, rendimentoLiquido: l.RendimentoLiquido, paisContraparte: l.PaisContraparte
+  }));
+}
+
+// Anexo G, Quadro 16 (pagamentos por conta).
+function parseQuadro16AnexoG(q16) {
+  return parseLinhasGenerico(filho(q16, "AnexoGq16T01")).map(l => ({ titular: l.Titular, valor: l.Valor }));
+}
+
 function parseAnexoG(anexoG) {
   if (!anexoG) return { anexoG: undefined, anexoGPassthrough: {} };
   const q04 = filho(anexoG, "Quadro04");
   const q05 = filho(anexoG, "Quadro05");
+  const q06 = filho(anexoG, "Quadro06");
+  const q07 = filho(anexoG, "Quadro07");
+  const q08 = filho(anexoG, "Quadro08");
+  const q10 = filho(anexoG, "Quadro10");
+  const q13 = filho(anexoG, "Quadro13");
+  const q16 = filho(anexoG, "Quadro16");
+  const q17 = filho(anexoG, "Quadro17");
   const quadro04 = parseQuadro04AnexoG(q04);
   const quadro05 = parseQuadro05AnexoG(q05);
+  const quadro06 = temConteudo(q06) ? parseQuadro06AnexoG(q06) : undefined;
+  const quadro07 = temConteudo(q07) ? parseQuadro07AnexoG(q07) : undefined;
+  const quadro08 = temConteudo(q08) ? parseQuadro08AnexoG(q08) : undefined;
+  const quadro10 = temConteudo(q10) ? parseQuadro10AnexoG(q10) : undefined;
+  const quadro13 = temConteudo(q13) ? parseQuadro13AnexoG(q13) : undefined;
+  const quadro16 = temConteudo(q16) ? parseQuadro16AnexoG(q16) : undefined;
+  const quadro17TotalEstrangeiro = texto(q17, "AnexoGq17C01");
 
   const passthrough = {};
-  for (let i = 6; i <= 19; i++) {
+  for (const i of [9, 11, 12, 14, 15, 18, 19]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoG, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
+  if (temConteudo(q06) && !(quadro06 && quadro06.length)) passthrough.Quadro06 = serializar(q06);
+  if (temConteudo(q07) && !(quadro07 && quadro07.length)) passthrough.Quadro07 = serializar(q07);
+  if (temConteudo(q08) && !(quadro08 && quadro08.length)) passthrough.Quadro08 = serializar(q08);
+  if (temConteudo(q10) && !(quadro10 && quadro10.length)) passthrough.Quadro10 = serializar(q10);
+  if (temConteudo(q13) && !(quadro13 && quadro13.length)) passthrough.Quadro13 = serializar(q13);
+  if (temConteudo(q16) && !(quadro16 && quadro16.length)) passthrough.Quadro16 = serializar(q16);
+  if (temConteudo(q17) && quadro17TotalEstrangeiro === undefined) passthrough.Quadro17 = serializar(q17);
 
-  const anexoGModel = (quadro04 || quadro05) ? {} : undefined;
+  const anexoGModel = (quadro04 || quadro05 || (quadro06 && quadro06.length) || (quadro07 && quadro07.length) ||
+    (quadro08 && quadro08.length) || (quadro10 && quadro10.length) || (quadro13 && quadro13.length) ||
+    (quadro16 && quadro16.length) || quadro17TotalEstrangeiro !== undefined) ? {} : undefined;
   if (anexoGModel) {
     if (quadro04) anexoGModel.quadro04 = quadro04;
     if (quadro05) anexoGModel.quadro05 = quadro05;
+    if (quadro06 && quadro06.length) anexoGModel.quadro06 = quadro06;
+    if (quadro07 && quadro07.length) anexoGModel.quadro07 = quadro07;
+    if (quadro08 && quadro08.length) anexoGModel.quadro08 = quadro08;
+    if (quadro10 && quadro10.length) anexoGModel.quadro10 = quadro10;
+    if (quadro13 && quadro13.length) anexoGModel.quadro13 = quadro13;
+    if (quadro16 && quadro16.length) anexoGModel.quadro16 = quadro16;
+    if (quadro17TotalEstrangeiro !== undefined) anexoGModel.quadro17TotalEstrangeiro = quadro17TotalEstrangeiro;
   }
 
   return { anexoG: anexoGModel, anexoGPassthrough: passthrough };

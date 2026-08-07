@@ -451,11 +451,11 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <div class="painel" id="painel-anexoG">
 <h2>Anexo G — Mais-Valias e Outros Incrementos Patrimoniais</h2>
 <p class="aviso-topo">
-  Este é o anexo mais extenso de todos (19 quadros). Por agora só está implementado o
-  Quadro 4 (alienação onerosa de imóveis) — nomes de campo confirmados contra um exemplo
-  real. Os Quadros 5 a 19 (reinvestimento em habitação própria, partes sociais, criptoativos,
-  instrumentos financeiros, etc.) ainda não têm interface própria; se importares uma
-  declaração com dados nesses quadros, ficam preservados tal como estavam.
+  Este é o anexo mais extenso de todos (19 quadros). Por agora estão implementados os
+  Quadros 4, 5, 6, 7, 8, 10, 13, 16 e 17 — nomes de campo confirmados contra um exemplo
+  real. Os Quadros 9, 11, 12, 14, 15, 18 e 19 (partes sociais, perda de residência,
+  criptoativos, etc.) ainda não têm interface própria; se importares uma declaração com
+  dados nesses quadros, ficam preservados tal como estavam.
   <strong>O cálculo de mais-valias ainda não está implementado</strong> — regras próprias e
   complexas (correção monetária, exclusão de 50% do saldo, reinvestimento, etc.) — os dados
   ficam guardados e exportados no XML, mas a estimativa não os usa.
@@ -638,6 +638,75 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <div><label>Ano do empréstimo <small class="hint">(5033)</small></label><input id="ag05bAno" type="number" size="6"></div>
   <div><label>Valor capital em dívida (€) <small class="hint">(5034)</small></label><input id="ag05bCapital" type="number" step="0.01"></div>
   <div><label>Valor usado na amortização (€) <small class="hint">(5035)</small></label><input id="ag05bAmortizacao" type="number" step="0.01"></div>
+</div>
+
+<h3>Alienação onerosa da propriedade intelectual (Quadro 6)</h3>
+<table id="tabelaAnexoG06">
+  <thead><tr><th>Titular</th><th>Valor de realização (€)</th><th>Valor de aquisição (€)</th><th>Despesas e encargos (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG06()">+ Adicionar</button>
+
+<h3>Cessão onerosa de posições contratuais/estruturas fiduciárias (Quadro 7)</h3>
+<datalist id="listaCodOperacaoG07">
+  <option value="G71">G71 — Posições contratuais/direitos sobre bens imóveis</option>
+  <option value="G72">G72 — Direitos sobre estruturas fiduciárias (cessão da posição do beneficiário)</option>
+</datalist>
+<table id="tabelaAnexoG07">
+  <thead><tr><th>Titular</th><th>Cód. operação</th><th>Valor de realização (€)</th><th>Valor de aquisição (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG07()">+ Adicionar</button>
+
+<h3>Cessão onerosa de créditos, prestações acessórias e suplementares (Quadro 8)</h3>
+<table id="tabelaAnexoG08">
+  <thead><tr><th>Titular</th><th>Importância recebida (€)</th><th>Valor nominal/aquisição (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG08()">+ Adicionar</button>
+
+<h3>Organismos de investimento coletivo — resgate/liquidação, opção pelo englobamento (Quadro 10)</h3>
+<datalist id="listaCodigoG10">
+  <option value="G30">G30 — Resgate/liquidação até 30/06/2015 (art.º 22.º EBF)</option>
+  <option value="G31">G31 — Resgate/liquidação em OICVM (art.º 22.º-A EBF, a partir de 01/07/2015)</option>
+  <option value="G32">G32 — Resgate/liquidação em fundos/sociedades de investimento imobiliário (recursos florestais)</option>
+  <option value="G33">G33 — OIC abertos, exclusão de tributação de 10% (rendimentos de 2024+)</option>
+  <option value="G34">G34 — OIC abertos, exclusão de tributação de 20% (rendimentos de 2024+)</option>
+  <option value="G35">G35 — OIC abertos, exclusão de tributação de 30% (rendimentos de 2024+)</option>
+</datalist>
+<table id="tabelaAnexoG10">
+  <thead><tr><th>Titular</th><th>NIF entidade emitente</th><th>Código</th><th>Rendimento (€)</th><th>Retenções na fonte (€)</th><th>NIF entidade retentora</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG10()">+ Adicionar</button>
+
+<h3>Instrumentos financeiros derivados, warrants e certificados (Quadro 13)</h3>
+<datalist id="listaCodigoOperacaoG13">
+  <option value="G51">G51 — Instrumentos financeiros derivados</option>
+  <option value="G52">G52 — Warrants autónomos</option>
+  <option value="G53">G53 — Certificados que atribuem direito a receber um ativo subjacente</option>
+  <option value="G54">G54 — Outros instrumentos financeiros complexos</option>
+</datalist>
+<table id="tabelaAnexoG13">
+  <thead><tr><th>Cód. operação</th><th>Titular</th><th>Rendimento líquido (€)</th><th>País da contraparte</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG13()">+ Adicionar</button>
+
+<h3>Pagamentos por conta (Quadro 16)</h3>
+<table id="tabelaAnexoG16">
+  <thead><tr><th>Titular</th><th>Valor (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoG16()">+ Adicionar</button>
+
+<h3>Informações complementares (Quadro 17)</h3>
+<p class="aviso-topo">
+  Só aplicável se assinalaste "Não Residente" (Q8B.C04 do Rosto) e preencheste o Quadro 4
+  ou o Quadro 7 deste anexo — indica o total dos rendimentos obtidos no estrangeiro.
+</p>
+<div class="row">
+  <div><label>Total de rendimentos obtidos no estrangeiro (€) <small class="hint">(17.1)</small></label><input id="ag17TotalEstrangeiro" type="number" step="0.01"></div>
 </div>
 </div>
 
@@ -1699,10 +1768,152 @@ indicares, assume-se o escalão mais baixo.</small></p>
     return { reinvestimento1, reinvestimento2, contratosSeguroFundo, amortizacaoEmprestimo };
   }
 
+  window.adicionarLinhaAnexoG06 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG06 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag06-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag06-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag06-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag06-despesas" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro06AnexoG() {
+    return [...document.querySelectorAll("#tabelaAnexoG06 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag06-titular").value,
+      valorRealizacao: tr.querySelector(".ag06-valorrealizacao").value || 0,
+      valorAquisicao: tr.querySelector(".ag06-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".ag06-despesas").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoG07 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG07 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag07-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag07-codoperacao" size="4" list="listaCodOperacaoG07"></td>
+      <td><input class="ag07-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="ag07-valoraquisicao" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro07AnexoGDireitos() {
+    return [...document.querySelectorAll("#tabelaAnexoG07 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag07-titular").value,
+      codOperacao: tr.querySelector(".ag07-codoperacao").value,
+      valorRealizacao: tr.querySelector(".ag07-valorrealizacao").value || 0,
+      valorAquisicao: tr.querySelector(".ag07-valoraquisicao").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoG08 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG08 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag08-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag08-importancia" type="number" step="0.01"></td>
+      <td><input class="ag08-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro08AnexoGCreditos() {
+    return [...document.querySelectorAll("#tabelaAnexoG08 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag08-titular").value,
+      importanciaRecebida: tr.querySelector(".ag08-importancia").value || 0,
+      valor: tr.querySelector(".ag08-valor").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoG10 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG10 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag10-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag10-nifemitente" size="10"></td>
+      <td><input class="ag10-codigo" size="4" list="listaCodigoG10"></td>
+      <td><input class="ag10-rendimento" type="number" step="0.01"></td>
+      <td><input class="ag10-retencoes" type="number" step="0.01"></td>
+      <td><input class="ag10-nifretentora" size="10"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro10AnexoGOIC() {
+    return [...document.querySelectorAll("#tabelaAnexoG10 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag10-titular").value,
+      nifEntidadeEmitente: tr.querySelector(".ag10-nifemitente").value,
+      codigo: tr.querySelector(".ag10-codigo").value,
+      rendimento: tr.querySelector(".ag10-rendimento").value || 0,
+      retencoesFonte: tr.querySelector(".ag10-retencoes").value || 0,
+      nifEntidadeRetentora: tr.querySelector(".ag10-nifretentora").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoG13 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG13 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="ag13-codoperacao" size="4" list="listaCodigoOperacaoG13"></td>
+      <td><select class="ag13-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag13-rendimento" type="number" step="0.01"></td>
+      <td><input class="ag13-pais" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro13AnexoG() {
+    return [...document.querySelectorAll("#tabelaAnexoG13 tbody tr")].map(tr => ({
+      codigoOperacao: tr.querySelector(".ag13-codoperacao").value,
+      titular: tr.querySelector(".ag13-titular").value,
+      rendimentoLiquido: tr.querySelector(".ag13-rendimento").value || 0,
+      paisContraparte: tr.querySelector(".ag13-pais").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoG16 = function () {
+    const tbody = document.querySelector("#tabelaAnexoG16 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><select class="ag16-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="ag16-valor" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro16AnexoG() {
+    return [...document.querySelectorAll("#tabelaAnexoG16 tbody tr")].map(tr => ({
+      titular: tr.querySelector(".ag16-titular").value,
+      valor: tr.querySelector(".ag16-valor").value || 0
+    }));
+  }
+
   function lerAnexoG() {
     const quadro04 = lerQuadro04AnexoG();
     const quadro05 = lerQuadro05AnexoG();
-    return (quadro04 || quadro05) ? { quadro04, quadro05 } : undefined;
+    const quadro06 = lerQuadro06AnexoG();
+    const quadro07 = lerQuadro07AnexoGDireitos();
+    const quadro08 = lerQuadro08AnexoGCreditos();
+    const quadro10 = lerQuadro10AnexoGOIC();
+    const quadro13 = lerQuadro13AnexoG();
+    const quadro16 = lerQuadro16AnexoG();
+    const quadro17TotalEstrangeiro = document.getElementById("ag17TotalEstrangeiro").value || undefined;
+
+    const temDados = quadro04 || quadro05 || quadro06.length || quadro07.length || quadro08.length ||
+      quadro10.length || quadro13.length || quadro16.length || quadro17TotalEstrangeiro !== undefined;
+    if (!temDados) return undefined;
+
+    return { quadro04, quadro05, quadro06, quadro07, quadro08, quadro10, quadro13, quadro16, quadro17TotalEstrangeiro };
   }
 
   function lerAnexoH() {
@@ -2041,6 +2252,13 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("ag05bAno").value = "";
       document.getElementById("ag05bCapital").value = "";
       document.getElementById("ag05bAmortizacao").value = "";
+      document.querySelector("#tabelaAnexoG06 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG07 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG08 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG10 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG13 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoG16 tbody").innerHTML = "";
+      document.getElementById("ag17TotalEstrangeiro").value = "";
 
       if (dados.anexoG && dados.anexoG.quadro04) {
         const q4 = dados.anexoG.quadro04;
@@ -2208,6 +2426,63 @@ indicares, assume-se o escalão mais baixo.</small></p>
           document.getElementById("ag05bCapital").value = q5.amortizacaoEmprestimo.valorCapitalDivida || "";
           document.getElementById("ag05bAmortizacao").value = q5.amortizacaoEmprestimo.valorAmortizacao || "";
         }
+      }
+
+      (dados.anexoG && dados.anexoG.quadro06 || []).forEach(l => {
+        adicionarLinhaAnexoG06();
+        const tr = document.querySelector("#tabelaAnexoG06 tbody tr:last-child");
+        if (l.titular) tr.querySelector(".ag06-titular").value = l.titular;
+        tr.querySelector(".ag06-valorrealizacao").value = l.valorRealizacao || "";
+        tr.querySelector(".ag06-valoraquisicao").value = l.valorAquisicao || "";
+        tr.querySelector(".ag06-despesas").value = l.despesasEncargos || "";
+      });
+
+      (dados.anexoG && dados.anexoG.quadro07 || []).forEach(l => {
+        adicionarLinhaAnexoG07();
+        const tr = document.querySelector("#tabelaAnexoG07 tbody tr:last-child");
+        if (l.titular) tr.querySelector(".ag07-titular").value = l.titular;
+        tr.querySelector(".ag07-codoperacao").value = l.codOperacao || "";
+        tr.querySelector(".ag07-valorrealizacao").value = l.valorRealizacao || "";
+        tr.querySelector(".ag07-valoraquisicao").value = l.valorAquisicao || "";
+      });
+
+      (dados.anexoG && dados.anexoG.quadro08 || []).forEach(l => {
+        adicionarLinhaAnexoG08();
+        const tr = document.querySelector("#tabelaAnexoG08 tbody tr:last-child");
+        if (l.titular) tr.querySelector(".ag08-titular").value = l.titular;
+        tr.querySelector(".ag08-importancia").value = l.importanciaRecebida || "";
+        tr.querySelector(".ag08-valor").value = l.valor || "";
+      });
+
+      (dados.anexoG && dados.anexoG.quadro10 || []).forEach(l => {
+        adicionarLinhaAnexoG10();
+        const tr = document.querySelector("#tabelaAnexoG10 tbody tr:last-child");
+        if (l.titular) tr.querySelector(".ag10-titular").value = l.titular;
+        tr.querySelector(".ag10-nifemitente").value = l.nifEntidadeEmitente || "";
+        tr.querySelector(".ag10-codigo").value = l.codigo || "";
+        tr.querySelector(".ag10-rendimento").value = l.rendimento || "";
+        tr.querySelector(".ag10-retencoes").value = l.retencoesFonte || "";
+        tr.querySelector(".ag10-nifretentora").value = l.nifEntidadeRetentora || "";
+      });
+
+      (dados.anexoG && dados.anexoG.quadro13 || []).forEach(l => {
+        adicionarLinhaAnexoG13();
+        const tr = document.querySelector("#tabelaAnexoG13 tbody tr:last-child");
+        tr.querySelector(".ag13-codoperacao").value = l.codigoOperacao || "";
+        if (l.titular) tr.querySelector(".ag13-titular").value = l.titular;
+        tr.querySelector(".ag13-rendimento").value = l.rendimentoLiquido || "";
+        tr.querySelector(".ag13-pais").value = l.paisContraparte || "";
+      });
+
+      (dados.anexoG && dados.anexoG.quadro16 || []).forEach(l => {
+        adicionarLinhaAnexoG16();
+        const tr = document.querySelector("#tabelaAnexoG16 tbody tr:last-child");
+        if (l.titular) tr.querySelector(".ag16-titular").value = l.titular;
+        tr.querySelector(".ag16-valor").value = l.valor || "";
+      });
+
+      if (dados.anexoG && dados.anexoG.quadro17TotalEstrangeiro !== undefined) {
+        document.getElementById("ag17TotalEstrangeiro").value = dados.anexoG.quadro17TotalEstrangeiro;
       }
 
       document.querySelector("#tabelaAnexoHPensoes tbody").innerHTML = "";
