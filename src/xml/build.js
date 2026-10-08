@@ -1406,12 +1406,50 @@ function temDadosQuadro07AnexoJ(q07) {
   return (q07.linhas && q07.linhas.length > 0) || q07.optaEnglobamento !== undefined || q07.pagamentosPorConta !== undefined;
 }
 
+// Anexo J, Quadro 8A (rendimentos de capitais obtidos no estrangeiro, Categoria E —
+// códigos E01 a E99, Tabela V). As colunas de imposto pago no estrangeiro relativas ao país
+// do agente pagador e ao imposto aí retido só se aplicam aos rendimentos com código E23
+// (Diretiva da Poupança 2003/48/CE). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro08AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (801 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoBruto: moeda(l.rendimentoBruto),
+    ImpostoPagoEstrangeiroPaisFonte: moeda(l.impostoPagoEstrangeiroPaisFonte),
+    ImpostoPagoEstrangeiroCodPaisPagador: l.impostoPagoEstrangeiroCodPaisPagador,
+    ImpostoPagoEstrangeiroImpostoRetido: moeda(l.impostoPagoEstrangeiroImpostoRetido),
+    NIFEntRetentora: l.nifEntRetentora, RetencaoFonte: moeda(l.retencaoFonte)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoBruto) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiroPaisFonte) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiroImpostoRetido) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.retencaoFonte) || 0), 0);
+  return listaComLinhas("AnexoJq08AT01", campos) +
+    el("AnexoJq08AT01SomaC01", moeda(somaC01)) + el("AnexoJq08AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq08AT01SomaC03", moeda(somaC03)) + el("AnexoJq08AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 8B (opção pelo englobamento dos rendimentos de capitais, Categoria E).
+// Campo B01 confirmado contra um exemplo real.
+function buildQuadro08AnexoJ(q08) {
+  if (!q08) return `<Quadro08/>`;
+  return `<Quadro08>` +
+    buildQuadro08AAnexoJ(q08.linhas || []) +
+    el("AnexoJq08B01", q08.optaEnglobamento === undefined ? undefined : (q08.optaEnglobamento ? "S" : "N")) +
+    `</Quadro08>`;
+}
+
+function temDadosQuadro08AnexoJ(q08) {
+  if (!q08) return false;
+  return (q08.linhas && q08.linhas.length > 0) || q08.optaEnglobamento !== undefined;
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais) e Quadro 7 (categoria F — prediais) implementados, com nomes
-// de campo confirmados contra um exemplo real. Os Quadros 8 a 11 (capitais, mais-valias,
-// rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
-// ficam preservados em passthrough quando importados.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
+// capitais) implementados, com nomes de campo confirmados contra um exemplo real. Os
+// Quadros 9 a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
+// não têm interface própria — ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -1434,7 +1472,8 @@ function buildAnexoJ(model) {
   const quadro05 = temDadosQuadro05AnexoJ(j.quadro05) ? buildQuadro05AnexoJ(j.quadro05) : (pass.Quadro05 || `<Quadro05/>`);
   const quadro06 = temDadosQuadro06AnexoJ(j.quadro06) ? buildQuadro06AnexoJ(j.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
-  const quadrosRestantes = ["Quadro08", "Quadro09", "Quadro10", "Quadro11"]
+  const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
+  const quadrosRestantes = ["Quadro09", "Quadro10", "Quadro11"]
     .map(q => pass[q] || `<${q}/>`).join("");
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -1444,6 +1483,7 @@ function buildAnexoJ(model) {
     quadro05 +
     quadro06 +
     quadro07 +
+    quadro08 +
     quadrosRestantes +
     `</AnexoJ>`;
 }

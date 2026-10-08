@@ -1010,11 +1010,11 @@ indicares, assume-se o escalão mais baixo.</small></p>
   Este anexo tem 11 quadros (espelha as categorias A/H/B/F/E/G do território português, mas
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
   (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
-  (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B) e o Quadro 7
-  (prediais, Categoria F) — nomes de campo confirmados contra um exemplo real. Os Quadros 8
-  a 11 (capitais, mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
-  não têm interface própria; se importares uma declaração com dados nesses quadros, ficam
-  preservados tal como estavam.
+  (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B), o Quadro 7
+  (prediais, Categoria F) e o Quadro 8 (capitais, Categoria E) — nomes de campo confirmados
+  contra um exemplo real. Os Quadros 9 a 11 (mais-valias, rendimentos de anos anteriores,
+  contas no estrangeiro) ainda não têm interface própria; se importares uma declaração com
+  dados nesses quadros, ficam preservados tal como estavam.
 </p>
 
 <h3>Identificação do titular do rendimento (Quadro 3A)</h3>
@@ -1194,6 +1194,49 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <h3>Pagamentos por conta (Quadro 7C)</h3>
 <div class="row">
   <div><label>Valor (€) <small class="hint">(campo 03 — não confirmado contra um exemplo real)</small></label><input id="aj07cPagamentosConta" type="number" step="0.01"></div>
+</div>
+
+<h3>Rendimentos de capitais (Quadro 8A — Categoria E)</h3>
+<datalist id="listaCodigoAnexoJ08A">
+  <option value="E01">E01 — Royalties e assistência técnica</option>
+  <option value="E10">E10 — Dividendos ou lucros, com retenção em Portugal</option>
+  <option value="E11">E11 — Dividendos ou lucros, sem retenção em Portugal</option>
+  <option value="E20">E20 — Rendimentos de valores mobiliários, com retenção em Portugal</option>
+  <option value="E21">E21 — Juros sem retenção em Portugal</option>
+  <option value="E22">E22 — Outros rendimentos de capitais sem retenção</option>
+  <option value="E23">E23 — Diretiva da Poupança, países em período de transição</option>
+  <option value="E24">E24 — Diretiva da Poupança, restantes países</option>
+  <option value="E25">E25 — Rendimentos de capitais (criptoativos)</option>
+  <option value="E99">E99 — Rendimentos de capitais com origem em país de regime fiscal mais favorável</option>
+</datalist>
+<p class="aviso-topo">
+  As colunas "Imposto pago no estrangeiro — país do agente pagador" e "— imposto retido" só
+  se aplicam aos rendimentos com código E23 (Diretiva da Poupança).
+</p>
+<table id="tabelaAnexoJ08A">
+  <thead><tr>
+    <th>Código</th><th>País da fonte</th><th>Rendimento bruto (€)</th>
+    <th>Imposto estrangeiro — país da fonte (€)</th>
+    <th>Imposto estrangeiro — país agente pagador</th>
+    <th>Imposto estrangeiro — imposto retido (€)</th>
+    <th>NIF entidade retentora (PT)</th><th>Retenção na fonte (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ08A()">+ Adicionar</button>
+
+<h3>Opção pelo englobamento (Quadro 8B)</h3>
+<p class="aviso-topo">
+  A opção pelo englobamento implica englobar todos os rendimentos de capitais (Categoria E),
+  nos termos do n.º 5 do art.º 22.º CIRS. Quando exercida, os lucros/dividendos (códigos
+  E10/E11) distribuídos por entidades residentes noutro Estado-membro da UE que cumpram os
+  requisitos da Diretiva 90/435/CEE são declarados por 50% do valor (art.º 40.º-A, n.º 4,
+  CIRS).
+</p>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(campos 01/02)</small></label>
+    <select id="aj08bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
 </div>
 </div>
 
@@ -3308,12 +3351,50 @@ function temDadosQuadro07AnexoJ(q07) {
   return (q07.linhas && q07.linhas.length > 0) || q07.optaEnglobamento !== undefined || q07.pagamentosPorConta !== undefined;
 }
 
+// Anexo J, Quadro 8A (rendimentos de capitais obtidos no estrangeiro, Categoria E —
+// códigos E01 a E99, Tabela V). As colunas de imposto pago no estrangeiro relativas ao país
+// do agente pagador e ao imposto aí retido só se aplicam aos rendimentos com código E23
+// (Diretiva da Poupança 2003/48/CE). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro08AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (801 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoBruto: moeda(l.rendimentoBruto),
+    ImpostoPagoEstrangeiroPaisFonte: moeda(l.impostoPagoEstrangeiroPaisFonte),
+    ImpostoPagoEstrangeiroCodPaisPagador: l.impostoPagoEstrangeiroCodPaisPagador,
+    ImpostoPagoEstrangeiroImpostoRetido: moeda(l.impostoPagoEstrangeiroImpostoRetido),
+    NIFEntRetentora: l.nifEntRetentora, RetencaoFonte: moeda(l.retencaoFonte)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoBruto) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiroPaisFonte) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiroImpostoRetido) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.retencaoFonte) || 0), 0);
+  return listaComLinhas("AnexoJq08AT01", campos) +
+    el("AnexoJq08AT01SomaC01", moeda(somaC01)) + el("AnexoJq08AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq08AT01SomaC03", moeda(somaC03)) + el("AnexoJq08AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 8B (opção pelo englobamento dos rendimentos de capitais, Categoria E).
+// Campo B01 confirmado contra um exemplo real.
+function buildQuadro08AnexoJ(q08) {
+  if (!q08) return `<Quadro08/>`;
+  return `<Quadro08>` +
+    buildQuadro08AAnexoJ(q08.linhas || []) +
+    el("AnexoJq08B01", q08.optaEnglobamento === undefined ? undefined : (q08.optaEnglobamento ? "S" : "N")) +
+    `</Quadro08>`;
+}
+
+function temDadosQuadro08AnexoJ(q08) {
+  if (!q08) return false;
+  return (q08.linhas && q08.linhas.length > 0) || q08.optaEnglobamento !== undefined;
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais) e Quadro 7 (categoria F — prediais) implementados, com nomes
-// de campo confirmados contra um exemplo real. Os Quadros 8 a 11 (capitais, mais-valias,
-// rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
-// ficam preservados em passthrough quando importados.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
+// capitais) implementados, com nomes de campo confirmados contra um exemplo real. Os
+// Quadros 9 a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
+// não têm interface própria — ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -3336,7 +3417,8 @@ function buildAnexoJ(model) {
   const quadro05 = temDadosQuadro05AnexoJ(j.quadro05) ? buildQuadro05AnexoJ(j.quadro05) : (pass.Quadro05 || `<Quadro05/>`);
   const quadro06 = temDadosQuadro06AnexoJ(j.quadro06) ? buildQuadro06AnexoJ(j.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
-  const quadrosRestantes = ["Quadro08", "Quadro09", "Quadro10", "Quadro11"]
+  const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
+  const quadrosRestantes = ["Quadro09", "Quadro10", "Quadro11"]
     .map(q => pass[q] || `<${q}/>`).join("");
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -3346,6 +3428,7 @@ function buildAnexoJ(model) {
     quadro05 +
     quadro06 +
     quadro07 +
+    quadro08 +
     quadrosRestantes +
     `</AnexoJ>`;
 }
@@ -4305,11 +4388,32 @@ function parseQuadro07AnexoJ(q07) {
   };
 }
 
+// Anexo J, Quadro 8A (rendimentos de capitais obtidos no estrangeiro, Categoria E).
+function parseQuadro08AAnexoJ(q08) {
+  return parseLinhasGenerico(filho(q08, "AnexoJq08AT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoBruto: l.RendimentoBruto,
+    impostoPagoEstrangeiroPaisFonte: l.ImpostoPagoEstrangeiroPaisFonte,
+    impostoPagoEstrangeiroCodPaisPagador: l.ImpostoPagoEstrangeiroCodPaisPagador,
+    impostoPagoEstrangeiroImpostoRetido: l.ImpostoPagoEstrangeiroImpostoRetido,
+    nifEntRetentora: l.NIFEntRetentora, retencaoFonte: l.RetencaoFonte
+  }));
+}
+
+function parseQuadro08AnexoJ(q08) {
+  if (!temConteudo(q08)) return undefined;
+  return {
+    linhas: parseQuadro08AAnexoJ(q08),
+    optaEnglobamento: texto(q08, "AnexoJq08B01") !== undefined ? texto(q08, "AnexoJq08B01") === "S" : undefined
+  };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais) e Quadro 7 (categoria F — prediais) implementados, nomes de
-// campo confirmados contra um exemplo real. Os Quadros 8 a 11 (capitais, mais-valias,
-// rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
+// capitais) implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 9
+// a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ficam
+// preservados em passthrough.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
@@ -4317,6 +4421,7 @@ function parseAnexoJ(anexoJ) {
   const q05 = filho(anexoJ, "Quadro05");
   const q06 = filho(anexoJ, "Quadro06");
   const q07 = filho(anexoJ, "Quadro07");
+  const q08 = filho(anexoJ, "Quadro08");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
@@ -4325,20 +4430,22 @@ function parseAnexoJ(anexoJ) {
   const quadro05 = parseQuadro05AnexoJ(q05);
   const quadro06 = parseQuadro06AnexoJ(q06);
   const quadro07 = parseQuadro07AnexoJ(q07);
+  const quadro08 = parseQuadro08AnexoJ(q08);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
   if (temConteudo(q05) && !quadro05) passthrough.Quadro05 = serializar(q05);
   if (temConteudo(q06) && !quadro06) passthrough.Quadro06 = serializar(q06);
   if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
-  for (const i of [8, 9, 10, 11]) {
+  if (temConteudo(q08) && !quadro08) passthrough.Quadro08 = serializar(q08);
+  for (const i of [9, 10, 11]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoJ, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }
@@ -6277,6 +6384,36 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  window.adicionarLinhaAnexoJ08A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ08A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj08a-codigo" size="4" list="listaCodigoAnexoJ08A"></td>
+      <td><input class="aj08a-pais" size="4"></td>
+      <td><input class="aj08a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj08a-impostopaisfonte" type="number" step="0.01"></td>
+      <td><input class="aj08a-paispagador" size="4"></td>
+      <td><input class="aj08a-impostoretido" type="number" step="0.01"></td>
+      <td><input class="aj08a-nif" size="10"></td>
+      <td><input class="aj08a-retencaofonte" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro08AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ08A tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj08a-codigo").value,
+      codPais: tr.querySelector(".aj08a-pais").value,
+      rendimentoBruto: tr.querySelector(".aj08a-rendimento").value || 0,
+      impostoPagoEstrangeiroPaisFonte: tr.querySelector(".aj08a-impostopaisfonte").value || 0,
+      impostoPagoEstrangeiroCodPaisPagador: tr.querySelector(".aj08a-paispagador").value || undefined,
+      impostoPagoEstrangeiroImpostoRetido: tr.querySelector(".aj08a-impostoretido").value || 0,
+      nifEntRetentora: tr.querySelector(".aj08a-nif").value || undefined,
+      retencaoFonte: tr.querySelector(".aj08a-retencaofonte").value || 0
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -6323,10 +6460,16 @@ if (typeof module !== "undefined" && module.exports) {
     const temQuadro07 = linhas07.length || optaEnglobamento07 !== undefined || pagamentosPorConta07 !== undefined;
     const quadro07 = temQuadro07 ? { linhas: linhas07, optaEnglobamento: optaEnglobamento07, pagamentosPorConta: pagamentosPorConta07 } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07;
+    const linhas08 = lerQuadro08AAnexoJ();
+    const optaEnglobamento08Valor = document.getElementById("aj08bOptaEnglobamento").value;
+    const optaEnglobamento08 = optaEnglobamento08Valor === "" ? undefined : optaEnglobamento08Valor === "S";
+    const temQuadro08 = linhas08.length || optaEnglobamento08 !== undefined;
+    const quadro08 = temQuadro08 ? { linhas: linhas08, optaEnglobamento: optaEnglobamento08 } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08 };
   }
 
   function lerDespesasEFatura() {
@@ -7161,6 +7304,8 @@ if (typeof module !== "undefined" && module.exports) {
       document.querySelector("#tabelaAnexoJ07A tbody").innerHTML = "";
       document.getElementById("aj07bOptaEnglobamento").value = "";
       document.getElementById("aj07cPagamentosConta").value = "";
+      document.querySelector("#tabelaAnexoJ08A tbody").innerHTML = "";
+      document.getElementById("aj08bOptaEnglobamento").value = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -7271,6 +7416,24 @@ if (typeof module !== "undefined" && module.exports) {
             document.getElementById("aj07bOptaEnglobamento").value = q7.optaEnglobamento ? "S" : "N";
           }
           document.getElementById("aj07cPagamentosConta").value = q7.pagamentosPorConta || "";
+        }
+        if (j.quadro08) {
+          const q8 = j.quadro08;
+          (q8.linhas || []).forEach(l => {
+            adicionarLinhaAnexoJ08A();
+            const tr = document.querySelector("#tabelaAnexoJ08A tbody tr:last-child");
+            tr.querySelector(".aj08a-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj08a-pais").value = l.codPais || "";
+            tr.querySelector(".aj08a-rendimento").value = l.rendimentoBruto || "";
+            tr.querySelector(".aj08a-impostopaisfonte").value = l.impostoPagoEstrangeiroPaisFonte || "";
+            tr.querySelector(".aj08a-paispagador").value = l.impostoPagoEstrangeiroCodPaisPagador || "";
+            tr.querySelector(".aj08a-impostoretido").value = l.impostoPagoEstrangeiroImpostoRetido || "";
+            tr.querySelector(".aj08a-nif").value = l.nifEntRetentora || "";
+            tr.querySelector(".aj08a-retencaofonte").value = l.retencaoFonte || "";
+          });
+          if (q8.optaEnglobamento !== undefined) {
+            document.getElementById("aj08bOptaEnglobamento").value = q8.optaEnglobamento ? "S" : "N";
+          }
         }
       }
 

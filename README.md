@@ -163,10 +163,17 @@ regenerar o `simulador-irs.html`.
   exemplo — nome extrapolado por analogia com o padrão dos Quadros 4B/5B, não confirmado —
   e, à semelhança dos campos de nacionalidade do Quadro 3A, é omitido por completo (nem
   sequer como tag vazia) quando não preenchido, ao contrário da convenção habitual de
-  auto-fecho dos restantes campos opcionais. Este anexo espelha as categorias A/H/B/F/E/G
-  do território português, mas para rendimentos obtidos fora de Portugal — tem 11 quadros;
-  os Quadros 8 a 11 (capitais, mais-valias, rendimentos de anos anteriores, contas no
-  estrangeiro) ainda não têm interface própria.
+  auto-fecho dos restantes campos opcionais; e Quadro 8 completo (rendimentos de capitais,
+  Categoria E) — 8A (códigos E01 a E99 da Tabela V, com país da fonte, rendimento bruto,
+  imposto pago no estrangeiro no país da fonte, imposto pago no estrangeiro no país do
+  agente pagador — código do país e imposto retido, aplicável apenas ao código E23 da
+  Diretiva da Poupança —, NIF da entidade retentora e retenção na fonte em Portugal) e 8B
+  (opção pelo englobamento, art.º 22.º n.º 5 CIRS). Nomes de campo confirmados contra um
+  exemplo real, incluindo a fórmula de cada uma das 4 somas (rendimento bruto, imposto pago
+  no estrangeiro no país da fonte, imposto retido pelo agente pagador e retenção na fonte em
+  Portugal). Este anexo espelha as categorias A/H/B/F/E/G do território português, mas para
+  rendimentos obtidos fora de Portugal — tem 11 quadros; os Quadros 9 a 11 (mais-valias,
+  rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
@@ -204,8 +211,8 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos G1, L, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
-8-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
-(os Anexos G e J, Quadros 3A/4/5/6/7, já estão mapeados). Ao **importar** uma declaração que
+9-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
+(os Anexos G e J, Quadros 3A/4/5/6/7/8, já estão mapeados). Ao **importar** uma declaração que
 já tenha dados nessas secções, esses dados são preservados tal como estavam (mas ainda não
 podem ser vistos/editados na interface) e mantidos ao exportar de novo — para não haver
 perda de informação.
@@ -251,15 +258,17 @@ perda de informação.
    próxima ronda). Cada anexo novo por implementar do zero (G1, L, SS) vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
    para os Anexos A, B, E, G, H e J.
-6. **Anexo J — Quadros 8 a 11** (capitais, mais-valias e outros incrementos
+6. **Anexo J — Quadros 9 a 11** (mais-valias e outros incrementos
    patrimoniais — com 4 sub-blocos no Quadro 9 —, rendimentos de anos anteriores, contas no
    estrangeiro) — já tenho as instruções e um exemplo preenchido, falta implementar. Nenhum
-   quadro entra ainda na estimativa (nem sequer os Quadros 4/5/6/7, já mapeados) — o crédito
-   de imposto por dupla tributação internacional (art.º 81.º CIRS) também ainda não está
-   implementado. O Quadro 5A (código H03 — pensões de alimentos) e o Quadro 7B
+   quadro entra ainda na estimativa (nem sequer os Quadros 4/5/6/7/8, já mapeados) — o
+   crédito de imposto por dupla tributação internacional (art.º 81.º CIRS) também ainda não
+   está implementado. O Quadro 5A (código H03 — pensões de alimentos) e o Quadro 7B
    (rendimentos prediais) têm taxas autónomas confirmadas (20% e 28%, respetivamente, art.º
-   72.º CIRS), ao contrário de outras taxas autónomas pendentes no Anexo G (Quadros 4A/4C) —
-   bons candidatos
+   72.º CIRS); o Quadro 8B (rendimentos de capitais, quando não se opta pelo englobamento)
+   remete para as taxas liberatórias do art.º 71.º CIRS, que variam por tipo de rendimento
+   (código) e ainda não foram confirmadas uma a uma — ao contrário de outras taxas autónomas
+   pendentes no Anexo G (Quadros 4A/4C) — bons candidatos
    para quando se avançar com o cálculo deste anexo.
 7. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
