@@ -852,34 +852,61 @@ function parseQuadro05AnexoJ(q05) {
   };
 }
 
+// Anexo J, Quadro 6A (rendimentos empresariais e profissionais obtidos no estrangeiro).
+function parseQuadro06AAnexoJ(q06) {
+  return parseLinhasGenerico(filho(q06, "AnexoJq06AT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais, estabelecimentoEstavelFixo: l.EstabelecimentoEstavelFixo,
+    rendimento: l.Rendimento, contribSocial: l.ContribSocial, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro,
+    nifEntRetentora: l.NIFEntRetentora, retencaoFonte: l.RetencaoFonte
+  }));
+}
+
+// Anexo J, Quadro 6B (informações complementares para a categoria B). Os campos booleanos
+// usam o valor literal "true" (não "S"/"N").
+function parseQuadro06BAnexoJ(q06) {
+  return parseLinhasGenerico(filho(q06, "AnexoJq06BT01")).map(l => ({
+    codLinhaQ6A: l.CodLinhaQ6A,
+    diasPermanenciaMenor: l.DiasPermanenciaMenor === "true",
+    diasPermanenciaMaior: l.DiasPermanenciaMaior === "true"
+  }));
+}
+
+function parseQuadro06AnexoJ(q06) {
+  if (!temConteudo(q06)) return undefined;
+  return { linhas: parseQuadro06AAnexoJ(q06), complementar: parseQuadro06BAnexoJ(q06) };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A) e Quadro 5 (categoria H — pensões) implementados, nomes de campo
-// confirmados contra um exemplo real. Os Quadros 6 a 11 (empresariais/profissionais,
-// prediais, capitais, mais-valias, rendimentos de anos anteriores, contas no estrangeiro)
-// ficam preservados em passthrough.
+// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões) e Quadro 6 (categoria B —
+// empresariais/profissionais) implementados, nomes de campo confirmados contra um exemplo
+// real. Os Quadros 7 a 11 (prediais, capitais, mais-valias, rendimentos de anos anteriores,
+// contas no estrangeiro) ficam preservados em passthrough.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
   const q04 = filho(anexoJ, "Quadro04");
   const q05 = filho(anexoJ, "Quadro05");
+  const q06 = filho(anexoJ, "Quadro06");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
     .filter(v => v !== undefined);
   const quadro04 = parseQuadro04AnexoJ(q04);
   const quadro05 = parseQuadro05AnexoJ(q05);
+  const quadro06 = parseQuadro06AnexoJ(q06);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
   if (temConteudo(q05) && !quadro05) passthrough.Quadro05 = serializar(q05);
-  for (const i of [6, 7, 8, 9, 10, 11]) {
+  if (temConteudo(q06) && !quadro06) passthrough.Quadro06 = serializar(q06);
+  for (const i of [7, 8, 9, 10, 11]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoJ, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05)
-    ? { titularNif, nacionalidades, quadro04, quadro05 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }

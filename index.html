@@ -1009,11 +1009,12 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <p class="aviso-topo">
   Este anexo tem 11 quadros (espelha as categorias A/H/B/F/E/G do território português, mas
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
-  (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A) e o Quadro 5
-  (pensões, Categoria H) — nomes de campo confirmados contra um exemplo real. Os Quadros 6 a
-  11 (empresariais/profissionais, prediais, capitais, mais-valias, rendimentos de anos
-  anteriores, contas no estrangeiro) ainda não têm interface própria; se importares uma
-  declaração com dados nesses quadros, ficam preservados tal como estavam.
+  (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
+  (pensões, Categoria H) e o Quadro 6 (empresariais/profissionais, Categoria B) — nomes de
+  campo confirmados contra um exemplo real. Os Quadros 7 a 11 (prediais, capitais,
+  mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda não têm
+  interface própria; se importares uma declaração com dados nesses quadros, ficam
+  preservados tal como estavam.
 </p>
 
 <h3>Identificação do titular do rendimento (Quadro 3A)</h3>
@@ -1133,6 +1134,43 @@ indicares, assume-se o escalão mais baixo.</small></p>
     <select id="aj05dOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
   </div>
 </div>
+
+<h3>Rendimentos empresariais e profissionais (Quadro 6A — Categoria B)</h3>
+<datalist id="listaCodigoAnexoJ06A">
+  <option value="B01">B01 — Rendimentos comerciais e industriais</option>
+  <option value="B02">B02 — Rendimentos agrícolas, silvícolas ou pecuários</option>
+  <option value="B03">B03 — Atividades profissionais da Tabela do art.º 151.º CIRS (exceto B10/B11)</option>
+  <option value="B04">B04 — Rendimentos de prestações de serviços não previstos nos códigos anteriores</option>
+  <option value="B05">B05 — Rendimentos de propriedade intelectual/industrial (não abrangidos pelo art.º 58.º EBF)</option>
+  <option value="B06">B06 — Propriedade intelectual (art.º 58.º EBF — parte não isenta)</option>
+  <option value="B07">B07 — Propriedade intelectual (art.º 58.º EBF — parte isenta)</option>
+  <option value="B08">B08 — Artistas e desportistas (2017 e anteriores)</option>
+  <option value="B09">B09 — Rendimentos prediais/capitais/mais-valias imputáveis à atividade empresarial</option>
+  <option value="B10">B10 — Artistas (2018 e seguintes)</option>
+  <option value="B11">B11 — Desportistas (2018 e seguintes)</option>
+  <option value="B12">B12 — Rendimentos comerciais e industriais (criptoativos)</option>
+  <option value="B13">B13 — Prestação de serviços — mineração de criptoativos</option>
+</datalist>
+<table id="tabelaAnexoJ06A">
+  <thead><tr>
+    <th>Código</th><th>País da fonte</th><th>Estab. estável/instalação fixa?</th><th>Rendimento (€)</th>
+    <th>Contrib. regime proteção social (€)</th><th>Imposto pago no estrangeiro (€)</th>
+    <th>NIF entidade retentora (PT)</th><th>Retenção na fonte (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ06A()">+ Adicionar</button>
+
+<h3>Informações complementares — Categoria B (Quadro 6B)</h3>
+<p class="aviso-topo">
+  Para os códigos B03/B04 (profissional e independente) sem estabelecimento estável/
+  instalação fixa: dias de permanência no país da prestação dos serviços.
+</p>
+<table id="tabelaAnexoJ06B">
+  <thead><tr><th>Linha do Q6A (ex: 601)</th><th>Dias &lt;183 (&lt;9m Panamá)</th><th>Dias ≥183 (≥9m Panamá)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ06B()">+ Adicionar</button>
 </div>
 
   </div>
@@ -2799,6 +2837,56 @@ indicares, assume-se o escalão mais baixo.</small></p>
     }));
   }
 
+  window.adicionarLinhaAnexoJ06A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ06A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj06a-codigo" size="4" list="listaCodigoAnexoJ06A"></td>
+      <td><input class="aj06a-pais" size="4"></td>
+      <td><select class="aj06a-estabelecimento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select></td>
+      <td><input class="aj06a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj06a-contribsocial" type="number" step="0.01"></td>
+      <td><input class="aj06a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj06a-nifretentora" size="10"></td>
+      <td><input class="aj06a-retencaofonte" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro06AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ06A tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj06a-codigo").value,
+      codPais: tr.querySelector(".aj06a-pais").value,
+      estabelecimentoEstavelFixo: tr.querySelector(".aj06a-estabelecimento").value || undefined,
+      rendimento: tr.querySelector(".aj06a-rendimento").value || 0,
+      contribSocial: tr.querySelector(".aj06a-contribsocial").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj06a-impostoestrangeiro").value || 0,
+      nifEntRetentora: tr.querySelector(".aj06a-nifretentora").value || undefined,
+      retencaoFonte: tr.querySelector(".aj06a-retencaofonte").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ06B = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ06B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj06b-linha" size="6"></td>
+      <td><input class="aj06b-diasmenor" type="checkbox"></td>
+      <td><input class="aj06b-diasmaior" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro06BAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ06B tbody tr")].map(tr => ({
+      codLinhaQ6A: tr.querySelector(".aj06b-linha").value,
+      diasPermanenciaMenor: tr.querySelector(".aj06b-diasmenor").checked,
+      diasPermanenciaMaior: tr.querySelector(".aj06b-diasmaior").checked
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -2833,10 +2921,15 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const temQuadro05 = linhas05.length || pagamentosPorConta05 !== undefined || complementar05.length || optaEnglobamentoPensoesAlimentos !== undefined;
     const quadro05 = temQuadro05 ? { linhas: linhas05, pagamentosPorConta: pagamentosPorConta05, complementar: complementar05, optaEnglobamentoPensoesAlimentos } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05;
+    const linhas06 = lerQuadro06AAnexoJ();
+    const complementar06 = lerQuadro06BAnexoJ();
+    const temQuadro06 = linhas06.length || complementar06.length;
+    const quadro06 = temQuadro06 ? { linhas: linhas06, complementar: complementar06 } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06 };
   }
 
   function lerDespesasEFatura() {
@@ -3666,6 +3759,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("aj05bPagamentosConta").value = "";
       document.querySelector("#tabelaAnexoJ05C tbody").innerHTML = "";
       document.getElementById("aj05dOptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoJ06A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ06B tbody").innerHTML = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -3737,6 +3832,29 @@ indicares, assume-se o escalão mais baixo.</small></p>
           if (q5.optaEnglobamentoPensoesAlimentos !== undefined) {
             document.getElementById("aj05dOptaEnglobamento").value = q5.optaEnglobamentoPensoesAlimentos ? "S" : "N";
           }
+        }
+
+        if (j.quadro06) {
+          const q6 = j.quadro06;
+          (q6.linhas || []).forEach(l => {
+            adicionarLinhaAnexoJ06A();
+            const tr = document.querySelector("#tabelaAnexoJ06A tbody tr:last-child");
+            tr.querySelector(".aj06a-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj06a-pais").value = l.codPais || "";
+            if (l.estabelecimentoEstavelFixo) tr.querySelector(".aj06a-estabelecimento").value = l.estabelecimentoEstavelFixo;
+            tr.querySelector(".aj06a-rendimento").value = l.rendimento || "";
+            tr.querySelector(".aj06a-contribsocial").value = l.contribSocial || "";
+            tr.querySelector(".aj06a-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+            tr.querySelector(".aj06a-nifretentora").value = l.nifEntRetentora || "";
+            tr.querySelector(".aj06a-retencaofonte").value = l.retencaoFonte || "";
+          });
+          (q6.complementar || []).forEach(c => {
+            adicionarLinhaAnexoJ06B();
+            const tr = document.querySelector("#tabelaAnexoJ06B tbody tr:last-child");
+            tr.querySelector(".aj06b-linha").value = c.codLinhaQ6A || "";
+            tr.querySelector(".aj06b-diasmenor").checked = !!c.diasPermanenciaMenor;
+            tr.querySelector(".aj06b-diasmaior").checked = !!c.diasPermanenciaMaior;
+          });
         }
       }
 
