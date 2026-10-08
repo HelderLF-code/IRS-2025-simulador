@@ -1010,10 +1010,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
   Este anexo tem 11 quadros (espelha as categorias A/H/B/F/E/G do território português, mas
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
   (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
-  (pensões, Categoria H) e o Quadro 6 (empresariais/profissionais, Categoria B) — nomes de
-  campo confirmados contra um exemplo real. Os Quadros 7 a 11 (prediais, capitais,
-  mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda não têm
-  interface própria; se importares uma declaração com dados nesses quadros, ficam
+  (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B) e o Quadro 7
+  (prediais, Categoria F) — nomes de campo confirmados contra um exemplo real. Os Quadros 8
+  a 11 (capitais, mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
+  não têm interface própria; se importares uma declaração com dados nesses quadros, ficam
   preservados tal como estavam.
 </p>
 
@@ -1171,6 +1171,30 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ06B()">+ Adicionar</button>
+
+<h3>Rendimentos prediais (Quadro 7A — Categoria F)</h3>
+<table id="tabelaAnexoJ07A">
+  <thead><tr><th>Código</th><th>País da fonte</th><th>Rendimento líquido (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ07A()">+ Adicionar</button>
+
+<h3>Opção pelo englobamento (Quadro 7B)</h3>
+<p class="aviso-topo">
+  Os rendimentos prediais são tributados autonomamente à taxa especial de 28% (art.º 72.º
+  CIRS). A opção pelo englobamento implica englobar todos os rendimentos prediais desta
+  categoria.
+</p>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(campos 01/02)</small></label>
+    <select id="aj07bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h3>Pagamentos por conta (Quadro 7C)</h3>
+<div class="row">
+  <div><label>Valor (€) <small class="hint">(campo 03 — não confirmado contra um exemplo real)</small></label><input id="aj07cPagamentosConta" type="number" step="0.01"></div>
+</div>
 </div>
 
   </div>
@@ -3249,12 +3273,47 @@ function temDadosQuadro06AnexoJ(q06) {
   return (q06.linhas && q06.linhas.length > 0) || (q06.complementar && q06.complementar.length > 0);
 }
 
+// Anexo J, Quadro 7A (rendimentos prediais obtidos no estrangeiro, Categoria F — código
+// único F01). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro07AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (701 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoLiquido: moeda(l.rendimentoLiquido), ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoLiquido) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq07AT01", campos) +
+    el("AnexoJq07AT01SomaC01", moeda(somaC01)) + el("AnexoJq07AT01SomaC02", moeda(somaC02));
+}
+
+// Anexo J, Quadro 7B (opção pelo englobamento) e 7C (pagamentos por conta). Os rendimentos
+// prediais são tributados autonomamente a 28% por omissão (art.º 72.º CIRS); o campo B01
+// (opção pelo englobamento) está confirmado contra um exemplo real. O campo de pagamentos
+// por conta (7C, campo 03) não aparecia preenchido no exemplo — nome extrapolado por
+// analogia com o padrão dos Quadros 4B/5B (AnexoJq0XC0Y), não confirmado — e, à semelhança
+// dos campos de nacionalidade do Quadro 3A, é omitido por completo (nem sequer como tag
+// vazia) quando não preenchido, ao contrário da convenção habitual de auto-fecho.
+function buildQuadro07AnexoJ(q07) {
+  if (!q07) return `<Quadro07/>`;
+  return `<Quadro07>` +
+    buildQuadro07AAnexoJ(q07.linhas || []) +
+    el("AnexoJq07B01", q07.optaEnglobamento === undefined ? undefined : (q07.optaEnglobamento ? "S" : "N")) +
+    (q07.pagamentosPorConta !== undefined ? el("AnexoJq07C03", moeda(q07.pagamentosPorConta)) : "") +
+    `</Quadro07>`;
+}
+
+function temDadosQuadro07AnexoJ(q07) {
+  if (!q07) return false;
+  return (q07.linhas && q07.linhas.length > 0) || q07.optaEnglobamento !== undefined || q07.pagamentosPorConta !== undefined;
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões) e Quadro 6 (categoria B —
-// empresariais/profissionais) implementados, com nomes de campo confirmados contra um
-// exemplo real. Os Quadros 7 a 11 (prediais, capitais, mais-valias, rendimentos de anos
-// anteriores, contas no estrangeiro) ainda não têm interface própria — ficam preservados em
-// passthrough quando importados.
+// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
+// empresariais/profissionais) e Quadro 7 (categoria F — prediais) implementados, com nomes
+// de campo confirmados contra um exemplo real. Os Quadros 8 a 11 (capitais, mais-valias,
+// rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
+// ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -3276,7 +3335,8 @@ function buildAnexoJ(model) {
   const quadro04 = temDadosQuadro04AnexoJ(j.quadro04) ? buildQuadro04AnexoJ(j.quadro04) : (pass.Quadro04 || `<Quadro04/>`);
   const quadro05 = temDadosQuadro05AnexoJ(j.quadro05) ? buildQuadro05AnexoJ(j.quadro05) : (pass.Quadro05 || `<Quadro05/>`);
   const quadro06 = temDadosQuadro06AnexoJ(j.quadro06) ? buildQuadro06AnexoJ(j.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
-  const quadrosRestantes = ["Quadro07", "Quadro08", "Quadro09", "Quadro10", "Quadro11"]
+  const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
+  const quadrosRestantes = ["Quadro08", "Quadro09", "Quadro10", "Quadro11"]
     .map(q => pass[q] || `<${q}/>`).join("");
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -3285,6 +3345,7 @@ function buildAnexoJ(model) {
     quadro04 +
     quadro05 +
     quadro06 +
+    quadro07 +
     quadrosRestantes +
     `</AnexoJ>`;
 }
@@ -4227,17 +4288,35 @@ function parseQuadro06AnexoJ(q06) {
   return { linhas: parseQuadro06AAnexoJ(q06), complementar: parseQuadro06BAnexoJ(q06) };
 }
 
+// Anexo J, Quadro 7A (rendimentos prediais obtidos no estrangeiro).
+function parseQuadro07AAnexoJ(q07) {
+  return parseLinhasGenerico(filho(q07, "AnexoJq07AT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoLiquido: l.RendimentoLiquido, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro
+  }));
+}
+
+function parseQuadro07AnexoJ(q07) {
+  if (!temConteudo(q07)) return undefined;
+  return {
+    linhas: parseQuadro07AAnexoJ(q07),
+    optaEnglobamento: texto(q07, "AnexoJq07B01") !== undefined ? texto(q07, "AnexoJq07B01") === "S" : undefined,
+    pagamentosPorConta: texto(q07, "AnexoJq07C03")
+  };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões) e Quadro 6 (categoria B —
-// empresariais/profissionais) implementados, nomes de campo confirmados contra um exemplo
-// real. Os Quadros 7 a 11 (prediais, capitais, mais-valias, rendimentos de anos anteriores,
-// contas no estrangeiro) ficam preservados em passthrough.
+// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
+// empresariais/profissionais) e Quadro 7 (categoria F — prediais) implementados, nomes de
+// campo confirmados contra um exemplo real. Os Quadros 8 a 11 (capitais, mais-valias,
+// rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
   const q04 = filho(anexoJ, "Quadro04");
   const q05 = filho(anexoJ, "Quadro05");
   const q06 = filho(anexoJ, "Quadro06");
+  const q07 = filho(anexoJ, "Quadro07");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
@@ -4245,19 +4324,21 @@ function parseAnexoJ(anexoJ) {
   const quadro04 = parseQuadro04AnexoJ(q04);
   const quadro05 = parseQuadro05AnexoJ(q05);
   const quadro06 = parseQuadro06AnexoJ(q06);
+  const quadro07 = parseQuadro07AnexoJ(q07);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
   if (temConteudo(q05) && !quadro05) passthrough.Quadro05 = serializar(q05);
   if (temConteudo(q06) && !quadro06) passthrough.Quadro06 = serializar(q06);
-  for (const i of [7, 8, 9, 10, 11]) {
+  if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
+  for (const i of [8, 9, 10, 11]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoJ, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }
@@ -6174,6 +6255,28 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  window.adicionarLinhaAnexoJ07A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ07A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj07a-codigo" size="4" value="F01"></td>
+      <td><input class="aj07a-pais" size="4"></td>
+      <td><input class="aj07a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj07a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro07AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ07A tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj07a-codigo").value,
+      codPais: tr.querySelector(".aj07a-pais").value,
+      rendimentoLiquido: tr.querySelector(".aj07a-rendimento").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj07a-impostoestrangeiro").value || 0
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -6213,10 +6316,17 @@ if (typeof module !== "undefined" && module.exports) {
     const temQuadro06 = linhas06.length || complementar06.length;
     const quadro06 = temQuadro06 ? { linhas: linhas06, complementar: complementar06 } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06;
+    const linhas07 = lerQuadro07AAnexoJ();
+    const optaEnglobamento07Valor = document.getElementById("aj07bOptaEnglobamento").value;
+    const optaEnglobamento07 = optaEnglobamento07Valor === "" ? undefined : optaEnglobamento07Valor === "S";
+    const pagamentosPorConta07 = document.getElementById("aj07cPagamentosConta").value || undefined;
+    const temQuadro07 = linhas07.length || optaEnglobamento07 !== undefined || pagamentosPorConta07 !== undefined;
+    const quadro07 = temQuadro07 ? { linhas: linhas07, optaEnglobamento: optaEnglobamento07, pagamentosPorConta: pagamentosPorConta07 } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07 };
   }
 
   function lerDespesasEFatura() {
@@ -7048,6 +7158,9 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("aj05dOptaEnglobamento").value = "";
       document.querySelector("#tabelaAnexoJ06A tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ06B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ07A tbody").innerHTML = "";
+      document.getElementById("aj07bOptaEnglobamento").value = "";
+      document.getElementById("aj07cPagamentosConta").value = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -7142,6 +7255,22 @@ if (typeof module !== "undefined" && module.exports) {
             tr.querySelector(".aj06b-diasmenor").checked = !!c.diasPermanenciaMenor;
             tr.querySelector(".aj06b-diasmaior").checked = !!c.diasPermanenciaMaior;
           });
+        }
+
+        if (j.quadro07) {
+          const q7 = j.quadro07;
+          (q7.linhas || []).forEach(l => {
+            adicionarLinhaAnexoJ07A();
+            const tr = document.querySelector("#tabelaAnexoJ07A tbody tr:last-child");
+            tr.querySelector(".aj07a-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj07a-pais").value = l.codPais || "";
+            tr.querySelector(".aj07a-rendimento").value = l.rendimentoLiquido || "";
+            tr.querySelector(".aj07a-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+          });
+          if (q7.optaEnglobamento !== undefined) {
+            document.getElementById("aj07bOptaEnglobamento").value = q7.optaEnglobamento ? "S" : "N";
+          }
+          document.getElementById("aj07cPagamentosConta").value = q7.pagamentosPorConta || "";
         }
       }
 

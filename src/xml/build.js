@@ -1371,12 +1371,47 @@ function temDadosQuadro06AnexoJ(q06) {
   return (q06.linhas && q06.linhas.length > 0) || (q06.complementar && q06.complementar.length > 0);
 }
 
+// Anexo J, Quadro 7A (rendimentos prediais obtidos no estrangeiro, Categoria F — código
+// único F01). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro07AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (701 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoLiquido: moeda(l.rendimentoLiquido), ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoLiquido) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq07AT01", campos) +
+    el("AnexoJq07AT01SomaC01", moeda(somaC01)) + el("AnexoJq07AT01SomaC02", moeda(somaC02));
+}
+
+// Anexo J, Quadro 7B (opção pelo englobamento) e 7C (pagamentos por conta). Os rendimentos
+// prediais são tributados autonomamente a 28% por omissão (art.º 72.º CIRS); o campo B01
+// (opção pelo englobamento) está confirmado contra um exemplo real. O campo de pagamentos
+// por conta (7C, campo 03) não aparecia preenchido no exemplo — nome extrapolado por
+// analogia com o padrão dos Quadros 4B/5B (AnexoJq0XC0Y), não confirmado — e, à semelhança
+// dos campos de nacionalidade do Quadro 3A, é omitido por completo (nem sequer como tag
+// vazia) quando não preenchido, ao contrário da convenção habitual de auto-fecho.
+function buildQuadro07AnexoJ(q07) {
+  if (!q07) return `<Quadro07/>`;
+  return `<Quadro07>` +
+    buildQuadro07AAnexoJ(q07.linhas || []) +
+    el("AnexoJq07B01", q07.optaEnglobamento === undefined ? undefined : (q07.optaEnglobamento ? "S" : "N")) +
+    (q07.pagamentosPorConta !== undefined ? el("AnexoJq07C03", moeda(q07.pagamentosPorConta)) : "") +
+    `</Quadro07>`;
+}
+
+function temDadosQuadro07AnexoJ(q07) {
+  if (!q07) return false;
+  return (q07.linhas && q07.linhas.length > 0) || q07.optaEnglobamento !== undefined || q07.pagamentosPorConta !== undefined;
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões) e Quadro 6 (categoria B —
-// empresariais/profissionais) implementados, com nomes de campo confirmados contra um
-// exemplo real. Os Quadros 7 a 11 (prediais, capitais, mais-valias, rendimentos de anos
-// anteriores, contas no estrangeiro) ainda não têm interface própria — ficam preservados em
-// passthrough quando importados.
+// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
+// empresariais/profissionais) e Quadro 7 (categoria F — prediais) implementados, com nomes
+// de campo confirmados contra um exemplo real. Os Quadros 8 a 11 (capitais, mais-valias,
+// rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
+// ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -1398,7 +1433,8 @@ function buildAnexoJ(model) {
   const quadro04 = temDadosQuadro04AnexoJ(j.quadro04) ? buildQuadro04AnexoJ(j.quadro04) : (pass.Quadro04 || `<Quadro04/>`);
   const quadro05 = temDadosQuadro05AnexoJ(j.quadro05) ? buildQuadro05AnexoJ(j.quadro05) : (pass.Quadro05 || `<Quadro05/>`);
   const quadro06 = temDadosQuadro06AnexoJ(j.quadro06) ? buildQuadro06AnexoJ(j.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
-  const quadrosRestantes = ["Quadro07", "Quadro08", "Quadro09", "Quadro10", "Quadro11"]
+  const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
+  const quadrosRestantes = ["Quadro08", "Quadro09", "Quadro10", "Quadro11"]
     .map(q => pass[q] || `<${q}/>`).join("");
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -1407,6 +1443,7 @@ function buildAnexoJ(model) {
     quadro04 +
     quadro05 +
     quadro06 +
+    quadro07 +
     quadrosRestantes +
     `</AnexoJ>`;
 }

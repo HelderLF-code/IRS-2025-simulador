@@ -1010,10 +1010,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
   Este anexo tem 11 quadros (espelha as categorias A/H/B/F/E/G do território português, mas
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
   (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
-  (pensões, Categoria H) e o Quadro 6 (empresariais/profissionais, Categoria B) — nomes de
-  campo confirmados contra um exemplo real. Os Quadros 7 a 11 (prediais, capitais,
-  mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda não têm
-  interface própria; se importares uma declaração com dados nesses quadros, ficam
+  (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B) e o Quadro 7
+  (prediais, Categoria F) — nomes de campo confirmados contra um exemplo real. Os Quadros 8
+  a 11 (capitais, mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
+  não têm interface própria; se importares uma declaração com dados nesses quadros, ficam
   preservados tal como estavam.
 </p>
 
@@ -1171,6 +1171,30 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ06B()">+ Adicionar</button>
+
+<h3>Rendimentos prediais (Quadro 7A — Categoria F)</h3>
+<table id="tabelaAnexoJ07A">
+  <thead><tr><th>Código</th><th>País da fonte</th><th>Rendimento líquido (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ07A()">+ Adicionar</button>
+
+<h3>Opção pelo englobamento (Quadro 7B)</h3>
+<p class="aviso-topo">
+  Os rendimentos prediais são tributados autonomamente à taxa especial de 28% (art.º 72.º
+  CIRS). A opção pelo englobamento implica englobar todos os rendimentos prediais desta
+  categoria.
+</p>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(campos 01/02)</small></label>
+    <select id="aj07bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h3>Pagamentos por conta (Quadro 7C)</h3>
+<div class="row">
+  <div><label>Valor (€) <small class="hint">(campo 03 — não confirmado contra um exemplo real)</small></label><input id="aj07cPagamentosConta" type="number" step="0.01"></div>
+</div>
 </div>
 
   </div>
@@ -2887,6 +2911,28 @@ indicares, assume-se o escalão mais baixo.</small></p>
     }));
   }
 
+  window.adicionarLinhaAnexoJ07A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ07A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj07a-codigo" size="4" value="F01"></td>
+      <td><input class="aj07a-pais" size="4"></td>
+      <td><input class="aj07a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj07a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro07AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ07A tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj07a-codigo").value,
+      codPais: tr.querySelector(".aj07a-pais").value,
+      rendimentoLiquido: tr.querySelector(".aj07a-rendimento").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj07a-impostoestrangeiro").value || 0
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -2926,10 +2972,17 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const temQuadro06 = linhas06.length || complementar06.length;
     const quadro06 = temQuadro06 ? { linhas: linhas06, complementar: complementar06 } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06;
+    const linhas07 = lerQuadro07AAnexoJ();
+    const optaEnglobamento07Valor = document.getElementById("aj07bOptaEnglobamento").value;
+    const optaEnglobamento07 = optaEnglobamento07Valor === "" ? undefined : optaEnglobamento07Valor === "S";
+    const pagamentosPorConta07 = document.getElementById("aj07cPagamentosConta").value || undefined;
+    const temQuadro07 = linhas07.length || optaEnglobamento07 !== undefined || pagamentosPorConta07 !== undefined;
+    const quadro07 = temQuadro07 ? { linhas: linhas07, optaEnglobamento: optaEnglobamento07, pagamentosPorConta: pagamentosPorConta07 } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07 };
   }
 
   function lerDespesasEFatura() {
@@ -3761,6 +3814,9 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("aj05dOptaEnglobamento").value = "";
       document.querySelector("#tabelaAnexoJ06A tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ06B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ07A tbody").innerHTML = "";
+      document.getElementById("aj07bOptaEnglobamento").value = "";
+      document.getElementById("aj07cPagamentosConta").value = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -3855,6 +3911,22 @@ indicares, assume-se o escalão mais baixo.</small></p>
             tr.querySelector(".aj06b-diasmenor").checked = !!c.diasPermanenciaMenor;
             tr.querySelector(".aj06b-diasmaior").checked = !!c.diasPermanenciaMaior;
           });
+        }
+
+        if (j.quadro07) {
+          const q7 = j.quadro07;
+          (q7.linhas || []).forEach(l => {
+            adicionarLinhaAnexoJ07A();
+            const tr = document.querySelector("#tabelaAnexoJ07A tbody tr:last-child");
+            tr.querySelector(".aj07a-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj07a-pais").value = l.codPais || "";
+            tr.querySelector(".aj07a-rendimento").value = l.rendimentoLiquido || "";
+            tr.querySelector(".aj07a-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+          });
+          if (q7.optaEnglobamento !== undefined) {
+            document.getElementById("aj07bOptaEnglobamento").value = q7.optaEnglobamento ? "S" : "N";
+          }
+          document.getElementById("aj07cPagamentosConta").value = q7.pagamentosPorConta || "";
         }
       }
 
