@@ -1008,12 +1008,12 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <h2>Anexo J — Rendimentos Obtidos no Estrangeiro</h2>
 <p class="aviso-topo">
   Este anexo tem 11 quadros (espelha as categorias A/H/B/F/E/G do território português, mas
-  para rendimentos obtidos fora de Portugal). Por agora está implementado o Quadro 3A
-  (identificação do titular) e o Quadro 4 (trabalho dependente, Categoria A) — nomes de
-  campo confirmados contra um exemplo real. Os Quadros 5 a 11 (pensões, empresariais/
-  profissionais, prediais, capitais, mais-valias, rendimentos de anos anteriores, contas no
-  estrangeiro) ainda não têm interface própria; se importares uma declaração com dados
-  nesses quadros, ficam preservados tal como estavam.
+  para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
+  (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A) e o Quadro 5
+  (pensões, Categoria H) — nomes de campo confirmados contra um exemplo real. Os Quadros 6 a
+  11 (empresariais/profissionais, prediais, capitais, mais-valias, rendimentos de anos
+  anteriores, contas no estrangeiro) ainda não têm interface própria; se importares uma
+  declaração com dados nesses quadros, ficam preservados tal como estavam.
 </p>
 
 <h3>Identificação do titular do rendimento (Quadro 3A)</h3>
@@ -1084,6 +1084,53 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <div class="row">
   <div><label>Pretende beneficiar do regime? <small class="hint">(493/494)</small></label>
     <select id="aj04e1OptaIrsJovem"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h3>Rendimentos de pensões (Quadro 5A — Categoria H)</h3>
+<datalist id="listaCodigoAnexoJ05A">
+  <option value="H01">H01 — Pensões (não públicas)</option>
+  <option value="H02">H02 — Pensões públicas</option>
+  <option value="H03">H03 — Pensões de alimentos (tributação autónoma a 20%, art.º 72.º CIRS)</option>
+  <option value="H04">H04 — Rendas temporárias e vitalícias</option>
+</datalist>
+<table id="tabelaAnexoJ05A">
+  <thead><tr>
+    <th>Código</th><th>País da fonte</th><th>Rendimento bruto (€)</th>
+    <th>Contrib. regime proteção social (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ05A()">+ Adicionar</button>
+
+<h3>Pagamentos por conta (Quadro 5B)</h3>
+<div class="row">
+  <div><label>Valor (€) <small class="hint">(campo 01)</small></label><input id="aj05bPagamentosConta" type="number" step="0.01"></div>
+</div>
+
+<h3>Informações complementares — Categoria H (Quadro 5C)</h3>
+<p class="aviso-topo">
+  Para o código H01: indicar a origem da pensão. Para o código H04: indicar as
+  contribuições iniciais subjacentes às rendas temporárias/vitalícias.
+</p>
+<table id="tabelaAnexoJ05C">
+  <thead><tr>
+    <th>Linha do Q5A (ex: 501)</th><th>Origem: emprego anterior</th><th>Origem: segurança social</th>
+    <th>Origem: outra</th><th>Contribuições iniciais (€, H04)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ05C()">+ Adicionar</button>
+
+<h3>Opção pelo englobamento das pensões de alimentos (Quadro 5D)</h3>
+<p class="aviso-topo">
+  Só relevante se houver linhas com o código H03 no Quadro 5A — por regra, são tributadas
+  autonomamente à taxa de 20%; a opção implica o englobamento de todos os rendimentos de
+  pensões de alimentos da Categoria H.
+</p>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(campos 02/03)</small></label>
+    <select id="aj05dOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
   </div>
 </div>
 </div>
@@ -2704,6 +2751,54 @@ indicares, assume-se o escalão mais baixo.</small></p>
     }));
   }
 
+  window.adicionarLinhaAnexoJ05A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ05A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj05a-codigo" size="4" list="listaCodigoAnexoJ05A"></td>
+      <td><input class="aj05a-pais" size="4"></td>
+      <td><input class="aj05a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj05a-contribsocial" type="number" step="0.01"></td>
+      <td><input class="aj05a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro05AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ05A tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj05a-codigo").value,
+      codPais: tr.querySelector(".aj05a-pais").value,
+      rendimentoBruto: tr.querySelector(".aj05a-rendimento").value || 0,
+      contribSocial: tr.querySelector(".aj05a-contribsocial").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj05a-impostoestrangeiro").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ05C = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ05C tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj05c-linha" size="6"></td>
+      <td><input class="aj05c-empregoanterior" type="checkbox"></td>
+      <td><input class="aj05c-segurancasocial" type="checkbox"></td>
+      <td><input class="aj05c-outra" type="checkbox"></td>
+      <td><input class="aj05c-contribuicoesiniciais" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro05CAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ05C tbody tr")].map(tr => ({
+      codLinhaQ5A: tr.querySelector(".aj05c-linha").value,
+      origemPensaoEmpregoAnterior: tr.querySelector(".aj05c-empregoanterior").checked,
+      origemPensaoSegurancaSocial: tr.querySelector(".aj05c-segurancasocial").checked,
+      origemPensaoOutra: tr.querySelector(".aj05c-outra").checked,
+      contribuicoesIniciais: tr.querySelector(".aj05c-contribuicoesiniciais").value || undefined
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -2730,10 +2825,18 @@ indicares, assume-se o escalão mais baixo.</small></p>
       irsJovemAntigo.nifEstabelecimento || irsJovemAntigo.codPais || irsJovemNovo !== undefined;
     const quadro04 = temQuadro04 ? { linhas, pagamentosPorConta, complementar, exResidenteAno, irsJovemAntigo, irsJovemNovo } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04;
+    const linhas05 = lerQuadro05AAnexoJ();
+    const pagamentosPorConta05 = document.getElementById("aj05bPagamentosConta").value || undefined;
+    const complementar05 = lerQuadro05CAnexoJ();
+    const optaEnglobamentoValor = document.getElementById("aj05dOptaEnglobamento").value;
+    const optaEnglobamentoPensoesAlimentos = optaEnglobamentoValor === "" ? undefined : optaEnglobamentoValor === "S";
+    const temQuadro05 = linhas05.length || pagamentosPorConta05 !== undefined || complementar05.length || optaEnglobamentoPensoesAlimentos !== undefined;
+    const quadro05 = temQuadro05 ? { linhas: linhas05, pagamentosPorConta: pagamentosPorConta05, complementar: complementar05, optaEnglobamentoPensoesAlimentos } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04 };
+    return { titularNif, nacionalidades, quadro04, quadro05 };
   }
 
   function lerDespesasEFatura() {
@@ -3559,6 +3662,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("aj04eNifEstabelecimento").value = "";
       document.getElementById("aj04eCodPais").value = "";
       document.getElementById("aj04e1OptaIrsJovem").value = "";
+      document.querySelector("#tabelaAnexoJ05A tbody").innerHTML = "";
+      document.getElementById("aj05bPagamentosConta").value = "";
+      document.querySelector("#tabelaAnexoJ05C tbody").innerHTML = "";
+      document.getElementById("aj05dOptaEnglobamento").value = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -3603,6 +3710,32 @@ indicares, assume-se o escalão mais baixo.</small></p>
           }
           if (q4.irsJovemNovo !== undefined) {
             document.getElementById("aj04e1OptaIrsJovem").value = q4.irsJovemNovo ? "S" : "N";
+          }
+        }
+
+        if (j.quadro05) {
+          const q5 = j.quadro05;
+          (q5.linhas || []).forEach(l => {
+            adicionarLinhaAnexoJ05A();
+            const tr = document.querySelector("#tabelaAnexoJ05A tbody tr:last-child");
+            tr.querySelector(".aj05a-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj05a-pais").value = l.codPais || "";
+            tr.querySelector(".aj05a-rendimento").value = l.rendimentoBruto || "";
+            tr.querySelector(".aj05a-contribsocial").value = l.contribSocial || "";
+            tr.querySelector(".aj05a-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+          });
+          document.getElementById("aj05bPagamentosConta").value = q5.pagamentosPorConta || "";
+          (q5.complementar || []).forEach(c => {
+            adicionarLinhaAnexoJ05C();
+            const tr = document.querySelector("#tabelaAnexoJ05C tbody tr:last-child");
+            tr.querySelector(".aj05c-linha").value = c.codLinhaQ5A || "";
+            tr.querySelector(".aj05c-empregoanterior").checked = !!c.origemPensaoEmpregoAnterior;
+            tr.querySelector(".aj05c-segurancasocial").checked = !!c.origemPensaoSegurancaSocial;
+            tr.querySelector(".aj05c-outra").checked = !!c.origemPensaoOutra;
+            tr.querySelector(".aj05c-contribuicoesiniciais").value = c.contribuicoesIniciais || "";
+          });
+          if (q5.optaEnglobamentoPensoesAlimentos !== undefined) {
+            document.getElementById("aj05dOptaEnglobamento").value = q5.optaEnglobamentoPensoesAlimentos ? "S" : "N";
           }
         }
       }

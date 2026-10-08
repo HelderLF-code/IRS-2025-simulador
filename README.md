@@ -142,10 +142,18 @@ regenerar o `simulador-irs.html`.
   "TornouResidenteFuncaoPublica" e "NaoTornouResidenteFuncaoPublica" do Quadro 4C, que não
   apareciam preenchidos nesse exemplo — extrapolados por analogia com os campos vizinhos
   confirmados (mesmo valor literal "true", não "S"/"N" como é habitual nos restantes
-  anexos). Este anexo espelha as categorias A/H/B/F/E/G do território português, mas para
-  rendimentos obtidos fora de Portugal — tem 11 quadros; os Quadros 5 a 11 (pensões,
-  empresariais/profissionais, prediais, capitais, mais-valias, rendimentos de anos
-  anteriores, contas no estrangeiro) ainda não têm interface própria.
+  anexos); e Quadro 5 completo (pensões, Categoria H) — 5A (códigos H01-H04, com país da
+  fonte, rendimento bruto, contribuições para regimes de proteção social e imposto pago no
+  estrangeiro — sem colunas de NIF/retenção em Portugal, ao contrário do Quadro 4A), 5B
+  (pagamentos por conta), 5C (origem da pensão — emprego anterior/segurança social/outra —
+  e contribuições iniciais para rendas temporárias/vitalícias) e 5D (opção pelo
+  englobamento das pensões de alimentos, código H03, tributadas autonomamente a 20% por
+  omissão, art.º 72.º CIRS). O campo "OrigemPensaoOutra" do Quadro 5C não aparecia
+  preenchido no exemplo — extrapolado por analogia, não confirmado. Este anexo espelha as
+  categorias A/H/B/F/E/G do território português, mas para rendimentos obtidos fora de
+  Portugal — tem 11 quadros; os Quadros 6 a 11 (empresariais/profissionais, prediais,
+  capitais, mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda não
+  têm interface própria.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
@@ -183,8 +191,8 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos G1, L, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
-5-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
-(os Anexos G e J, Quadros 3A/4, já estão mapeados). Ao **importar** uma declaração que já
+6-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
+(os Anexos G e J, Quadros 3A/4/5, já estão mapeados). Ao **importar** uma declaração que já
 tenha dados nessas secções, esses dados são preservados tal como estavam (mas ainda não
 podem ser vistos/editados na interface) e mantidos ao exportar de novo — para não haver
 perda de informação.
@@ -230,12 +238,15 @@ perda de informação.
    próxima ronda). Cada anexo novo por implementar do zero (G1, L, SS) vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
    para os Anexos A, B, E, G, H e J.
-6. **Anexo J — Quadros 5 a 11** (pensões, rendimentos empresariais/profissionais, prediais,
+6. **Anexo J — Quadros 6 a 11** (rendimentos empresariais/profissionais, prediais,
    capitais, mais-valias e outros incrementos patrimoniais — com 4 sub-blocos no Quadro 9 —,
    rendimentos de anos anteriores, contas no estrangeiro) — já tenho as instruções e um
-   exemplo preenchido, falta implementar. Nenhum destes quadros entra ainda na estimativa
-   (nem sequer o Quadro 4, já mapeado) — o crédito de imposto por dupla tributação
-   internacional (art.º 81.º CIRS) também ainda não está implementado.
+   exemplo preenchido, falta implementar. Nenhum quadro entra ainda na estimativa (nem
+   sequer os Quadros 4/5, já mapeados) — o crédito de imposto por dupla tributação
+   internacional (art.º 81.º CIRS) também ainda não está implementado. O Quadro 5A (código
+   H03 — pensões de alimentos) tem uma taxa autónoma confirmada (20%, art.º 72.º CIRS), ao
+   contrário de outras taxas autónomas pendentes no Anexo G (Quadros 4A/4C) — bom candidato
+   para quando se avançar com o cálculo deste anexo.
 7. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
