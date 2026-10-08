@@ -65,6 +65,7 @@
     <button type="button" data-secao="anexoG" onclick="mostrarSecao('anexoG')">Anexo G</button>
     <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
     <button type="button" data-secao="anexoH" onclick="mostrarSecao('anexoH')">Anexo H</button>
+    <button type="button" data-secao="anexoJ" onclick="mostrarSecao('anexoJ')">Anexo J</button>
   </nav>
   <div class="conteudo-secoes">
 
@@ -1003,6 +1004,90 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <button type="button" onclick="adicionarLinhaAnexoHBeneficio()">+ Adicionar</button>
 </div>
 
+<div class="painel" id="painel-anexoJ">
+<h2>Anexo J — Rendimentos Obtidos no Estrangeiro</h2>
+<p class="aviso-topo">
+  Este anexo tem 11 quadros (espelha as categorias A/H/B/F/E/G do território português, mas
+  para rendimentos obtidos fora de Portugal). Por agora está implementado o Quadro 3A
+  (identificação do titular) e o Quadro 4 (trabalho dependente, Categoria A) — nomes de
+  campo confirmados contra um exemplo real. Os Quadros 5 a 11 (pensões, empresariais/
+  profissionais, prediais, capitais, mais-valias, rendimentos de anos anteriores, contas no
+  estrangeiro) ainda não têm interface própria; se importares uma declaração com dados
+  nesses quadros, ficam preservados tal como estavam.
+</p>
+
+<h3>Identificação do titular do rendimento (Quadro 3A)</h3>
+<div class="row">
+  <div><label>NIF do titular <small class="hint">(campo 03 — em branco assume o sujeito passivo A)</small></label><input id="aj03Titular" size="10"></div>
+  <div><label>Nacionalidade 1 <small class="hint">(campo 04)</small></label><input id="aj03Nac1" size="4"></div>
+  <div><label>Nacionalidade 2 <small class="hint">(campo 05)</small></label><input id="aj03Nac2" size="4"></div>
+  <div><label>Nacionalidade 3 <small class="hint">(campo 06)</small></label><input id="aj03Nac3" size="4"></div>
+</div>
+
+<h3>Rendimentos de trabalho dependente (Quadro 4A — Categoria A)</h3>
+<datalist id="listaCodigoAnexoJ04A">
+  <option value="A01">A01 — Remunerações privadas</option>
+  <option value="A02">A02 — Remunerações públicas</option>
+  <option value="A03">A03 — Remunerações de membros de órgãos de gestão/administração de sociedades (2018+)</option>
+</datalist>
+<table id="tabelaAnexoJ04A">
+  <thead><tr>
+    <th>Código</th><th>País da fonte</th><th>Rendimento bruto (€)</th><th>Contrib. regime proteção social (€)</th>
+    <th>Imposto pago no estrangeiro (€)</th><th>NIF entidade (PT)</th><th>Retenção na fonte (€)</th><th>Retenção sobretaxa (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ04A()">+ Adicionar</button>
+
+<h3>Pagamentos por conta (Quadro 4B)</h3>
+<div class="row">
+  <div><label>Valor (€) <small class="hint">(campo 01)</small></label><input id="aj04bPagamentosConta" type="number" step="0.01"></div>
+</div>
+
+<h3>Informações complementares — Categoria A (Quadro 4C)</h3>
+<p class="aviso-topo">
+  Para eliminação da dupla tributação internacional (Convenções/art.º 81.º CIRS): dias de
+  permanência no país onde o trabalho foi prestado, trabalhador fronteiriço (Espanha), e
+  motivo de residência para remunerações públicas (código A02).
+</p>
+<table id="tabelaAnexoJ04C">
+  <thead><tr>
+    <th>Linha do Q4A (ex: 401)</th><th>País da entidade pagadora</th>
+    <th>Dias ≤183</th><th>Dias &gt;183</th><th>Trabalhador fronteiriço (Espanha)</th>
+    <th>Tornou-se residente só p/ função pública? Sim</th><th>Não</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ04C()">+ Adicionar</button>
+
+<h3>Regime fiscal aplicável a ex-residentes (Quadro 4D, art.º 12.º-A CIRS)</h3>
+<div class="row">
+  <div><label>Ano em que se tornou residente <small class="hint">(campo 491)</small></label><input id="aj04dAno" type="number" size="6"></div>
+</div>
+
+<h3>Opção pelo regime do art.º 12.º-B — IRS Jovem, anos de 2020 a 2024 (Quadro 4E)</h3>
+<datalist id="listaNivelQNQAnexoJ">
+  <option value="01">01 — Nível 4 (secundário com dupla certificação/vocacionado + estágio)</option>
+  <option value="02">02 — Nível 5 (pós-secundário não superior)</option>
+  <option value="03">03 — Nível 6 (Licenciatura)</option>
+  <option value="04">04 — Nível 7 (Mestrado)</option>
+  <option value="05">05 — Nível 8 (Doutoramento)</option>
+</datalist>
+<div class="row">
+  <div><label>Ano de conclusão do ciclo de estudos <small class="hint">(492a)</small></label><input id="aj04eAnoConclusao" type="number" size="6"></div>
+  <div><label>Nível de qualificação QNQ <small class="hint">(492b)</small></label><input id="aj04eNivelQNQ" size="4" list="listaNivelQNQAnexoJ"></div>
+  <div><label>NIF do estabelecimento de ensino (PT) <small class="hint">(492c)</small></label><input id="aj04eNifEstabelecimento" size="10"></div>
+  <div><label>Código do país (se estudos concluídos fora de Portugal) <small class="hint">(492d)</small></label><input id="aj04eCodPais" size="4"></div>
+</div>
+
+<h3>Opção pelo regime do art.º 12.º-B — IRS Jovem, anos de 2025 e seguintes (Quadro 4E.1)</h3>
+<div class="row">
+  <div><label>Pretende beneficiar do regime? <small class="hint">(493/494)</small></label>
+    <select id="aj04e1OptaIrsJovem"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+</div>
+
   </div>
 </div>
 
@@ -1043,7 +1128,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
   // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
-  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoGPassthrough: {}, anexoHPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
+  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoGPassthrough: {}, anexoHPassthrough: {}, anexoJPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -2561,6 +2646,96 @@ indicares, assume-se o escalão mais baixo.</small></p>
     return { pensoesAlimentos, rendimentosIsentos, propriedadeIntelectual, beneficiosDeficiencia };
   }
 
+  window.adicionarLinhaAnexoJ04A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ04A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj04a-codigo" size="4" list="listaCodigoAnexoJ04A"></td>
+      <td><input class="aj04a-pais" size="4"></td>
+      <td><input class="aj04a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj04a-contribsocial" type="number" step="0.01"></td>
+      <td><input class="aj04a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj04a-nif" size="10"></td>
+      <td><input class="aj04a-retencaofonte" type="number" step="0.01"></td>
+      <td><input class="aj04a-retencaosobretaxa" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ04A tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj04a-codigo").value,
+      codPais: tr.querySelector(".aj04a-pais").value,
+      rendimentoBruto: tr.querySelector(".aj04a-rendimento").value || 0,
+      contribSocial: tr.querySelector(".aj04a-contribsocial").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj04a-impostoestrangeiro").value || 0,
+      nif: tr.querySelector(".aj04a-nif").value || undefined,
+      retencaoFonte: tr.querySelector(".aj04a-retencaofonte").value || 0,
+      retencaoSobretaxa: tr.querySelector(".aj04a-retencaosobretaxa").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ04C = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ04C tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj04c-linha" size="6"></td>
+      <td><input class="aj04c-pais" size="4"></td>
+      <td><input class="aj04c-diasmenor" type="checkbox"></td>
+      <td><input class="aj04c-diasmaior" type="checkbox"></td>
+      <td><input class="aj04c-fronteirico" type="checkbox"></td>
+      <td><input class="aj04c-tornouresidente" type="checkbox"></td>
+      <td><input class="aj04c-naotornouresidente" type="checkbox"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04CAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ04C tbody tr")].map(tr => ({
+      codLinhaQ4A: tr.querySelector(".aj04c-linha").value,
+      codPais: tr.querySelector(".aj04c-pais").value || undefined,
+      diasPermanenciaMenor: tr.querySelector(".aj04c-diasmenor").checked,
+      diasPermanenciaMaior: tr.querySelector(".aj04c-diasmaior").checked,
+      trabalhadorFronteirico: tr.querySelector(".aj04c-fronteirico").checked,
+      tornouResidenteFuncaoPublica: tr.querySelector(".aj04c-tornouresidente").checked,
+      naoTornouResidenteFuncaoPublica: tr.querySelector(".aj04c-naotornouresidente").checked
+    }));
+  }
+
+  function lerAnexoJ() {
+    const titularNif = document.getElementById("aj03Titular").value || undefined;
+    const nacionalidades = [
+      document.getElementById("aj03Nac1").value,
+      document.getElementById("aj03Nac2").value,
+      document.getElementById("aj03Nac3").value
+    ].filter(Boolean);
+
+    const linhas = lerQuadro04AAnexoJ();
+    const pagamentosPorConta = document.getElementById("aj04bPagamentosConta").value || undefined;
+    const complementar = lerQuadro04CAnexoJ();
+    const exResidenteAno = document.getElementById("aj04dAno").value || undefined;
+    const irsJovemAntigo = {
+      anoConclusao: document.getElementById("aj04eAnoConclusao").value || undefined,
+      nivelQNQ: document.getElementById("aj04eNivelQNQ").value || undefined,
+      nifEstabelecimento: document.getElementById("aj04eNifEstabelecimento").value || undefined,
+      codPais: document.getElementById("aj04eCodPais").value || undefined
+    };
+    const irsJovemNovoValor = document.getElementById("aj04e1OptaIrsJovem").value;
+    const irsJovemNovo = irsJovemNovoValor === "" ? undefined : irsJovemNovoValor === "S";
+
+    const temQuadro04 = linhas.length || pagamentosPorConta !== undefined || complementar.length ||
+      exResidenteAno || irsJovemAntigo.anoConclusao || irsJovemAntigo.nivelQNQ ||
+      irsJovemAntigo.nifEstabelecimento || irsJovemAntigo.codPais || irsJovemNovo !== undefined;
+    const quadro04 = temQuadro04 ? { linhas, pagamentosPorConta, complementar, exResidenteAno, irsJovemAntigo, irsJovemNovo } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04;
+    if (!temDados) return undefined;
+
+    return { titularNif, nacionalidades, quadro04 };
+  }
+
   function lerDespesasEFatura() {
     return {
       geraisFamiliares: document.getElementById("despesaGeraisFamiliares").value || 0,
@@ -2702,6 +2877,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       anexoGPassthrough: dadosPreservados.anexoGPassthrough,
       anexoH: lerAnexoH(),
       anexoHPassthrough: dadosPreservados.anexoHPassthrough,
+      anexoJ: lerAnexoJ(),
+      anexoJPassthrough: dadosPreservados.anexoJPassthrough,
       rostoPassthrough: dadosPreservados.rostoPassthrough,
       anexosPassthrough: dadosPreservados.anexosPassthrough
     };
@@ -3369,6 +3546,68 @@ indicares, assume-se o escalão mais baixo.</small></p>
         });
       }
 
+      document.getElementById("aj03Titular").value = "";
+      document.getElementById("aj03Nac1").value = "";
+      document.getElementById("aj03Nac2").value = "";
+      document.getElementById("aj03Nac3").value = "";
+      document.querySelector("#tabelaAnexoJ04A tbody").innerHTML = "";
+      document.getElementById("aj04bPagamentosConta").value = "";
+      document.querySelector("#tabelaAnexoJ04C tbody").innerHTML = "";
+      document.getElementById("aj04dAno").value = "";
+      document.getElementById("aj04eAnoConclusao").value = "";
+      document.getElementById("aj04eNivelQNQ").value = "";
+      document.getElementById("aj04eNifEstabelecimento").value = "";
+      document.getElementById("aj04eCodPais").value = "";
+      document.getElementById("aj04e1OptaIrsJovem").value = "";
+
+      if (dados.anexoJ) {
+        const j = dados.anexoJ;
+        document.getElementById("aj03Titular").value = j.titularNif || "";
+        const nac = j.nacionalidades || [];
+        document.getElementById("aj03Nac1").value = nac[0] || "";
+        document.getElementById("aj03Nac2").value = nac[1] || "";
+        document.getElementById("aj03Nac3").value = nac[2] || "";
+
+        if (j.quadro04) {
+          const q4 = j.quadro04;
+          (q4.linhas || []).forEach(l => {
+            adicionarLinhaAnexoJ04A();
+            const tr = document.querySelector("#tabelaAnexoJ04A tbody tr:last-child");
+            tr.querySelector(".aj04a-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj04a-pais").value = l.codPais || "";
+            tr.querySelector(".aj04a-rendimento").value = l.rendimentoBruto || "";
+            tr.querySelector(".aj04a-contribsocial").value = l.contribSocial || "";
+            tr.querySelector(".aj04a-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+            tr.querySelector(".aj04a-nif").value = l.nif || "";
+            tr.querySelector(".aj04a-retencaofonte").value = l.retencaoFonte || "";
+            tr.querySelector(".aj04a-retencaosobretaxa").value = l.retencaoSobretaxa || "";
+          });
+          document.getElementById("aj04bPagamentosConta").value = q4.pagamentosPorConta || "";
+          (q4.complementar || []).forEach(c => {
+            adicionarLinhaAnexoJ04C();
+            const tr = document.querySelector("#tabelaAnexoJ04C tbody tr:last-child");
+            tr.querySelector(".aj04c-linha").value = c.codLinhaQ4A || "";
+            tr.querySelector(".aj04c-pais").value = c.codPais || "";
+            tr.querySelector(".aj04c-diasmenor").checked = !!c.diasPermanenciaMenor;
+            tr.querySelector(".aj04c-diasmaior").checked = !!c.diasPermanenciaMaior;
+            tr.querySelector(".aj04c-fronteirico").checked = !!c.trabalhadorFronteirico;
+            tr.querySelector(".aj04c-tornouresidente").checked = !!c.tornouResidenteFuncaoPublica;
+            tr.querySelector(".aj04c-naotornouresidente").checked = !!c.naoTornouResidenteFuncaoPublica;
+          });
+          document.getElementById("aj04dAno").value = q4.exResidenteAno || "";
+          if (q4.irsJovemAntigo) {
+            document.getElementById("aj04eAnoConclusao").value = q4.irsJovemAntigo.anoConclusao || "";
+            document.getElementById("aj04eNivelQNQ").value = q4.irsJovemAntigo.nivelQNQ || "";
+            document.getElementById("aj04eNifEstabelecimento").value = q4.irsJovemAntigo.nifEstabelecimento || "";
+            document.getElementById("aj04eCodPais").value = q4.irsJovemAntigo.codPais || "";
+          }
+          if (q4.irsJovemNovo !== undefined) {
+            document.getElementById("aj04e1OptaIrsJovem").value = q4.irsJovemNovo ? "S" : "N";
+          }
+        }
+      }
+
+
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
         "nifTitular", "codigoAtividade", "codigoCAEProf", "codigoCAEAgricola",
@@ -3589,6 +3828,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
         anexoBPassthrough: dados.anexoBPassthrough || {},
         anexoGPassthrough: dados.anexoGPassthrough || {},
         anexoHPassthrough: dados.anexoHPassthrough || {},
+        anexoJPassthrough: dados.anexoJPassthrough || {},
         rostoPassthrough: dados.rostoPassthrough || {},
         anexosPassthrough: dados.anexosPassthrough || {}
       };
@@ -3597,6 +3837,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
       const quadrosBPreservados = Object.keys(dadosPreservados.anexoBPassthrough);
       const quadrosGPreservados = Object.keys(dadosPreservados.anexoGPassthrough);
       const quadrosHPreservados = Object.keys(dadosPreservados.anexoHPassthrough);
+      const quadrosJPreservados = Object.keys(dadosPreservados.anexoJPassthrough);
       const aviso = document.getElementById("avisoImportacao");
       aviso.style.display = "block";
       aviso.innerHTML = `<strong>Importado.</strong> Ano ${dados.agregado.ano}, NIF ${dados.agregado.nifA}, ` +
@@ -3613,6 +3854,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
           : "") +
         (quadrosHPreservados.length
           ? `<br>Nota: ${quadrosHPreservados.map(q => q.replace("Quadro", "Quadro ")).join(", ")} do Anexo H ` +
+            `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
+          : "") +
+        (quadrosJPreservados.length
+          ? `<br>Nota: ${quadrosJPreservados.map(q => q.replace("Quadro", "Quadro ")).join(", ")} do Anexo J ` +
             `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
           : "") +
         (secoesPreservadas.length

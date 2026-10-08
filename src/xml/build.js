@@ -1207,13 +1207,106 @@ function buildAnexoH(model) {
     `</AnexoH>`;
 }
 
+// Anexo J, Quadro 4A (rendimentos de trabalho dependente obtidos no estrangeiro, Categoria
+// A — códigos A01/A02/A03). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro04AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return { xml: "", soma: null };
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (401 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoBruto: moeda(l.rendimentoBruto), ContribSocial: moeda(l.contribSocial),
+    ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro), NIF: l.nif,
+    RetencaoFonte: moeda(l.retencaoFonte), RetencaoSobretaxa: moeda(l.retencaoSobretaxa)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoBruto) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.contribSocial) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.retencaoFonte) || 0), 0);
+  const somaC05 = linhas.reduce((a, l) => a + (Number(l.retencaoSobretaxa) || 0), 0);
+  const xml = listaComLinhas("AnexoJq04AT01", campos) +
+    el("AnexoJq04AT01SomaC01", moeda(somaC01)) + el("AnexoJq04AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq04AT01SomaC03", moeda(somaC03)) + el("AnexoJq04AT01SomaC04", moeda(somaC04)) +
+    el("AnexoJq04AT01SomaC05", moeda(somaC05));
+  return { xml };
+}
+
+// Anexo J, Quadro 4C (informações complementares para a categoria A — dias de permanência,
+// trabalhador fronteiriço, motivo da residência para remunerações públicas). Os campos
+// CodLinhaQ4A/CodPais/DiasPermanenciaMenor/DiasPermanenciaMaior estão confirmados contra um
+// exemplo real (valor "true", não "S"/"N" — único caso assim na aplicação). Os campos
+// TrabalhadorFronteirico/TornouResidenteFuncaoPublica/NaoTornouResidenteFuncaoPublica não
+// apareciam preenchidos no exemplo — nomes extrapolados por analogia com o mesmo padrão
+// "true", não confirmados.
+function buildQuadro04CAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  return listaComLinhas("AnexoJq04CT01", linhas.map(l => ({
+    CodLinhaQ4A: l.codLinhaQ4A, CodPais: l.codPais,
+    DiasPermanenciaMenor: l.diasPermanenciaMenor ? "true" : undefined,
+    DiasPermanenciaMaior: l.diasPermanenciaMaior ? "true" : undefined,
+    TrabalhadorFronteirico: l.trabalhadorFronteirico ? "true" : undefined,
+    TornouResidenteFuncaoPublica: l.tornouResidenteFuncaoPublica ? "true" : undefined,
+    NaoTornouResidenteFuncaoPublica: l.naoTornouResidenteFuncaoPublica ? "true" : undefined
+  })));
+}
+
+function buildQuadro04AnexoJ(q04) {
+  if (!q04) return `<Quadro04/>`;
+  const at01 = buildQuadro04AAnexoJ(q04.linhas || []);
+  const ct01 = buildQuadro04CAnexoJ(q04.complementar || []);
+  const jovemAntigo = q04.irsJovemAntigo || {};
+  return `<Quadro04>` +
+    at01.xml +
+    el("AnexoJq04C01", q04.pagamentosPorConta !== undefined ? moeda(q04.pagamentosPorConta) : undefined) +
+    ct01 +
+    el("AnexoJq04C491", q04.exResidenteAno) +
+    el("AnexoJq04C492a", jovemAntigo.anoConclusao) +
+    el("AnexoJq04C492b", jovemAntigo.nivelQNQ) +
+    el("AnexoJq04C492c", jovemAntigo.nifEstabelecimento) +
+    el("AnexoJq04C492d", jovemAntigo.codPais) +
+    el("AnexoJq04B493", q04.irsJovemNovo === undefined ? undefined : (q04.irsJovemNovo ? "S" : "N")) +
+    `</Quadro04>`;
+}
+
+function temDadosQuadro04AnexoJ(q04) {
+  if (!q04) return false;
+  const jovemAntigo = q04.irsJovemAntigo || {};
+  return (q04.linhas && q04.linhas.length > 0) || (q04.complementar && q04.complementar.length > 0) ||
+    q04.pagamentosPorConta !== undefined || !!q04.exResidenteAno ||
+    !!jovemAntigo.anoConclusao || !!jovemAntigo.nivelQNQ || !!jovemAntigo.nifEstabelecimento || !!jovemAntigo.codPais ||
+    q04.irsJovemNovo !== undefined;
+}
+
+// Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular) e
+// Quadro 4 (categoria A) implementados, com nomes de campo confirmados contra um exemplo
+// real. Os Quadros 5 a 11 (pensões, empresariais/profissionais, prediais, capitais,
+// mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda não têm
+// interface própria — ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const j = model.anexoJ || {};
+  const pass = model.anexoJPassthrough || {};
   const campoC02 = tributacaoConjunta ? el("AnexoJq03C02", nifB) : "";
+  const nacionalidades = j.nacionalidades || [];
+  // Campos 04/05/06 (nacionalidades) são omitidos por completo quando não preenchidos —
+  // confirmado contra um exemplo real com só 2 nacionalidades (sem o terceiro campo, nem
+  // sequer como tag vazia), ao contrário da convenção habitual de auto-fecho.
+  const camposNacionalidade = nacionalidades
+    .slice(0, 3)
+    .map((n, idx) => n ? el(`AnexoJq03C0${4 + idx}`, n) : "")
+    .join("");
+  const quadro03 = `<Quadro03>` +
+    el("AnexoJq03C01", nifA) + campoC02 + el("AnexoJq03C03", j.titularNif || nifA) +
+    camposNacionalidade +
+    `</Quadro03>`;
+
+  const quadro04 = temDadosQuadro04AnexoJ(j.quadro04) ? buildQuadro04AnexoJ(j.quadro04) : (pass.Quadro04 || `<Quadro04/>`);
+  const quadrosRestantes = ["Quadro05", "Quadro06", "Quadro07", "Quadro08", "Quadro09", "Quadro10", "Quadro11"]
+    .map(q => pass[q] || `<${q}/>`).join("");
+
   return `<AnexoJ id="${esc(nifA)}">` +
     `<Quadro02>${el("AnexoJq02C01", ano)}</Quadro02>` +
-    `<Quadro03>${el("AnexoJq03C01", nifA)}${campoC02}${el("AnexoJq03C03", nifA)}</Quadro03>` +
-    Array.from({ length: 8 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    quadro03 +
+    quadro04 +
+    quadrosRestantes +
     `</AnexoJ>`;
 }
 
@@ -1256,7 +1349,7 @@ function buildModelo3XML(model) {
     partes.push(buildAnexoG(model));
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
     partes.push(buildAnexoH(model));
-    partes.push(pass.AnexoJ || buildAnexoJ(model));
+    partes.push(buildAnexoJ(model));
     partes.push(pass.AnexoL || buildAnexoL(model));
     partes.push(pass.AnexoSS || buildAnexoSS(model));
   }

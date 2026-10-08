@@ -131,6 +131,21 @@ regenerar o `simulador-irs.html`.
   (benefícios fiscais/deficiência — códigos 601 a 607 com cálculo próprio; código com
   campo de código dá sugestões via lista de autocompletar). Quadro 6C (opção de declarar
   despesas em alternativa às comunicadas à AT) e Quadros 7-10 ainda sem interface própria.
+- Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular do
+  rendimento e nacionalidades) e Quadro 4 completo (trabalho dependente, Categoria A) — 4A
+  (códigos A01/A02/A03, com país da fonte, rendimento bruto, contribuições para regimes de
+  proteção social, imposto pago no estrangeiro e retenções em Portugal), 4B (pagamentos por
+  conta), 4C (informações complementares para eliminação da dupla tributação — dias de
+  permanência, trabalhador fronteiriço, motivo de residência para remunerações públicas),
+  4D (regime fiscal de ex-residentes) e 4E/4E.1 (IRS Jovem, art.º 12.º-B CIRS). Nomes de
+  campo confirmados contra um exemplo real, exceto os campos "TrabalhadorFronteirico",
+  "TornouResidenteFuncaoPublica" e "NaoTornouResidenteFuncaoPublica" do Quadro 4C, que não
+  apareciam preenchidos nesse exemplo — extrapolados por analogia com os campos vizinhos
+  confirmados (mesmo valor literal "true", não "S"/"N" como é habitual nos restantes
+  anexos). Este anexo espelha as categorias A/H/B/F/E/G do território português, mas para
+  rendimentos obtidos fora de Portugal — tem 11 quadros; os Quadros 5 a 11 (pensões,
+  empresariais/profissionais, prediais, capitais, mais-valias, rendimentos de anos
+  anteriores, contas no estrangeiro) ainda não têm interface própria.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
@@ -166,12 +181,13 @@ regenerar o `simulador-irs.html`.
   Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
   fora dos separadores.
 
-A estrutura XML dos Anexos G1, J, L, SS ainda **não** está mapeada em detalhe — são
-emitidos apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos
-Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H (o Anexo G está
-totalmente mapeado). Ao **importar** uma declaração que já tenha dados nessas secções,
-esses dados são preservados tal como estavam (mas ainda não podem ser vistos/editados na
-interface) e mantidos ao exportar de novo — para não haver perda de informação.
+A estrutura XML dos Anexos G1, L, SS ainda **não** está mapeada em detalhe — são emitidos
+apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
+5-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
+(os Anexos G e J, Quadros 3A/4, já estão mapeados). Ao **importar** uma declaração que já
+tenha dados nessas secções, esses dados são preservados tal como estavam (mas ainda não
+podem ser vistos/editados na interface) e mantidos ao exportar de novo — para não haver
+perda de informação.
 
 ## Por confirmar / próximos passos
 
@@ -211,13 +227,19 @@ interface) e mantidos ao exportar de novo — para não haver perda de informaç
    anexo (6, 8, 9, 10, 11, 12, 13, 14, 18 — vários dependem de taxas de tributação autónoma
    do art.º 72.º CIRS ainda por confirmar, para quando não se opta pelo englobamento no
    Quadro 15; os Quadros 10/11A/11B/14, sem essa dependência, são bons candidatos para a
-   próxima ronda). Cada anexo novo por implementar do zero (G1, J, L, SS) vai precisar de um
+   próxima ronda). Cada anexo novo por implementar do zero (G1, L, SS) vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
-   para os Anexos A, B, E, G e H.
-6. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
+   para os Anexos A, B, E, G, H e J.
+6. **Anexo J — Quadros 5 a 11** (pensões, rendimentos empresariais/profissionais, prediais,
+   capitais, mais-valias e outros incrementos patrimoniais — com 4 sub-blocos no Quadro 9 —,
+   rendimentos de anos anteriores, contas no estrangeiro) — já tenho as instruções e um
+   exemplo preenchido, falta implementar. Nenhum destes quadros entra ainda na estimativa
+   (nem sequer o Quadro 4, já mapeado) — o crédito de imposto por dupla tributação
+   internacional (art.º 81.º CIRS) também ainda não está implementado.
+7. **Parâmetros fiscais em `data/parametros_2025.js`** (escalões, IAS, deduções) são a
    melhor estimativa disponível — devem ser confirmados contra a Tabela de Retenção/OE2025
    antes de qualquer estimativa ser entregue a um cliente real.
-7. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — implementadas (despesas gerais
+8. **Deduções à coleta (art.º 78.º e seguintes do CIRS)** — implementadas (despesas gerais
    e familiares, saúde, educação, imóveis, exigência de fatura), com taxas e limites em
    `data/parametros_2025.js` (a validar). Falta ainda o limite geral e decrescente por
    escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos

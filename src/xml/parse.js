@@ -167,7 +167,7 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoG1", "AnexoJ", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoG1", "AnexoL", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
@@ -785,6 +785,70 @@ function parseAnexoH(anexoH) {
   return { anexoH: h, anexoHPassthrough: passthrough };
 }
 
+// Anexo J, Quadro 4A (rendimentos de trabalho dependente obtidos no estrangeiro).
+function parseQuadro04AAnexoJ(q04) {
+  return parseLinhasGenerico(filho(q04, "AnexoJq04AT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoBruto: l.RendimentoBruto, contribSocial: l.ContribSocial, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro,
+    nif: l.NIF, retencaoFonte: l.RetencaoFonte, retencaoSobretaxa: l.RetencaoSobretaxa
+  }));
+}
+
+// Anexo J, Quadro 4C (informações complementares para a categoria A). Os campos
+// Dias/TrabalhadorFronteirico/FuncaoPublica usam o valor literal "true" (não "S"/"N").
+function parseQuadro04CAnexoJ(q04) {
+  return parseLinhasGenerico(filho(q04, "AnexoJq04CT01")).map(l => ({
+    codLinhaQ4A: l.CodLinhaQ4A, codPais: l.CodPais,
+    diasPermanenciaMenor: l.DiasPermanenciaMenor === "true",
+    diasPermanenciaMaior: l.DiasPermanenciaMaior === "true",
+    trabalhadorFronteirico: l.TrabalhadorFronteirico === "true",
+    tornouResidenteFuncaoPublica: l.TornouResidenteFuncaoPublica === "true",
+    naoTornouResidenteFuncaoPublica: l.NaoTornouResidenteFuncaoPublica === "true"
+  }));
+}
+
+function parseQuadro04AnexoJ(q04) {
+  if (!temConteudo(q04)) return undefined;
+  return {
+    linhas: parseQuadro04AAnexoJ(q04),
+    pagamentosPorConta: texto(q04, "AnexoJq04C01"),
+    complementar: parseQuadro04CAnexoJ(q04),
+    exResidenteAno: texto(q04, "AnexoJq04C491"),
+    irsJovemAntigo: {
+      anoConclusao: texto(q04, "AnexoJq04C492a"), nivelQNQ: texto(q04, "AnexoJq04C492b"),
+      nifEstabelecimento: texto(q04, "AnexoJq04C492c"), codPais: texto(q04, "AnexoJq04C492d")
+    },
+    irsJovemNovo: texto(q04, "AnexoJq04B493") !== undefined ? texto(q04, "AnexoJq04B493") === "S" : undefined
+  };
+}
+
+// Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular) e
+// Quadro 4 (categoria A) implementados, nomes de campo confirmados contra um exemplo real.
+// Os Quadros 5 a 11 (pensões, empresariais/profissionais, prediais, capitais, mais-valias,
+// rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
+function parseAnexoJ(anexoJ) {
+  if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
+  const q03 = filho(anexoJ, "Quadro03");
+  const q04 = filho(anexoJ, "Quadro04");
+
+  const titularNif = texto(q03, "AnexoJq03C03");
+  const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
+    .filter(v => v !== undefined);
+  const quadro04 = parseQuadro04AnexoJ(q04);
+
+  const passthrough = {};
+  if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
+  for (const i of [5, 6, 7, 8, 9, 10, 11]) {
+    const numero = String(i).padStart(2, "0");
+    const elQ = filho(anexoJ, `Quadro${numero}`);
+    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
+  }
+
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04) ? { titularNif, nacionalidades, quadro04 } : undefined;
+
+  return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
+}
+
 function parseModelo3XML(xmlTexto) {
   const doc = new DOMParser().parseFromString(xmlTexto, "application/xml");
   const erro = doc.querySelector("parsererror");
@@ -803,6 +867,7 @@ function parseModelo3XML(xmlTexto) {
   const anexoE = filho(raiz, "AnexoE");
   const anexoG = filho(raiz, "AnexoG");
   const anexoH = filho(raiz, "AnexoH");
+  const anexoJ = filho(raiz, "AnexoJ");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
@@ -810,6 +875,7 @@ function parseModelo3XML(xmlTexto) {
   const { anexoE: anexoEModel } = parseAnexoE(anexoE);
   const { anexoG: anexoGModel, anexoGPassthrough } = parseAnexoG(anexoG);
   const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
+  const { anexoJ: anexoJModel, anexoJPassthrough } = parseAnexoJ(anexoJ);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
   return {
@@ -824,6 +890,8 @@ function parseModelo3XML(xmlTexto) {
     anexoGPassthrough,
     anexoH: anexoHModel,
     anexoHPassthrough,
+    anexoJ: anexoJModel,
+    anexoJPassthrough,
     rostoPassthrough,
     anexosPassthrough
   };
