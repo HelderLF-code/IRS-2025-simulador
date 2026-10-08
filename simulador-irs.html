@@ -1011,10 +1011,11 @@ indicares, assume-se o escalão mais baixo.</small></p>
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
   (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
   (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B), o Quadro 7
-  (prediais, Categoria F) e o Quadro 8 (capitais, Categoria E) — nomes de campo confirmados
-  contra um exemplo real. Os Quadros 9 a 11 (mais-valias, rendimentos de anos anteriores,
-  contas no estrangeiro) ainda não têm interface própria; se importares uma declaração com
-  dados nesses quadros, ficam preservados tal como estavam.
+  (prediais, Categoria F), o Quadro 8 (capitais, Categoria E) e o Quadro 9 (mais-valias e
+  outros incrementos patrimoniais, Categoria G) — nomes de campo confirmados contra um
+  exemplo real. Os Quadros 10 e 11 (rendimentos de anos anteriores, contas no estrangeiro)
+  ainda não têm interface própria; se importares uma declaração com dados nesses quadros,
+  ficam preservados tal como estavam.
 </p>
 
 <h3>Identificação do titular do rendimento (Quadro 3A)</h3>
@@ -1236,6 +1237,138 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <div class="row">
   <div><label>Opta pelo englobamento? <small class="hint">(campos 01/02)</small></label>
     <select id="aj08bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h2>Quadro 9 — Incrementos patrimoniais no estrangeiro (Categoria G)</h2>
+<p class="aviso-topo">
+  Mais-valias e outros incrementos patrimoniais obtidos fora do território português.
+  Espelha o Anexo G, mas com uma estrutura própria de englobamento obrigatório/opcional.
+</p>
+
+<h3>Alienação de imóveis (Quadro 9.1A, englobamento obrigatório)</h3>
+<table id="tabelaAnexoJ091A">
+  <thead><tr>
+    <th>País da fonte</th><th>Realização — Ano</th><th>Realização — Mês</th><th>Valor realização (€)</th>
+    <th>Aquisição — Ano</th><th>Aquisição — Mês</th><th>Valor aquisição (€)</th>
+    <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ091A()">+ Adicionar</button>
+
+<h3>Outros incrementos patrimoniais de englobamento obrigatório (Quadro 9.1B)</h3>
+<p class="aviso-topo">
+  Código único G99 (Tabela VI) — cessão onerosa de posições contratuais/direitos sobre
+  estruturas fiduciárias, indemnizações e importâncias por não concorrência, entre outros.
+</p>
+<table id="tabelaAnexoJ091B">
+  <thead><tr><th>Código</th><th>País da fonte</th><th>Rendimento (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ091B()">+ Adicionar</button>
+
+<h3>Alienação de partes sociais e valores mobiliários (Quadro 9.2A, opção de englobamento)</h3>
+<datalist id="listaCodigoAnexoJ092A">
+  <option value="G01">G01 — Alienação onerosa de ações/partes sociais</option>
+  <option value="G02">G02 — Alienação onerosa de quotas</option>
+  <option value="G03">G03 — Remição e amortização com redução de capital</option>
+  <option value="G04">G04 — Extinção/entrega de partes sociais (fusão, cisão, permuta)</option>
+  <option value="G05">G05 — Valor atribuído em partilha/liquidação de estruturas fiduciárias</option>
+  <option value="G06">G06 — Alienação de partes de capital com base em imóveis (≥50% do valor)</option>
+  <option value="G10">G10 — Alienação/reembolso de obrigações e outros títulos de dívida</option>
+  <option value="G20">G20 — Resgate/alienação de unidades de participação ou liquidação de fundos</option>
+  <option value="G34">G34 — Alienação onerosa de criptoativos que constituem valores mobiliários</option>
+  <option value="G90">G90 — Alienação onerosa de outros valores mobiliários</option>
+</datalist>
+<p class="aviso-topo">
+  A coluna "Respeita a valores mobiliários admitidos à negociação ou a partes de OIC
+  abertos?" só se aplica aos códigos G01, G04, G05, G10, G20, G34 ou G90 (art.º 43.º n.º 5
+  CIRS, Lei n.º 31/2024).
+</p>
+<table id="tabelaAnexoJ092A">
+  <thead><tr>
+    <th>País da fonte</th><th>Código</th>
+    <th>Realização — Ano</th><th>Realização — Mês</th><th>Realização — Dia</th><th>Valor realização (€)</th>
+    <th>Aquisição — Ano</th><th>Aquisição — Mês</th><th>Aquisição — Dia</th><th>Valor aquisição (€)</th>
+    <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th>
+    <th>País da contraparte</th><th>Valores mobiliários/OIC aberto?</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ092A()">+ Adicionar</button>
+
+<h3>Partes sociais de micro/pequenas empresas (Quadro 9.2A1)</h3>
+<p class="aviso-topo">
+  Identifica, por referência à linha do Quadro 9.2A, as alienações de partes sociais de
+  micro ou pequenas empresas com sede no estrangeiro não cotadas (saldo considerado em 50%,
+  art.º 43.º n.º 3 CIRS).
+</p>
+<table id="tabelaAnexoJ092A1">
+  <thead><tr><th>Linha do Quadro 9.2A (ex: 951)</th><th>NIF da sociedade</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ092A1()">+ Adicionar</button>
+
+<h3>Outros incrementos patrimoniais de opção de englobamento (Quadro 9.2B)</h3>
+<datalist id="listaCodigoAnexoJ092B">
+  <option value="G30">G30 — Instrumentos financeiros derivados</option>
+  <option value="G31">G31 — Warrants autónomos</option>
+  <option value="G32">G32 — Certificados que atribuam direito a receber valor de ativo subjacente</option>
+  <option value="G33">G33 — Produtos financeiros complexos com risco de perda de capital</option>
+  <option value="G97">G97 — Alienação de propriedade intelectual/industrial (quando não titular originário)</option>
+  <option value="G98">G98 — Cessão onerosa de créditos, prestações acessórias e suplementares</option>
+</datalist>
+<table id="tabelaAnexoJ092B">
+  <thead><tr>
+    <th>Código</th><th>País da fonte</th><th>Rendimento líquido (€)</th>
+    <th>Imposto pago no estrangeiro (€)</th><th>País da contraparte</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ092B()">+ Adicionar</button>
+
+<h3>Opção pelo englobamento (Quadro 9.2C)</h3>
+<p class="aviso-topo">
+  Aplica-se em conjunto aos incrementos patrimoniais de opção de englobamento dos Quadros
+  9.2A e 9.2B. Sem essa opção, são tributados autonomamente às taxas especiais do art.º
+  72.º CIRS.
+</p>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(campos 01/02 — campo exportado como "AnexoJq092B01", continuação da numeração do Quadro 9.2B)</small></label>
+    <select id="aj092cOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h3>Pagamentos por conta (Quadro 9.3)</h3>
+<p class="aviso-topo">
+  Relativo aos rendimentos declarados nos Quadros 9.1A, 9.1B, 9.2A e 9.2B.
+</p>
+<div class="row">
+  <div><label>Valor (€) <small class="hint">(campo 01)</small></label><input id="aj093PagamentosConta" type="number" step="0.01"></div>
+</div>
+
+<h3>Criptoativos que não constituem valores mobiliários (Quadro 9.4A)</h3>
+<p class="aviso-topo">
+  Detidos por período inferior a 365 dias, ou quando o titular tenha perdido a qualidade
+  de residente em Portugal (art.º 10.º n.º 1 al. k), n.º 19 e n.º 22 CIRS).
+</p>
+<table id="tabelaAnexoJ094A">
+  <thead><tr>
+    <th>País da fonte</th>
+    <th>Realização — Ano</th><th>Realização — Mês</th><th>Realização — Dia</th><th>Valor realização (€)</th>
+    <th>Aquisição — Ano</th><th>Aquisição — Mês</th><th>Aquisição — Dia</th><th>Valor aquisição (€)</th>
+    <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th>
+    <th>País da contraparte</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ094A()">+ Adicionar</button>
+
+<h3>Opção pelo englobamento dos criptoativos (Quadro 9.4B)</h3>
+<div class="row">
+  <div><label>Opta pelo englobamento? <small class="hint">(campos 01/02)</small></label>
+    <select id="aj094bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
   </div>
 </div>
 </div>
@@ -3389,12 +3522,154 @@ function temDadosQuadro08AnexoJ(q08) {
   return (q08.linhas && q08.linhas.length > 0) || q08.optaEnglobamento !== undefined;
 }
 
+// Anexo J, Quadro 9.1A (alienação onerosa de bens imóveis situados no estrangeiro,
+// englobamento obrigatório — art.º 10.º n.º 1 al. a) CIRS). Nomes de campo confirmados
+// contra um exemplo real.
+function buildQuadro091AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (901 + idx), CodPais: l.codPais,
+    AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, ValorRealizacao: moeda(l.valorRealizacao),
+    AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, ValorAquisicao: moeda(l.valorAquisicao),
+    DespesasEncargos: moeda(l.despesasEncargos), ImpostoPagoNoEstrangeiro: moeda(l.impostoPagoNoEstrangeiro)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.impostoPagoNoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq091AT01", campos) +
+    el("AnexoJq091AT01SomaC01", moeda(somaC01)) + el("AnexoJq091AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq091AT01SomaC03", moeda(somaC03)) + el("AnexoJq091AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 9.1B (outros incrementos patrimoniais de englobamento obrigatório —
+// código único G99, Tabela VI). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro091BAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (921 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoBruto: moeda(l.rendimentoBruto), ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoBruto) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq091BT01", campos) +
+    el("AnexoJq091BT01SomaC01", moeda(somaC01)) + el("AnexoJq091BT01SomaC02", moeda(somaC02));
+}
+
+// Anexo J, Quadro 9.2A (alienação onerosa de partes sociais e outros valores mobiliários,
+// opção de englobamento — art.º 10.º n.º 1 al. b) CIRS, códigos G01 a G90 da Tabela VII).
+// Nomes de campo confirmados contra um exemplo real.
+function buildQuadro092AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (951 + idx), CodPais: l.codPais, Codigo: l.codigo,
+    AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, DiaRealizacao: l.diaRealizacao,
+    ValorRealizacao: moeda(l.valorRealizacao),
+    AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, DiaAquisicao: l.diaAquisicao,
+    ValorAquisicao: moeda(l.valorAquisicao),
+    DespesasEncargos: moeda(l.despesasEncargos), ImpostoPagoNoEstrangeiro: moeda(l.impostoPagoNoEstrangeiro),
+    CodPaisContraparte: l.codPaisContraparte,
+    RespeitaValoresMobiliarios: l.respeitaValoresMobiliarios === undefined ? undefined : (l.respeitaValoresMobiliarios ? "S" : "N")
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.impostoPagoNoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq092AT01", campos) +
+    el("AnexoJq092AT01SomaC01", moeda(somaC01)) + el("AnexoJq092AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq092AT01SomaC03", moeda(somaC03)) + el("AnexoJq092AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 9.2A1 (identificação das linhas do Quadro 9.2A relativas a alienação de
+// partes sociais de micro/pequenas empresas, art.º 43.º n.º 3 CIRS — saldo considerado em
+// 50%). Nomes de campo confirmados contra um exemplo real. Sem linhas de soma.
+function buildQuadro092A1AnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (980 + idx), CampoQ92A: l.campoQ92A, NifSociedade: l.nifSociedade
+  }));
+  return listaComLinhas("AnexoJq092A1T01", campos);
+}
+
+// Anexo J, Quadro 9.2B (outros incrementos patrimoniais de opção de englobamento — art.º
+// 10.º n.º 1 als. c) e e) a h) CIRS, códigos G30 a G98 da Tabela VIII). Nomes de campo
+// confirmados contra um exemplo real.
+function buildQuadro092BAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (991 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoLiquido: moeda(l.rendimentoLiquido), ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro),
+    CodPaisContraparte: l.codPaisContraparte
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoLiquido) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq092BT01", campos) +
+    el("AnexoJq092BT01SomaC01", moeda(somaC01)) + el("AnexoJq092BT01SomaC02", moeda(somaC02));
+}
+
+// Anexo J, Quadro 9.4A (alienação onerosa de criptoativos que não constituam valores
+// mobiliários, detidos há menos de 365 dias ou com perda da qualidade de residente — art.º
+// 10.º n.º 1 al. k), n.º 19 e n.º 22 CIRS). Note-se que este quadro usa "CodPaisFonte", ao
+// contrário de "CodPais" nos quadros 9.1A/9.2A. Nomes de campo confirmados contra um
+// exemplo real.
+function buildQuadro094AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (1001 + idx), CodPaisFonte: l.codPaisFonte,
+    AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, DiaRealizacao: l.diaRealizacao,
+    ValorRealizacao: moeda(l.valorRealizacao),
+    AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, DiaAquisicao: l.diaAquisicao,
+    ValorAquisicao: moeda(l.valorAquisicao),
+    DespesasEncargos: moeda(l.despesasEncargos), ImpostoPagoNoEstrangeiro: moeda(l.impostoPagoNoEstrangeiro),
+    CodPaisContraparte: l.codPaisContraparte
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.impostoPagoNoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq094AT01", campos) +
+    el("AnexoJq094AT01SomaC01", moeda(somaC01)) + el("AnexoJq094AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq094AT01SomaC03", moeda(somaC03)) + el("AnexoJq094AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 9 completo (incrementos patrimoniais obtidos no estrangeiro, Categoria
+// G). O campo de opção pelo englobamento dos incrementos patrimoniais de opção (Quadro
+// 9.2C, que se aplica em conjunto aos Quadros 9.2A e 9.2B) é emitido com a tag
+// "AnexoJq092B01" — continuação da numeração de campos do Quadro 9.2B, e não "092C01" como
+// seria de esperar pelo número do quadro nas instruções — confirmado contra um exemplo
+// real. O Quadro 9.3 (pagamentos por conta, campo único) e o Quadro 9.4B (opção pelo
+// englobamento dos criptoativos do Quadro 9.4A) também têm nomes de campo confirmados.
+function buildQuadro09AnexoJ(q09) {
+  if (!q09) return `<Quadro09/>`;
+  return `<Quadro09>` +
+    buildQuadro091AAnexoJ(q09.q91a || []) +
+    buildQuadro091BAnexoJ(q09.q91b || []) +
+    buildQuadro092AAnexoJ(q09.q92a || []) +
+    buildQuadro092A1AnexoJ(q09.q92a1 || []) +
+    buildQuadro092BAnexoJ(q09.q92b || []) +
+    el("AnexoJq092B01", q09.optaEnglobamento92 === undefined ? undefined : (q09.optaEnglobamento92 ? "S" : "N")) +
+    el("AnexoJq093C01", q09.pagamentosPorConta93 !== undefined ? moeda(q09.pagamentosPorConta93) : undefined) +
+    buildQuadro094AAnexoJ(q09.q94a || []) +
+    el("AnexoJq094B01", q09.optaEnglobamento94 === undefined ? undefined : (q09.optaEnglobamento94 ? "S" : "N")) +
+    `</Quadro09>`;
+}
+
+function temDadosQuadro09AnexoJ(q09) {
+  if (!q09) return false;
+  return (q09.q91a && q09.q91a.length > 0) || (q09.q91b && q09.q91b.length > 0) ||
+    (q09.q92a && q09.q92a.length > 0) || (q09.q92a1 && q09.q92a1.length > 0) ||
+    (q09.q92b && q09.q92b.length > 0) || q09.optaEnglobamento92 !== undefined ||
+    q09.pagamentosPorConta93 !== undefined ||
+    (q09.q94a && q09.q94a.length > 0) || q09.optaEnglobamento94 !== undefined;
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
-// capitais) implementados, com nomes de campo confirmados contra um exemplo real. Os
-// Quadros 9 a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
-// não têm interface própria — ficam preservados em passthrough quando importados.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
+// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
+// implementados, com nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
+// (rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
+// ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -3418,7 +3693,8 @@ function buildAnexoJ(model) {
   const quadro06 = temDadosQuadro06AnexoJ(j.quadro06) ? buildQuadro06AnexoJ(j.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
   const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
-  const quadrosRestantes = ["Quadro09", "Quadro10", "Quadro11"]
+  const quadro09 = temDadosQuadro09AnexoJ(j.quadro09) ? buildQuadro09AnexoJ(j.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
+  const quadrosRestantes = ["Quadro10", "Quadro11"]
     .map(q => pass[q] || `<${q}/>`).join("");
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -3429,6 +3705,7 @@ function buildAnexoJ(model) {
     quadro06 +
     quadro07 +
     quadro08 +
+    quadro09 +
     quadrosRestantes +
     `</AnexoJ>`;
 }
@@ -4408,12 +4685,89 @@ function parseQuadro08AnexoJ(q08) {
   };
 }
 
+// Anexo J, Quadro 9.1A (alienação onerosa de bens imóveis no estrangeiro).
+function parseQuadro091AAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq091AT01")).map(l => ({
+    nlinha: l.NLinha, codPais: l.CodPais,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, impostoPagoNoEstrangeiro: l.ImpostoPagoNoEstrangeiro
+  }));
+}
+
+// Anexo J, Quadro 9.1B (outros incrementos patrimoniais de englobamento obrigatório).
+function parseQuadro091BAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq091BT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoBruto: l.RendimentoBruto, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro
+  }));
+}
+
+// Anexo J, Quadro 9.2A (alienação onerosa de partes sociais e valores mobiliários).
+function parseQuadro092AAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq092AT01")).map(l => ({
+    nlinha: l.NLinha, codPais: l.CodPais, codigo: l.Codigo,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao,
+    valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao,
+    valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, impostoPagoNoEstrangeiro: l.ImpostoPagoNoEstrangeiro,
+    codPaisContraparte: l.CodPaisContraparte,
+    respeitaValoresMobiliarios: l.RespeitaValoresMobiliarios === undefined ? undefined : l.RespeitaValoresMobiliarios === "S"
+  }));
+}
+
+// Anexo J, Quadro 9.2A1 (partes sociais de micro/pequenas empresas — referência ao Q9.2A).
+function parseQuadro092A1AnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq092A1T01")).map(l => ({
+    nlinha: l.NLinha, campoQ92A: l.CampoQ92A, nifSociedade: l.NifSociedade
+  }));
+}
+
+// Anexo J, Quadro 9.2B (outros incrementos patrimoniais de opção de englobamento).
+function parseQuadro092BAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq092BT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoLiquido: l.RendimentoLiquido, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro,
+    codPaisContraparte: l.CodPaisContraparte
+  }));
+}
+
+// Anexo J, Quadro 9.4A (alienação onerosa de criptoativos que não constituam valores
+// mobiliários). Usa "CodPaisFonte", ao contrário de "CodPais" nos quadros 9.1A/9.2A.
+function parseQuadro094AAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq094AT01")).map(l => ({
+    nlinha: l.NLinha, codPaisFonte: l.CodPaisFonte,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao,
+    valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao,
+    valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, impostoPagoNoEstrangeiro: l.ImpostoPagoNoEstrangeiro,
+    codPaisContraparte: l.CodPaisContraparte
+  }));
+}
+
+// Anexo J, Quadro 9 completo (incrementos patrimoniais, Categoria G). O campo de opção
+// pelo englobamento do Quadro 9.2C (aplicável em conjunto aos Quadros 9.2A e 9.2B) usa a
+// tag "AnexoJq092B01" — confirmado contra um exemplo real, ver nota em build.js.
+function parseQuadro09AnexoJ(q09) {
+  if (!temConteudo(q09)) return undefined;
+  return {
+    q91a: parseQuadro091AAnexoJ(q09), q91b: parseQuadro091BAnexoJ(q09),
+    q92a: parseQuadro092AAnexoJ(q09), q92a1: parseQuadro092A1AnexoJ(q09), q92b: parseQuadro092BAnexoJ(q09),
+    optaEnglobamento92: texto(q09, "AnexoJq092B01") !== undefined ? texto(q09, "AnexoJq092B01") === "S" : undefined,
+    pagamentosPorConta93: texto(q09, "AnexoJq093C01"),
+    q94a: parseQuadro094AAnexoJ(q09),
+    optaEnglobamento94: texto(q09, "AnexoJq094B01") !== undefined ? texto(q09, "AnexoJq094B01") === "S" : undefined
+  };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
-// capitais) implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 9
-// a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ficam
-// preservados em passthrough.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
+// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
+// implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
+// (rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
@@ -4422,6 +4776,7 @@ function parseAnexoJ(anexoJ) {
   const q06 = filho(anexoJ, "Quadro06");
   const q07 = filho(anexoJ, "Quadro07");
   const q08 = filho(anexoJ, "Quadro08");
+  const q09 = filho(anexoJ, "Quadro09");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
@@ -4431,6 +4786,7 @@ function parseAnexoJ(anexoJ) {
   const quadro06 = parseQuadro06AnexoJ(q06);
   const quadro07 = parseQuadro07AnexoJ(q07);
   const quadro08 = parseQuadro08AnexoJ(q08);
+  const quadro09 = parseQuadro09AnexoJ(q09);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
@@ -4438,14 +4794,15 @@ function parseAnexoJ(anexoJ) {
   if (temConteudo(q06) && !quadro06) passthrough.Quadro06 = serializar(q06);
   if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !quadro08) passthrough.Quadro08 = serializar(q08);
-  for (const i of [9, 10, 11]) {
+  if (temConteudo(q09) && !quadro09) passthrough.Quadro09 = serializar(q09);
+  for (const i of [10, 11]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoJ, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }
@@ -6414,6 +6771,185 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  window.adicionarLinhaAnexoJ091A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ091A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj091a-pais" size="4"></td>
+      <td><input class="aj091a-anorealizacao" type="number" size="6"></td>
+      <td><input class="aj091a-mesrealizacao" type="number" size="4"></td>
+      <td><input class="aj091a-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="aj091a-anoaquisicao" type="number" size="6"></td>
+      <td><input class="aj091a-mesaquisicao" type="number" size="4"></td>
+      <td><input class="aj091a-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="aj091a-despesas" type="number" step="0.01"></td>
+      <td><input class="aj091a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro091AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ091A tbody tr")].map(tr => ({
+      codPais: tr.querySelector(".aj091a-pais").value,
+      anoRealizacao: tr.querySelector(".aj091a-anorealizacao").value || undefined,
+      mesRealizacao: tr.querySelector(".aj091a-mesrealizacao").value || undefined,
+      valorRealizacao: tr.querySelector(".aj091a-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".aj091a-anoaquisicao").value || undefined,
+      mesAquisicao: tr.querySelector(".aj091a-mesaquisicao").value || undefined,
+      valorAquisicao: tr.querySelector(".aj091a-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".aj091a-despesas").value || 0,
+      impostoPagoNoEstrangeiro: tr.querySelector(".aj091a-impostoestrangeiro").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ091B = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ091B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj091b-codigo" size="4" value="G99"></td>
+      <td><input class="aj091b-pais" size="4"></td>
+      <td><input class="aj091b-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj091b-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro091BAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ091B tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj091b-codigo").value,
+      codPais: tr.querySelector(".aj091b-pais").value,
+      rendimentoBruto: tr.querySelector(".aj091b-rendimento").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj091b-impostoestrangeiro").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ092A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ092A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj092a-pais" size="4"></td>
+      <td><input class="aj092a-codigo" size="4" list="listaCodigoAnexoJ092A"></td>
+      <td><input class="aj092a-anorealizacao" type="number" size="6"></td>
+      <td><input class="aj092a-mesrealizacao" type="number" size="4"></td>
+      <td><input class="aj092a-diarealizacao" type="number" size="4"></td>
+      <td><input class="aj092a-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="aj092a-anoaquisicao" type="number" size="6"></td>
+      <td><input class="aj092a-mesaquisicao" type="number" size="4"></td>
+      <td><input class="aj092a-diaaquisicao" type="number" size="4"></td>
+      <td><input class="aj092a-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="aj092a-despesas" type="number" step="0.01"></td>
+      <td><input class="aj092a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj092a-paiscontraparte" size="4"></td>
+      <td><select class="aj092a-respeitavm"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro092AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ092A tbody tr")].map(tr => {
+      const respeitaVmValor = tr.querySelector(".aj092a-respeitavm").value;
+      return {
+        codPais: tr.querySelector(".aj092a-pais").value,
+        codigo: tr.querySelector(".aj092a-codigo").value,
+        anoRealizacao: tr.querySelector(".aj092a-anorealizacao").value || undefined,
+        mesRealizacao: tr.querySelector(".aj092a-mesrealizacao").value || undefined,
+        diaRealizacao: tr.querySelector(".aj092a-diarealizacao").value || undefined,
+        valorRealizacao: tr.querySelector(".aj092a-valorrealizacao").value || 0,
+        anoAquisicao: tr.querySelector(".aj092a-anoaquisicao").value || undefined,
+        mesAquisicao: tr.querySelector(".aj092a-mesaquisicao").value || undefined,
+        diaAquisicao: tr.querySelector(".aj092a-diaaquisicao").value || undefined,
+        valorAquisicao: tr.querySelector(".aj092a-valoraquisicao").value || 0,
+        despesasEncargos: tr.querySelector(".aj092a-despesas").value || 0,
+        impostoPagoNoEstrangeiro: tr.querySelector(".aj092a-impostoestrangeiro").value || 0,
+        codPaisContraparte: tr.querySelector(".aj092a-paiscontraparte").value || undefined,
+        respeitaValoresMobiliarios: respeitaVmValor === "" ? undefined : respeitaVmValor === "S"
+      };
+    });
+  }
+
+  window.adicionarLinhaAnexoJ092A1 = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ092A1 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj092a1-campo" size="6"></td>
+      <td><input class="aj092a1-nif" size="14"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro092A1AnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ092A1 tbody tr")].map(tr => ({
+      campoQ92A: tr.querySelector(".aj092a1-campo").value || undefined,
+      nifSociedade: tr.querySelector(".aj092a1-nif").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ092B = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ092B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj092b-codigo" size="4" list="listaCodigoAnexoJ092B"></td>
+      <td><input class="aj092b-pais" size="4"></td>
+      <td><input class="aj092b-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj092b-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj092b-paiscontraparte" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro092BAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ092B tbody tr")].map(tr => ({
+      codRendimento: tr.querySelector(".aj092b-codigo").value,
+      codPais: tr.querySelector(".aj092b-pais").value,
+      rendimentoLiquido: tr.querySelector(".aj092b-rendimento").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj092b-impostoestrangeiro").value || 0,
+      codPaisContraparte: tr.querySelector(".aj092b-paiscontraparte").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ094A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ094A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj094a-pais" size="4"></td>
+      <td><input class="aj094a-anorealizacao" type="number" size="6"></td>
+      <td><input class="aj094a-mesrealizacao" type="number" size="4"></td>
+      <td><input class="aj094a-diarealizacao" type="number" size="4"></td>
+      <td><input class="aj094a-valorrealizacao" type="number" step="0.01"></td>
+      <td><input class="aj094a-anoaquisicao" type="number" size="6"></td>
+      <td><input class="aj094a-mesaquisicao" type="number" size="4"></td>
+      <td><input class="aj094a-diaaquisicao" type="number" size="4"></td>
+      <td><input class="aj094a-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="aj094a-despesas" type="number" step="0.01"></td>
+      <td><input class="aj094a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj094a-paiscontraparte" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro094AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ094A tbody tr")].map(tr => ({
+      codPaisFonte: tr.querySelector(".aj094a-pais").value,
+      anoRealizacao: tr.querySelector(".aj094a-anorealizacao").value || undefined,
+      mesRealizacao: tr.querySelector(".aj094a-mesrealizacao").value || undefined,
+      diaRealizacao: tr.querySelector(".aj094a-diarealizacao").value || undefined,
+      valorRealizacao: tr.querySelector(".aj094a-valorrealizacao").value || 0,
+      anoAquisicao: tr.querySelector(".aj094a-anoaquisicao").value || undefined,
+      mesAquisicao: tr.querySelector(".aj094a-mesaquisicao").value || undefined,
+      diaAquisicao: tr.querySelector(".aj094a-diaaquisicao").value || undefined,
+      valorAquisicao: tr.querySelector(".aj094a-valoraquisicao").value || 0,
+      despesasEncargos: tr.querySelector(".aj094a-despesas").value || 0,
+      impostoPagoNoEstrangeiro: tr.querySelector(".aj094a-impostoestrangeiro").value || 0,
+      codPaisContraparte: tr.querySelector(".aj094a-paiscontraparte").value || undefined
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -6466,10 +7002,29 @@ if (typeof module !== "undefined" && module.exports) {
     const temQuadro08 = linhas08.length || optaEnglobamento08 !== undefined;
     const quadro08 = temQuadro08 ? { linhas: linhas08, optaEnglobamento: optaEnglobamento08 } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08;
+    const q91a = lerQuadro091AAnexoJ();
+    const q91b = lerQuadro091BAnexoJ();
+    const q92a = lerQuadro092AAnexoJ();
+    const q92a1 = lerQuadro092A1AnexoJ();
+    const q92b = lerQuadro092BAnexoJ();
+    const optaEnglobamento92Valor = document.getElementById("aj092cOptaEnglobamento").value;
+    const optaEnglobamento92 = optaEnglobamento92Valor === "" ? undefined : optaEnglobamento92Valor === "S";
+    const pagamentosPorConta93 = document.getElementById("aj093PagamentosConta").value || undefined;
+    const q94a = lerQuadro094AAnexoJ();
+    const optaEnglobamento94Valor = document.getElementById("aj094bOptaEnglobamento").value;
+    const optaEnglobamento94 = optaEnglobamento94Valor === "" ? undefined : optaEnglobamento94Valor === "S";
+    const temQuadro09 = q91a.length || q91b.length || q92a.length || q92a1.length || q92b.length ||
+      optaEnglobamento92 !== undefined || pagamentosPorConta93 !== undefined || q94a.length ||
+      optaEnglobamento94 !== undefined;
+    const quadro09 = temQuadro09 ? {
+      q91a, q91b, q92a, q92a1, q92b,
+      optaEnglobamento92, pagamentosPorConta93, q94a, optaEnglobamento94
+    } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 };
   }
 
   function lerDespesasEFatura() {
@@ -7306,6 +7861,15 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("aj07cPagamentosConta").value = "";
       document.querySelector("#tabelaAnexoJ08A tbody").innerHTML = "";
       document.getElementById("aj08bOptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoJ091A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ091B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ092A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ092A1 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ092B tbody").innerHTML = "";
+      document.getElementById("aj092cOptaEnglobamento").value = "";
+      document.getElementById("aj093PagamentosConta").value = "";
+      document.querySelector("#tabelaAnexoJ094A tbody").innerHTML = "";
+      document.getElementById("aj094bOptaEnglobamento").value = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -7433,6 +7997,88 @@ if (typeof module !== "undefined" && module.exports) {
           });
           if (q8.optaEnglobamento !== undefined) {
             document.getElementById("aj08bOptaEnglobamento").value = q8.optaEnglobamento ? "S" : "N";
+          }
+        }
+        if (j.quadro09) {
+          const q9 = j.quadro09;
+          (q9.q91a || []).forEach(l => {
+            adicionarLinhaAnexoJ091A();
+            const tr = document.querySelector("#tabelaAnexoJ091A tbody tr:last-child");
+            tr.querySelector(".aj091a-pais").value = l.codPais || "";
+            tr.querySelector(".aj091a-anorealizacao").value = l.anoRealizacao || "";
+            tr.querySelector(".aj091a-mesrealizacao").value = l.mesRealizacao || "";
+            tr.querySelector(".aj091a-valorrealizacao").value = l.valorRealizacao || "";
+            tr.querySelector(".aj091a-anoaquisicao").value = l.anoAquisicao || "";
+            tr.querySelector(".aj091a-mesaquisicao").value = l.mesAquisicao || "";
+            tr.querySelector(".aj091a-valoraquisicao").value = l.valorAquisicao || "";
+            tr.querySelector(".aj091a-despesas").value = l.despesasEncargos || "";
+            tr.querySelector(".aj091a-impostoestrangeiro").value = l.impostoPagoNoEstrangeiro || "";
+          });
+          (q9.q91b || []).forEach(l => {
+            adicionarLinhaAnexoJ091B();
+            const tr = document.querySelector("#tabelaAnexoJ091B tbody tr:last-child");
+            tr.querySelector(".aj091b-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj091b-pais").value = l.codPais || "";
+            tr.querySelector(".aj091b-rendimento").value = l.rendimentoBruto || "";
+            tr.querySelector(".aj091b-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+          });
+          (q9.q92a || []).forEach(l => {
+            adicionarLinhaAnexoJ092A();
+            const tr = document.querySelector("#tabelaAnexoJ092A tbody tr:last-child");
+            tr.querySelector(".aj092a-pais").value = l.codPais || "";
+            tr.querySelector(".aj092a-codigo").value = l.codigo || "";
+            tr.querySelector(".aj092a-anorealizacao").value = l.anoRealizacao || "";
+            tr.querySelector(".aj092a-mesrealizacao").value = l.mesRealizacao || "";
+            tr.querySelector(".aj092a-diarealizacao").value = l.diaRealizacao || "";
+            tr.querySelector(".aj092a-valorrealizacao").value = l.valorRealizacao || "";
+            tr.querySelector(".aj092a-anoaquisicao").value = l.anoAquisicao || "";
+            tr.querySelector(".aj092a-mesaquisicao").value = l.mesAquisicao || "";
+            tr.querySelector(".aj092a-diaaquisicao").value = l.diaAquisicao || "";
+            tr.querySelector(".aj092a-valoraquisicao").value = l.valorAquisicao || "";
+            tr.querySelector(".aj092a-despesas").value = l.despesasEncargos || "";
+            tr.querySelector(".aj092a-impostoestrangeiro").value = l.impostoPagoNoEstrangeiro || "";
+            tr.querySelector(".aj092a-paiscontraparte").value = l.codPaisContraparte || "";
+            if (l.respeitaValoresMobiliarios !== undefined) {
+              tr.querySelector(".aj092a-respeitavm").value = l.respeitaValoresMobiliarios ? "S" : "N";
+            }
+          });
+          (q9.q92a1 || []).forEach(l => {
+            adicionarLinhaAnexoJ092A1();
+            const tr = document.querySelector("#tabelaAnexoJ092A1 tbody tr:last-child");
+            tr.querySelector(".aj092a1-campo").value = l.campoQ92A || "";
+            tr.querySelector(".aj092a1-nif").value = l.nifSociedade || "";
+          });
+          (q9.q92b || []).forEach(l => {
+            adicionarLinhaAnexoJ092B();
+            const tr = document.querySelector("#tabelaAnexoJ092B tbody tr:last-child");
+            tr.querySelector(".aj092b-codigo").value = l.codRendimento || "";
+            tr.querySelector(".aj092b-pais").value = l.codPais || "";
+            tr.querySelector(".aj092b-rendimento").value = l.rendimentoLiquido || "";
+            tr.querySelector(".aj092b-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+            tr.querySelector(".aj092b-paiscontraparte").value = l.codPaisContraparte || "";
+          });
+          if (q9.optaEnglobamento92 !== undefined) {
+            document.getElementById("aj092cOptaEnglobamento").value = q9.optaEnglobamento92 ? "S" : "N";
+          }
+          document.getElementById("aj093PagamentosConta").value = q9.pagamentosPorConta93 || "";
+          (q9.q94a || []).forEach(l => {
+            adicionarLinhaAnexoJ094A();
+            const tr = document.querySelector("#tabelaAnexoJ094A tbody tr:last-child");
+            tr.querySelector(".aj094a-pais").value = l.codPaisFonte || "";
+            tr.querySelector(".aj094a-anorealizacao").value = l.anoRealizacao || "";
+            tr.querySelector(".aj094a-mesrealizacao").value = l.mesRealizacao || "";
+            tr.querySelector(".aj094a-diarealizacao").value = l.diaRealizacao || "";
+            tr.querySelector(".aj094a-valorrealizacao").value = l.valorRealizacao || "";
+            tr.querySelector(".aj094a-anoaquisicao").value = l.anoAquisicao || "";
+            tr.querySelector(".aj094a-mesaquisicao").value = l.mesAquisicao || "";
+            tr.querySelector(".aj094a-diaaquisicao").value = l.diaAquisicao || "";
+            tr.querySelector(".aj094a-valoraquisicao").value = l.valorAquisicao || "";
+            tr.querySelector(".aj094a-despesas").value = l.despesasEncargos || "";
+            tr.querySelector(".aj094a-impostoestrangeiro").value = l.impostoPagoNoEstrangeiro || "";
+            tr.querySelector(".aj094a-paiscontraparte").value = l.codPaisContraparte || "";
+          });
+          if (q9.optaEnglobamento94 !== undefined) {
+            document.getElementById("aj094bOptaEnglobamento").value = q9.optaEnglobamento94 ? "S" : "N";
           }
         }
       }

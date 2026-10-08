@@ -171,9 +171,27 @@ regenerar o `simulador-irs.html`.
   (opção pelo englobamento, art.º 22.º n.º 5 CIRS). Nomes de campo confirmados contra um
   exemplo real, incluindo a fórmula de cada uma das 4 somas (rendimento bruto, imposto pago
   no estrangeiro no país da fonte, imposto retido pelo agente pagador e retenção na fonte em
-  Portugal). Este anexo espelha as categorias A/H/B/F/E/G do território português, mas para
-  rendimentos obtidos fora de Portugal — tem 11 quadros; os Quadros 9 a 11 (mais-valias,
-  rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria.
+  Portugal); e Quadro 9 completo (mais-valias e outros incrementos patrimoniais no
+  estrangeiro, Categoria G) — 9.1A (alienação onerosa de imóveis, englobamento obrigatório,
+  com correção monetária e exclusão de 50% asseguradas pela liquidação automática, à
+  semelhança do Anexo G), 9.1B (outros incrementos de englobamento obrigatório, código único
+  G99 da Tabela VI), 9.2A (alienação de partes sociais e valores mobiliários, opção de
+  englobamento, códigos G01 a G90 da Tabela VII, incluindo a coluna "respeita a valores
+  mobiliários/OIC aberto?" introduzida pela Lei n.º 31/2024), 9.2A1 (identificação das
+  alienações de partes sociais de micro/pequenas empresas, por referência à linha do
+  Quadro 9.2A — saldo considerado em 50%, art.º 43.º n.º 3 CIRS), 9.2B (outros incrementos
+  de opção de englobamento, códigos G30 a G98 da Tabela VIII), 9.2C (opção pelo
+  englobamento dos Quadros 9.2A e 9.2B), 9.3 (pagamentos por conta) e 9.4A/9.4B (alienação
+  de criptoativos que não constituam valores mobiliários, detidos há menos de 365 dias ou
+  com perda da qualidade de residente, e respetiva opção pelo englobamento). Nomes de campo
+  confirmados contra um exemplo real, incluindo a fórmula de cada soma; de notar que o
+  campo de opção do Quadro 9.2C é exportado com a tag "AnexoJq092B01" — continuação da
+  numeração de campos do Quadro 9.2B, e não "092C01" como seria de esperar pelo número do
+  quadro nas instruções — e que o Quadro 9.4A usa "CodPaisFonte" em vez de "CodPais" como
+  nos restantes sub-quadros. Este anexo espelha as categorias A/H/B/F/E/G do território
+  português, mas para rendimentos obtidos fora de Portugal — tem 11 quadros; os Quadros 10
+  e 11 (rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface
+  própria.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
@@ -211,8 +229,8 @@ regenerar o `simulador-irs.html`.
 
 A estrutura XML dos Anexos G1, L, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
-9-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
-(os Anexos G e J, Quadros 3A/4/5/6/7/8, já estão mapeados). Ao **importar** uma declaração que
+10-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
+(os Anexos G e J, Quadros 3A/4/5/6/7/8/9, já estão mapeados). Ao **importar** uma declaração que
 já tenha dados nessas secções, esses dados são preservados tal como estavam (mas ainda não
 podem ser vistos/editados na interface) e mantidos ao exportar de novo — para não haver
 perda de informação.
@@ -258,10 +276,9 @@ perda de informação.
    próxima ronda). Cada anexo novo por implementar do zero (G1, L, SS) vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
    para os Anexos A, B, E, G, H e J.
-6. **Anexo J — Quadros 9 a 11** (mais-valias e outros incrementos
-   patrimoniais — com 4 sub-blocos no Quadro 9 —, rendimentos de anos anteriores, contas no
+6. **Anexo J — Quadros 10 e 11** (rendimentos de anos anteriores, contas no
    estrangeiro) — já tenho as instruções e um exemplo preenchido, falta implementar. Nenhum
-   quadro entra ainda na estimativa (nem sequer os Quadros 4/5/6/7/8, já mapeados) — o
+   quadro entra ainda na estimativa (nem sequer os Quadros 4/5/6/7/8/9, já mapeados) — o
    crédito de imposto por dupla tributação internacional (art.º 81.º CIRS) também ainda não
    está implementado. O Quadro 5A (código H03 — pensões de alimentos) e o Quadro 7B
    (rendimentos prediais) têm taxas autónomas confirmadas (20% e 28%, respetivamente, art.º

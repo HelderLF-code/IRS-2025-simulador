@@ -913,12 +913,89 @@ function parseQuadro08AnexoJ(q08) {
   };
 }
 
+// Anexo J, Quadro 9.1A (alienação onerosa de bens imóveis no estrangeiro).
+function parseQuadro091AAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq091AT01")).map(l => ({
+    nlinha: l.NLinha, codPais: l.CodPais,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, impostoPagoNoEstrangeiro: l.ImpostoPagoNoEstrangeiro
+  }));
+}
+
+// Anexo J, Quadro 9.1B (outros incrementos patrimoniais de englobamento obrigatório).
+function parseQuadro091BAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq091BT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoBruto: l.RendimentoBruto, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro
+  }));
+}
+
+// Anexo J, Quadro 9.2A (alienação onerosa de partes sociais e valores mobiliários).
+function parseQuadro092AAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq092AT01")).map(l => ({
+    nlinha: l.NLinha, codPais: l.CodPais, codigo: l.Codigo,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao,
+    valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao,
+    valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, impostoPagoNoEstrangeiro: l.ImpostoPagoNoEstrangeiro,
+    codPaisContraparte: l.CodPaisContraparte,
+    respeitaValoresMobiliarios: l.RespeitaValoresMobiliarios === undefined ? undefined : l.RespeitaValoresMobiliarios === "S"
+  }));
+}
+
+// Anexo J, Quadro 9.2A1 (partes sociais de micro/pequenas empresas — referência ao Q9.2A).
+function parseQuadro092A1AnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq092A1T01")).map(l => ({
+    nlinha: l.NLinha, campoQ92A: l.CampoQ92A, nifSociedade: l.NifSociedade
+  }));
+}
+
+// Anexo J, Quadro 9.2B (outros incrementos patrimoniais de opção de englobamento).
+function parseQuadro092BAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq092BT01")).map(l => ({
+    nlinha: l.NLinha, codRendimento: l.CodRendimento, codPais: l.CodPais,
+    rendimentoLiquido: l.RendimentoLiquido, impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro,
+    codPaisContraparte: l.CodPaisContraparte
+  }));
+}
+
+// Anexo J, Quadro 9.4A (alienação onerosa de criptoativos que não constituam valores
+// mobiliários). Usa "CodPaisFonte", ao contrário de "CodPais" nos quadros 9.1A/9.2A.
+function parseQuadro094AAnexoJ(q09) {
+  return parseLinhasGenerico(filho(q09, "AnexoJq094AT01")).map(l => ({
+    nlinha: l.NLinha, codPaisFonte: l.CodPaisFonte,
+    anoRealizacao: l.AnoRealizacao, mesRealizacao: l.MesRealizacao, diaRealizacao: l.DiaRealizacao,
+    valorRealizacao: l.ValorRealizacao,
+    anoAquisicao: l.AnoAquisicao, mesAquisicao: l.MesAquisicao, diaAquisicao: l.DiaAquisicao,
+    valorAquisicao: l.ValorAquisicao,
+    despesasEncargos: l.DespesasEncargos, impostoPagoNoEstrangeiro: l.ImpostoPagoNoEstrangeiro,
+    codPaisContraparte: l.CodPaisContraparte
+  }));
+}
+
+// Anexo J, Quadro 9 completo (incrementos patrimoniais, Categoria G). O campo de opção
+// pelo englobamento do Quadro 9.2C (aplicável em conjunto aos Quadros 9.2A e 9.2B) usa a
+// tag "AnexoJq092B01" — confirmado contra um exemplo real, ver nota em build.js.
+function parseQuadro09AnexoJ(q09) {
+  if (!temConteudo(q09)) return undefined;
+  return {
+    q91a: parseQuadro091AAnexoJ(q09), q91b: parseQuadro091BAnexoJ(q09),
+    q92a: parseQuadro092AAnexoJ(q09), q92a1: parseQuadro092A1AnexoJ(q09), q92b: parseQuadro092BAnexoJ(q09),
+    optaEnglobamento92: texto(q09, "AnexoJq092B01") !== undefined ? texto(q09, "AnexoJq092B01") === "S" : undefined,
+    pagamentosPorConta93: texto(q09, "AnexoJq093C01"),
+    q94a: parseQuadro094AAnexoJ(q09),
+    optaEnglobamento94: texto(q09, "AnexoJq094B01") !== undefined ? texto(q09, "AnexoJq094B01") === "S" : undefined
+  };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
-// capitais) implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 9
-// a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ficam
-// preservados em passthrough.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
+// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
+// implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
+// (rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
@@ -927,6 +1004,7 @@ function parseAnexoJ(anexoJ) {
   const q06 = filho(anexoJ, "Quadro06");
   const q07 = filho(anexoJ, "Quadro07");
   const q08 = filho(anexoJ, "Quadro08");
+  const q09 = filho(anexoJ, "Quadro09");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
@@ -936,6 +1014,7 @@ function parseAnexoJ(anexoJ) {
   const quadro06 = parseQuadro06AnexoJ(q06);
   const quadro07 = parseQuadro07AnexoJ(q07);
   const quadro08 = parseQuadro08AnexoJ(q08);
+  const quadro09 = parseQuadro09AnexoJ(q09);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
@@ -943,14 +1022,15 @@ function parseAnexoJ(anexoJ) {
   if (temConteudo(q06) && !quadro06) passthrough.Quadro06 = serializar(q06);
   if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !quadro08) passthrough.Quadro08 = serializar(q08);
-  for (const i of [9, 10, 11]) {
+  if (temConteudo(q09) && !quadro09) passthrough.Quadro09 = serializar(q09);
+  for (const i of [10, 11]) {
     const numero = String(i).padStart(2, "0");
     const elQ = filho(anexoJ, `Quadro${numero}`);
     if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
   }
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }

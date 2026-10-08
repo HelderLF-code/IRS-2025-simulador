@@ -1444,12 +1444,154 @@ function temDadosQuadro08AnexoJ(q08) {
   return (q08.linhas && q08.linhas.length > 0) || q08.optaEnglobamento !== undefined;
 }
 
+// Anexo J, Quadro 9.1A (alienação onerosa de bens imóveis situados no estrangeiro,
+// englobamento obrigatório — art.º 10.º n.º 1 al. a) CIRS). Nomes de campo confirmados
+// contra um exemplo real.
+function buildQuadro091AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (901 + idx), CodPais: l.codPais,
+    AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, ValorRealizacao: moeda(l.valorRealizacao),
+    AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, ValorAquisicao: moeda(l.valorAquisicao),
+    DespesasEncargos: moeda(l.despesasEncargos), ImpostoPagoNoEstrangeiro: moeda(l.impostoPagoNoEstrangeiro)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.impostoPagoNoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq091AT01", campos) +
+    el("AnexoJq091AT01SomaC01", moeda(somaC01)) + el("AnexoJq091AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq091AT01SomaC03", moeda(somaC03)) + el("AnexoJq091AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 9.1B (outros incrementos patrimoniais de englobamento obrigatório —
+// código único G99, Tabela VI). Nomes de campo confirmados contra um exemplo real.
+function buildQuadro091BAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (921 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoBruto: moeda(l.rendimentoBruto), ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro)
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoBruto) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq091BT01", campos) +
+    el("AnexoJq091BT01SomaC01", moeda(somaC01)) + el("AnexoJq091BT01SomaC02", moeda(somaC02));
+}
+
+// Anexo J, Quadro 9.2A (alienação onerosa de partes sociais e outros valores mobiliários,
+// opção de englobamento — art.º 10.º n.º 1 al. b) CIRS, códigos G01 a G90 da Tabela VII).
+// Nomes de campo confirmados contra um exemplo real.
+function buildQuadro092AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (951 + idx), CodPais: l.codPais, Codigo: l.codigo,
+    AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, DiaRealizacao: l.diaRealizacao,
+    ValorRealizacao: moeda(l.valorRealizacao),
+    AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, DiaAquisicao: l.diaAquisicao,
+    ValorAquisicao: moeda(l.valorAquisicao),
+    DespesasEncargos: moeda(l.despesasEncargos), ImpostoPagoNoEstrangeiro: moeda(l.impostoPagoNoEstrangeiro),
+    CodPaisContraparte: l.codPaisContraparte,
+    RespeitaValoresMobiliarios: l.respeitaValoresMobiliarios === undefined ? undefined : (l.respeitaValoresMobiliarios ? "S" : "N")
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.impostoPagoNoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq092AT01", campos) +
+    el("AnexoJq092AT01SomaC01", moeda(somaC01)) + el("AnexoJq092AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq092AT01SomaC03", moeda(somaC03)) + el("AnexoJq092AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 9.2A1 (identificação das linhas do Quadro 9.2A relativas a alienação de
+// partes sociais de micro/pequenas empresas, art.º 43.º n.º 3 CIRS — saldo considerado em
+// 50%). Nomes de campo confirmados contra um exemplo real. Sem linhas de soma.
+function buildQuadro092A1AnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (980 + idx), CampoQ92A: l.campoQ92A, NifSociedade: l.nifSociedade
+  }));
+  return listaComLinhas("AnexoJq092A1T01", campos);
+}
+
+// Anexo J, Quadro 9.2B (outros incrementos patrimoniais de opção de englobamento — art.º
+// 10.º n.º 1 als. c) e e) a h) CIRS, códigos G30 a G98 da Tabela VIII). Nomes de campo
+// confirmados contra um exemplo real.
+function buildQuadro092BAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (991 + idx), CodRendimento: l.codRendimento, CodPais: l.codPais,
+    RendimentoLiquido: moeda(l.rendimentoLiquido), ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro),
+    CodPaisContraparte: l.codPaisContraparte
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.rendimentoLiquido) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.impostoPagoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq092BT01", campos) +
+    el("AnexoJq092BT01SomaC01", moeda(somaC01)) + el("AnexoJq092BT01SomaC02", moeda(somaC02));
+}
+
+// Anexo J, Quadro 9.4A (alienação onerosa de criptoativos que não constituam valores
+// mobiliários, detidos há menos de 365 dias ou com perda da qualidade de residente — art.º
+// 10.º n.º 1 al. k), n.º 19 e n.º 22 CIRS). Note-se que este quadro usa "CodPaisFonte", ao
+// contrário de "CodPais" nos quadros 9.1A/9.2A. Nomes de campo confirmados contra um
+// exemplo real.
+function buildQuadro094AAnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map((l, idx) => ({
+    NLinha: l.nlinha || (1001 + idx), CodPaisFonte: l.codPaisFonte,
+    AnoRealizacao: l.anoRealizacao, MesRealizacao: l.mesRealizacao, DiaRealizacao: l.diaRealizacao,
+    ValorRealizacao: moeda(l.valorRealizacao),
+    AnoAquisicao: l.anoAquisicao, MesAquisicao: l.mesAquisicao, DiaAquisicao: l.diaAquisicao,
+    ValorAquisicao: moeda(l.valorAquisicao),
+    DespesasEncargos: moeda(l.despesasEncargos), ImpostoPagoNoEstrangeiro: moeda(l.impostoPagoNoEstrangeiro),
+    CodPaisContraparte: l.codPaisContraparte
+  }));
+  const somaC01 = linhas.reduce((a, l) => a + (Number(l.valorRealizacao) || 0), 0);
+  const somaC02 = linhas.reduce((a, l) => a + (Number(l.valorAquisicao) || 0), 0);
+  const somaC03 = linhas.reduce((a, l) => a + (Number(l.despesasEncargos) || 0), 0);
+  const somaC04 = linhas.reduce((a, l) => a + (Number(l.impostoPagoNoEstrangeiro) || 0), 0);
+  return listaComLinhas("AnexoJq094AT01", campos) +
+    el("AnexoJq094AT01SomaC01", moeda(somaC01)) + el("AnexoJq094AT01SomaC02", moeda(somaC02)) +
+    el("AnexoJq094AT01SomaC03", moeda(somaC03)) + el("AnexoJq094AT01SomaC04", moeda(somaC04));
+}
+
+// Anexo J, Quadro 9 completo (incrementos patrimoniais obtidos no estrangeiro, Categoria
+// G). O campo de opção pelo englobamento dos incrementos patrimoniais de opção (Quadro
+// 9.2C, que se aplica em conjunto aos Quadros 9.2A e 9.2B) é emitido com a tag
+// "AnexoJq092B01" — continuação da numeração de campos do Quadro 9.2B, e não "092C01" como
+// seria de esperar pelo número do quadro nas instruções — confirmado contra um exemplo
+// real. O Quadro 9.3 (pagamentos por conta, campo único) e o Quadro 9.4B (opção pelo
+// englobamento dos criptoativos do Quadro 9.4A) também têm nomes de campo confirmados.
+function buildQuadro09AnexoJ(q09) {
+  if (!q09) return `<Quadro09/>`;
+  return `<Quadro09>` +
+    buildQuadro091AAnexoJ(q09.q91a || []) +
+    buildQuadro091BAnexoJ(q09.q91b || []) +
+    buildQuadro092AAnexoJ(q09.q92a || []) +
+    buildQuadro092A1AnexoJ(q09.q92a1 || []) +
+    buildQuadro092BAnexoJ(q09.q92b || []) +
+    el("AnexoJq092B01", q09.optaEnglobamento92 === undefined ? undefined : (q09.optaEnglobamento92 ? "S" : "N")) +
+    el("AnexoJq093C01", q09.pagamentosPorConta93 !== undefined ? moeda(q09.pagamentosPorConta93) : undefined) +
+    buildQuadro094AAnexoJ(q09.q94a || []) +
+    el("AnexoJq094B01", q09.optaEnglobamento94 === undefined ? undefined : (q09.optaEnglobamento94 ? "S" : "N")) +
+    `</Quadro09>`;
+}
+
+function temDadosQuadro09AnexoJ(q09) {
+  if (!q09) return false;
+  return (q09.q91a && q09.q91a.length > 0) || (q09.q91b && q09.q91b.length > 0) ||
+    (q09.q92a && q09.q92a.length > 0) || (q09.q92a1 && q09.q92a1.length > 0) ||
+    (q09.q92b && q09.q92b.length > 0) || q09.optaEnglobamento92 !== undefined ||
+    q09.pagamentosPorConta93 !== undefined ||
+    (q09.q94a && q09.q94a.length > 0) || q09.optaEnglobamento94 !== undefined;
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais) e Quadro 8 (categoria E —
-// capitais) implementados, com nomes de campo confirmados contra um exemplo real. Os
-// Quadros 9 a 11 (mais-valias, rendimentos de anos anteriores, contas no estrangeiro) ainda
-// não têm interface própria — ficam preservados em passthrough quando importados.
+// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
+// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
+// implementados, com nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
+// (rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
+// ficam preservados em passthrough quando importados.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -1473,7 +1615,8 @@ function buildAnexoJ(model) {
   const quadro06 = temDadosQuadro06AnexoJ(j.quadro06) ? buildQuadro06AnexoJ(j.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
   const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
-  const quadrosRestantes = ["Quadro09", "Quadro10", "Quadro11"]
+  const quadro09 = temDadosQuadro09AnexoJ(j.quadro09) ? buildQuadro09AnexoJ(j.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
+  const quadrosRestantes = ["Quadro10", "Quadro11"]
     .map(q => pass[q] || `<${q}/>`).join("");
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -1484,6 +1627,7 @@ function buildAnexoJ(model) {
     quadro06 +
     quadro07 +
     quadro08 +
+    quadro09 +
     quadrosRestantes +
     `</AnexoJ>`;
 }
