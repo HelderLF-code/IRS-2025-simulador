@@ -1585,6 +1585,50 @@ function temDadosQuadro09AnexoJ(q09) {
     (q09.q94a && q09.q94a.length > 0) || q09.optaEnglobamento94 !== undefined;
 }
 
+// Anexo J, Quadro 10 (rendimentos de anos anteriores incluídos nos Quadros 4, 5, 6, 7, 8 ou
+// 9.1B, regime do art.º 74.º CIRS). ATENÇÃO: o único exemplo real disponível tem este
+// quadro vazio (<AnexoJq10AT01/><AnexoJq10BT01/>) — os nomes dos contentores AnexoJq10AT01
+// (Quadro 10A, regime do n.º 1) e AnexoJq10BT01 (Quadro 10B, opção pelo regime do n.º 3)
+// estão confirmados, mas os nomes dos campos de cada linha NÃO estão confirmados contra
+// dados reais. Foram extrapolados por analogia com o padrão já confirmado do Quadro 14 do
+// Anexo G / Quadro 5 do Anexo E para o mesmo regime do art.º 74.º (campos
+// Quadro/NLinha/AnoRendimentos/Rendimento[/Nanos ou Retencoes]), adaptados com os nomes
+// mais descritivos já usados no resto do Anexo J (ContribSocial, ImpostoPagoEstrangeiro,
+// RetencaoFonte em vez do "Retencoes" domésticos). Corrigir assim que houver um exemplo
+// preenchido. Ao contrário dos outros sub-quadros do Anexo J, os dois contentores aparecem
+// sempre (mesmo auto-fechados) quando o Quadro 10 está presente — confirmado no exemplo
+// vazio — por isso usa-se diretamente "listaComLinhas" em vez do padrão de omitir o
+// contentor por completo quando não há linhas.
+function buildQuadro10AAnexoJ(linhas) {
+  const campos = (linhas || []).map(l => ({
+    Quadro: l.quadro, NLinha: l.nlinha, AnoRendimentos: l.anoRendimentos,
+    Rendimento: moeda(l.rendimento), Nanos: l.nanos
+  }));
+  return listaComLinhas("AnexoJq10AT01", campos);
+}
+
+function buildQuadro10BAnexoJ(linhas) {
+  const campos = (linhas || []).map(l => ({
+    Quadro: l.quadro, NLinha: l.nlinha, AnoRendimentos: l.anoRendimentos,
+    Rendimento: moeda(l.rendimento), ContribSocial: moeda(l.contribSocial),
+    ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro), RetencaoFonte: moeda(l.retencaoFonte)
+  }));
+  return listaComLinhas("AnexoJq10BT01", campos);
+}
+
+function buildQuadro10AnexoJ(q10) {
+  if (!q10) return `<Quadro10/>`;
+  return `<Quadro10>` +
+    buildQuadro10AAnexoJ(q10.q10a) +
+    buildQuadro10BAnexoJ(q10.q10b) +
+    `</Quadro10>`;
+}
+
+function temDadosQuadro10AnexoJ(q10) {
+  if (!q10) return false;
+  return (q10.q10a && q10.q10a.length > 0) || (q10.q10b && q10.q10b.length > 0);
+}
+
 // Anexo J, Quadro 11 (contas de depósito ou de títulos abertas em instituição financeira
 // não residente, ou em sucursal fora de Portugal de instituição financeira residente —
 // art.º 63.º-A n.os 8/9 LGT). Tabela 1 identifica as contas por IBAN/BIC; a Tabela 2 é usada
@@ -1615,14 +1659,12 @@ function temDadosQuadro11AnexoJ(q11) {
   return (q11.contasIbanBic && q11.contasIbanBic.length > 0) || (q11.outrasContas && q11.outrasContas.length > 0);
 }
 
-// Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
-// Quadro 11 (contas no estrangeiro) implementados, com nomes de campo confirmados contra um
-// exemplo real. O Quadro 10 (rendimentos de anos anteriores) ainda não tem interface
-// própria — fica preservado em passthrough quando importado; o exemplo disponível tem esse
-// quadro vazio, sem nomes de campo para confirmar.
+// Anexo J (rendimentos obtidos no estrangeiro), 11 quadros, todos com interface própria:
+// Quadro 3A (identificação do titular), Quadro 4 (categoria A), Quadro 5 (categoria H —
+// pensões), Quadro 6 (categoria B — empresariais/profissionais), Quadro 7 (categoria F —
+// prediais), Quadro 8 (categoria E — capitais), Quadro 9 (categoria G — mais-valias e
+// outros incrementos patrimoniais), Quadro 10 (rendimentos de anos anteriores — nomes de
+// campo das linhas não confirmados, ver nota acima) e Quadro 11 (contas no estrangeiro).
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -1647,7 +1689,7 @@ function buildAnexoJ(model) {
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
   const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
   const quadro09 = temDadosQuadro09AnexoJ(j.quadro09) ? buildQuadro09AnexoJ(j.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
-  const quadro10 = pass.Quadro10 || `<Quadro10/>`;
+  const quadro10 = temDadosQuadro10AnexoJ(j.quadro10) ? buildQuadro10AnexoJ(j.quadro10) : (pass.Quadro10 || `<Quadro10/>`);
   const quadro11 = temDadosQuadro11AnexoJ(j.quadro11) ? buildQuadro11AnexoJ(j.quadro11) : (pass.Quadro11 || `<Quadro11/>`);
 
   return `<AnexoJ id="${esc(nifA)}">` +

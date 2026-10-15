@@ -1372,6 +1372,43 @@ indicares, assume-se o escalão mais baixo.</small></p>
   </div>
 </div>
 
+<h2>Quadro 10 — Rendimentos de anos anteriores (art.º 74.º CIRS)</h2>
+<p class="aviso-topo">
+  Para rendimentos de anos anteriores incluídos nos Quadros 4, 5, 6, 7, 8 ou 9.1B.
+  <strong>Atenção:</strong> os nomes dos campos de cada linha (abaixo) não estão confirmados
+  contra um exemplo real preenchido — foram extrapolados por analogia com o Quadro 14 do
+  Anexo G, que usa o mesmo regime do art.º 74.º CIRS. Os nomes dos contentores
+  ("AnexoJq10AT01"/"AnexoJq10BT01") estão confirmados.
+</p>
+<datalist id="listaQuadroOrigemAnexoJ10">
+  <option value="Q4A">Q4A — trabalho dependente</option>
+  <option value="Q5A">Q5A — pensões</option>
+  <option value="Q6A">Q6A — empresariais/profissionais</option>
+  <option value="Q7A">Q7A — prediais</option>
+  <option value="Q8A">Q8A — capitais</option>
+  <option value="Q91B">Q91B — outros incrementos patrimoniais</option>
+</datalist>
+<h3>Regime do n.º 1 do art.º 74.º (Quadro 10A)</h3>
+<table id="tabelaAnexoJ10A">
+  <thead><tr>
+    <th>Quadro de origem</th><th>Linha de origem (ex: 401)</th><th>Ano dos rendimentos</th>
+    <th>Rendimento (€)</th><th>N.º de anos/fração</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ10A()">+ Adicionar</button>
+
+<h3>Opção pelo regime do n.º 3 do art.º 74.º (Quadro 10B)</h3>
+<table id="tabelaAnexoJ10B">
+  <thead><tr>
+    <th>Quadro de origem</th><th>Linha de origem</th><th>Ano dos rendimentos</th>
+    <th>Rendimento (€)</th><th>Contrib. regime proteção social (€)</th>
+    <th>Imposto pago no estrangeiro (€)</th><th>Retenção na fonte (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ10B()">+ Adicionar</button>
+
 <h2>Quadro 11 — Contas no estrangeiro</h2>
 <p class="aviso-topo">
   Contas de depósito ou de títulos abertas em instituição financeira não residente em
@@ -3684,6 +3721,50 @@ function temDadosQuadro09AnexoJ(q09) {
     (q09.q94a && q09.q94a.length > 0) || q09.optaEnglobamento94 !== undefined;
 }
 
+// Anexo J, Quadro 10 (rendimentos de anos anteriores incluídos nos Quadros 4, 5, 6, 7, 8 ou
+// 9.1B, regime do art.º 74.º CIRS). ATENÇÃO: o único exemplo real disponível tem este
+// quadro vazio (<AnexoJq10AT01/><AnexoJq10BT01/>) — os nomes dos contentores AnexoJq10AT01
+// (Quadro 10A, regime do n.º 1) e AnexoJq10BT01 (Quadro 10B, opção pelo regime do n.º 3)
+// estão confirmados, mas os nomes dos campos de cada linha NÃO estão confirmados contra
+// dados reais. Foram extrapolados por analogia com o padrão já confirmado do Quadro 14 do
+// Anexo G / Quadro 5 do Anexo E para o mesmo regime do art.º 74.º (campos
+// Quadro/NLinha/AnoRendimentos/Rendimento[/Nanos ou Retencoes]), adaptados com os nomes
+// mais descritivos já usados no resto do Anexo J (ContribSocial, ImpostoPagoEstrangeiro,
+// RetencaoFonte em vez do "Retencoes" domésticos). Corrigir assim que houver um exemplo
+// preenchido. Ao contrário dos outros sub-quadros do Anexo J, os dois contentores aparecem
+// sempre (mesmo auto-fechados) quando o Quadro 10 está presente — confirmado no exemplo
+// vazio — por isso usa-se diretamente "listaComLinhas" em vez do padrão de omitir o
+// contentor por completo quando não há linhas.
+function buildQuadro10AAnexoJ(linhas) {
+  const campos = (linhas || []).map(l => ({
+    Quadro: l.quadro, NLinha: l.nlinha, AnoRendimentos: l.anoRendimentos,
+    Rendimento: moeda(l.rendimento), Nanos: l.nanos
+  }));
+  return listaComLinhas("AnexoJq10AT01", campos);
+}
+
+function buildQuadro10BAnexoJ(linhas) {
+  const campos = (linhas || []).map(l => ({
+    Quadro: l.quadro, NLinha: l.nlinha, AnoRendimentos: l.anoRendimentos,
+    Rendimento: moeda(l.rendimento), ContribSocial: moeda(l.contribSocial),
+    ImpostoPagoEstrangeiro: moeda(l.impostoPagoEstrangeiro), RetencaoFonte: moeda(l.retencaoFonte)
+  }));
+  return listaComLinhas("AnexoJq10BT01", campos);
+}
+
+function buildQuadro10AnexoJ(q10) {
+  if (!q10) return `<Quadro10/>`;
+  return `<Quadro10>` +
+    buildQuadro10AAnexoJ(q10.q10a) +
+    buildQuadro10BAnexoJ(q10.q10b) +
+    `</Quadro10>`;
+}
+
+function temDadosQuadro10AnexoJ(q10) {
+  if (!q10) return false;
+  return (q10.q10a && q10.q10a.length > 0) || (q10.q10b && q10.q10b.length > 0);
+}
+
 // Anexo J, Quadro 11 (contas de depósito ou de títulos abertas em instituição financeira
 // não residente, ou em sucursal fora de Portugal de instituição financeira residente —
 // art.º 63.º-A n.os 8/9 LGT). Tabela 1 identifica as contas por IBAN/BIC; a Tabela 2 é usada
@@ -3714,14 +3795,12 @@ function temDadosQuadro11AnexoJ(q11) {
   return (q11.contasIbanBic && q11.contasIbanBic.length > 0) || (q11.outrasContas && q11.outrasContas.length > 0);
 }
 
-// Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
-// Quadro 11 (contas no estrangeiro) implementados, com nomes de campo confirmados contra um
-// exemplo real. O Quadro 10 (rendimentos de anos anteriores) ainda não tem interface
-// própria — fica preservado em passthrough quando importado; o exemplo disponível tem esse
-// quadro vazio, sem nomes de campo para confirmar.
+// Anexo J (rendimentos obtidos no estrangeiro), 11 quadros, todos com interface própria:
+// Quadro 3A (identificação do titular), Quadro 4 (categoria A), Quadro 5 (categoria H —
+// pensões), Quadro 6 (categoria B — empresariais/profissionais), Quadro 7 (categoria F —
+// prediais), Quadro 8 (categoria E — capitais), Quadro 9 (categoria G — mais-valias e
+// outros incrementos patrimoniais), Quadro 10 (rendimentos de anos anteriores — nomes de
+// campo das linhas não confirmados, ver nota acima) e Quadro 11 (contas no estrangeiro).
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -3746,7 +3825,7 @@ function buildAnexoJ(model) {
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
   const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
   const quadro09 = temDadosQuadro09AnexoJ(j.quadro09) ? buildQuadro09AnexoJ(j.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
-  const quadro10 = pass.Quadro10 || `<Quadro10/>`;
+  const quadro10 = temDadosQuadro10AnexoJ(j.quadro10) ? buildQuadro10AnexoJ(j.quadro10) : (pass.Quadro10 || `<Quadro10/>`);
   const quadro11 = temDadosQuadro11AnexoJ(j.quadro11) ? buildQuadro11AnexoJ(j.quadro11) : (pass.Quadro11 || `<Quadro11/>`);
 
   return `<AnexoJ id="${esc(nifA)}">` +
@@ -4815,6 +4894,34 @@ function parseQuadro09AnexoJ(q09) {
   };
 }
 
+// Anexo J, Quadro 10 (rendimentos de anos anteriores, regime do art.º 74.º CIRS). Ver nota
+// em build.js: os nomes dos contentores AnexoJq10AT01/AnexoJq10BT01 estão confirmados, mas
+// os nomes dos campos de cada linha (Quadro/NLinha/AnoRendimentos/Rendimento/...) foram
+// extrapolados por analogia com o Quadro 14 do Anexo G — não confirmados contra dados
+// reais, porque o único exemplo disponível tem este quadro vazio.
+function parseQuadro10AAnexoJ(q10) {
+  return parseLinhasGenerico(filho(q10, "AnexoJq10AT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos,
+    rendimento: l.Rendimento, nanos: l.Nanos
+  }));
+}
+
+function parseQuadro10BAnexoJ(q10) {
+  return parseLinhasGenerico(filho(q10, "AnexoJq10BT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, anoRendimentos: l.AnoRendimentos,
+    rendimento: l.Rendimento, contribSocial: l.ContribSocial,
+    impostoPagoEstrangeiro: l.ImpostoPagoEstrangeiro, retencaoFonte: l.RetencaoFonte
+  }));
+}
+
+function parseQuadro10AnexoJ(q10) {
+  if (!temConteudo(q10)) return undefined;
+  const q10a = parseQuadro10AAnexoJ(q10);
+  const q10b = parseQuadro10BAnexoJ(q10);
+  if (!q10a.length && !q10b.length) return undefined;
+  return { q10a, q10b };
+}
+
 // Anexo J, Quadro 11 (contas de depósito/títulos abertas em instituição financeira no
 // estrangeiro). Tabela 1 (IBAN/BIC) e Tabela 2 (outro número de identificação, quando a
 // conta não pode ser identificada por IBAN nem BIC). Nomes de campo confirmados contra um
@@ -4835,13 +4942,12 @@ function parseQuadro11AnexoJ(q11) {
   return { contasIbanBic, outrasContas };
 }
 
-// Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
-// Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
-// empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
-// Quadro 11 (contas no estrangeiro) implementados, nomes de campo confirmados contra um
-// exemplo real. O Quadro 10 (rendimentos de anos anteriores) fica preservado em
-// passthrough — o exemplo disponível tem esse quadro vazio, sem nomes de campo a confirmar.
+// Anexo J (rendimentos obtidos no estrangeiro), 11 quadros, todos com interface própria:
+// Quadro 3A (identificação do titular), Quadro 4 (categoria A), Quadro 5 (categoria H —
+// pensões), Quadro 6 (categoria B — empresariais/profissionais), Quadro 7 (categoria F —
+// prediais), Quadro 8 (categoria E — capitais), Quadro 9 (categoria G — mais-valias e
+// outros incrementos patrimoniais), Quadro 10 (rendimentos de anos anteriores — nomes de
+// campo das linhas não confirmados, ver nota acima) e Quadro 11 (contas no estrangeiro).
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
@@ -4851,6 +4957,7 @@ function parseAnexoJ(anexoJ) {
   const q07 = filho(anexoJ, "Quadro07");
   const q08 = filho(anexoJ, "Quadro08");
   const q09 = filho(anexoJ, "Quadro09");
+  const q10 = filho(anexoJ, "Quadro10");
   const q11 = filho(anexoJ, "Quadro11");
 
   const titularNif = texto(q03, "AnexoJq03C03");
@@ -4862,6 +4969,7 @@ function parseAnexoJ(anexoJ) {
   const quadro07 = parseQuadro07AnexoJ(q07);
   const quadro08 = parseQuadro08AnexoJ(q08);
   const quadro09 = parseQuadro09AnexoJ(q09);
+  const quadro10 = parseQuadro10AnexoJ(q10);
   const quadro11 = parseQuadro11AnexoJ(q11);
 
   const passthrough = {};
@@ -4871,12 +4979,11 @@ function parseAnexoJ(anexoJ) {
   if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !quadro08) passthrough.Quadro08 = serializar(q08);
   if (temConteudo(q09) && !quadro09) passthrough.Quadro09 = serializar(q09);
+  if (temConteudo(q10) && !quadro10) passthrough.Quadro10 = serializar(q10);
   if (temConteudo(q11) && !quadro11) passthrough.Quadro11 = serializar(q11);
-  const q10 = filho(anexoJ, "Quadro10");
-  if (temConteudo(q10)) passthrough.Quadro10 = serializar(q10);
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro10 || quadro11)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro10, quadro11 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }
@@ -7024,6 +7131,58 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  window.adicionarLinhaAnexoJ10A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ10A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj10a-quadro" size="5" list="listaQuadroOrigemAnexoJ10"></td>
+      <td><input class="aj10a-nlinha" size="6"></td>
+      <td><input class="aj10a-anorendimentos" type="number" size="6"></td>
+      <td><input class="aj10a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj10a-nanos" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro10AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ10A tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".aj10a-quadro").value || undefined,
+      nlinha: tr.querySelector(".aj10a-nlinha").value || undefined,
+      anoRendimentos: tr.querySelector(".aj10a-anorendimentos").value || undefined,
+      rendimento: tr.querySelector(".aj10a-rendimento").value || 0,
+      nanos: tr.querySelector(".aj10a-nanos").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ10B = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ10B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj10b-quadro" size="5" list="listaQuadroOrigemAnexoJ10"></td>
+      <td><input class="aj10b-nlinha" size="6"></td>
+      <td><input class="aj10b-anorendimentos" type="number" size="6"></td>
+      <td><input class="aj10b-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj10b-contribsocial" type="number" step="0.01"></td>
+      <td><input class="aj10b-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj10b-retencaofonte" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro10BAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ10B tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".aj10b-quadro").value || undefined,
+      nlinha: tr.querySelector(".aj10b-nlinha").value || undefined,
+      anoRendimentos: tr.querySelector(".aj10b-anorendimentos").value || undefined,
+      rendimento: tr.querySelector(".aj10b-rendimento").value || 0,
+      contribSocial: tr.querySelector(".aj10b-contribsocial").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj10b-impostoestrangeiro").value || 0,
+      retencaoFonte: tr.querySelector(".aj10b-retencaofonte").value || 0
+    }));
+  }
+
   window.adicionarLinhaAnexoJ11T01 = function () {
     const tbody = document.querySelector("#tabelaAnexoJ11T01 tbody");
     const tr = document.createElement("tr");
@@ -7129,15 +7288,20 @@ if (typeof module !== "undefined" && module.exports) {
       optaEnglobamento92, pagamentosPorConta93, q94a, optaEnglobamento94
     } : undefined;
 
+    const q10a = lerQuadro10AAnexoJ();
+    const q10b = lerQuadro10BAnexoJ();
+    const temQuadro10 = q10a.length || q10b.length;
+    const quadro10 = temQuadro10 ? { q10a, q10b } : undefined;
+
     const contasIbanBic = lerQuadro11T01AnexoJ();
     const outrasContas = lerQuadro11T02AnexoJ();
     const temQuadro11 = contasIbanBic.length || outrasContas.length;
     const quadro11 = temQuadro11 ? { contasIbanBic, outrasContas } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11;
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro10 || quadro11;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro10, quadro11 };
   }
 
   function lerDespesasEFatura() {
@@ -7983,6 +8147,8 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("aj093PagamentosConta").value = "";
       document.querySelector("#tabelaAnexoJ094A tbody").innerHTML = "";
       document.getElementById("aj094bOptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoJ10A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ10B tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ11T01 tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ11T02 tbody").innerHTML = "";
 
@@ -8195,6 +8361,29 @@ if (typeof module !== "undefined" && module.exports) {
           if (q9.optaEnglobamento94 !== undefined) {
             document.getElementById("aj094bOptaEnglobamento").value = q9.optaEnglobamento94 ? "S" : "N";
           }
+        }
+        if (j.quadro10) {
+          const q10 = j.quadro10;
+          (q10.q10a || []).forEach(l => {
+            adicionarLinhaAnexoJ10A();
+            const tr = document.querySelector("#tabelaAnexoJ10A tbody tr:last-child");
+            tr.querySelector(".aj10a-quadro").value = l.quadro || "";
+            tr.querySelector(".aj10a-nlinha").value = l.nlinha || "";
+            tr.querySelector(".aj10a-anorendimentos").value = l.anoRendimentos || "";
+            tr.querySelector(".aj10a-rendimento").value = l.rendimento || "";
+            tr.querySelector(".aj10a-nanos").value = l.nanos || "";
+          });
+          (q10.q10b || []).forEach(l => {
+            adicionarLinhaAnexoJ10B();
+            const tr = document.querySelector("#tabelaAnexoJ10B tbody tr:last-child");
+            tr.querySelector(".aj10b-quadro").value = l.quadro || "";
+            tr.querySelector(".aj10b-nlinha").value = l.nlinha || "";
+            tr.querySelector(".aj10b-anorendimentos").value = l.anoRendimentos || "";
+            tr.querySelector(".aj10b-rendimento").value = l.rendimento || "";
+            tr.querySelector(".aj10b-contribsocial").value = l.contribSocial || "";
+            tr.querySelector(".aj10b-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+            tr.querySelector(".aj10b-retencaofonte").value = l.retencaoFonte || "";
+          });
         }
         if (j.quadro11) {
           const q11 = j.quadro11;

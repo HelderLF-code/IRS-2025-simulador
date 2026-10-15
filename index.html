@@ -1372,6 +1372,43 @@ indicares, assume-se o escalão mais baixo.</small></p>
   </div>
 </div>
 
+<h2>Quadro 10 — Rendimentos de anos anteriores (art.º 74.º CIRS)</h2>
+<p class="aviso-topo">
+  Para rendimentos de anos anteriores incluídos nos Quadros 4, 5, 6, 7, 8 ou 9.1B.
+  <strong>Atenção:</strong> os nomes dos campos de cada linha (abaixo) não estão confirmados
+  contra um exemplo real preenchido — foram extrapolados por analogia com o Quadro 14 do
+  Anexo G, que usa o mesmo regime do art.º 74.º CIRS. Os nomes dos contentores
+  ("AnexoJq10AT01"/"AnexoJq10BT01") estão confirmados.
+</p>
+<datalist id="listaQuadroOrigemAnexoJ10">
+  <option value="Q4A">Q4A — trabalho dependente</option>
+  <option value="Q5A">Q5A — pensões</option>
+  <option value="Q6A">Q6A — empresariais/profissionais</option>
+  <option value="Q7A">Q7A — prediais</option>
+  <option value="Q8A">Q8A — capitais</option>
+  <option value="Q91B">Q91B — outros incrementos patrimoniais</option>
+</datalist>
+<h3>Regime do n.º 1 do art.º 74.º (Quadro 10A)</h3>
+<table id="tabelaAnexoJ10A">
+  <thead><tr>
+    <th>Quadro de origem</th><th>Linha de origem (ex: 401)</th><th>Ano dos rendimentos</th>
+    <th>Rendimento (€)</th><th>N.º de anos/fração</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ10A()">+ Adicionar</button>
+
+<h3>Opção pelo regime do n.º 3 do art.º 74.º (Quadro 10B)</h3>
+<table id="tabelaAnexoJ10B">
+  <thead><tr>
+    <th>Quadro de origem</th><th>Linha de origem</th><th>Ano dos rendimentos</th>
+    <th>Rendimento (€)</th><th>Contrib. regime proteção social (€)</th>
+    <th>Imposto pago no estrangeiro (€)</th><th>Retenção na fonte (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ10B()">+ Adicionar</button>
+
 <h2>Quadro 11 — Contas no estrangeiro</h2>
 <p class="aviso-topo">
   Contas de depósito ou de títulos abertas em instituição financeira não residente em
@@ -3339,6 +3376,58 @@ indicares, assume-se o escalão mais baixo.</small></p>
     }));
   }
 
+  window.adicionarLinhaAnexoJ10A = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ10A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj10a-quadro" size="5" list="listaQuadroOrigemAnexoJ10"></td>
+      <td><input class="aj10a-nlinha" size="6"></td>
+      <td><input class="aj10a-anorendimentos" type="number" size="6"></td>
+      <td><input class="aj10a-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj10a-nanos" type="number" size="4"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro10AAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ10A tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".aj10a-quadro").value || undefined,
+      nlinha: tr.querySelector(".aj10a-nlinha").value || undefined,
+      anoRendimentos: tr.querySelector(".aj10a-anorendimentos").value || undefined,
+      rendimento: tr.querySelector(".aj10a-rendimento").value || 0,
+      nanos: tr.querySelector(".aj10a-nanos").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ10B = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ10B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj10b-quadro" size="5" list="listaQuadroOrigemAnexoJ10"></td>
+      <td><input class="aj10b-nlinha" size="6"></td>
+      <td><input class="aj10b-anorendimentos" type="number" size="6"></td>
+      <td><input class="aj10b-rendimento" type="number" step="0.01"></td>
+      <td><input class="aj10b-contribsocial" type="number" step="0.01"></td>
+      <td><input class="aj10b-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj10b-retencaofonte" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro10BAnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ10B tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".aj10b-quadro").value || undefined,
+      nlinha: tr.querySelector(".aj10b-nlinha").value || undefined,
+      anoRendimentos: tr.querySelector(".aj10b-anorendimentos").value || undefined,
+      rendimento: tr.querySelector(".aj10b-rendimento").value || 0,
+      contribSocial: tr.querySelector(".aj10b-contribsocial").value || 0,
+      impostoPagoEstrangeiro: tr.querySelector(".aj10b-impostoestrangeiro").value || 0,
+      retencaoFonte: tr.querySelector(".aj10b-retencaofonte").value || 0
+    }));
+  }
+
   window.adicionarLinhaAnexoJ11T01 = function () {
     const tbody = document.querySelector("#tabelaAnexoJ11T01 tbody");
     const tr = document.createElement("tr");
@@ -3444,15 +3533,20 @@ indicares, assume-se o escalão mais baixo.</small></p>
       optaEnglobamento92, pagamentosPorConta93, q94a, optaEnglobamento94
     } : undefined;
 
+    const q10a = lerQuadro10AAnexoJ();
+    const q10b = lerQuadro10BAnexoJ();
+    const temQuadro10 = q10a.length || q10b.length;
+    const quadro10 = temQuadro10 ? { q10a, q10b } : undefined;
+
     const contasIbanBic = lerQuadro11T01AnexoJ();
     const outrasContas = lerQuadro11T02AnexoJ();
     const temQuadro11 = contasIbanBic.length || outrasContas.length;
     const quadro11 = temQuadro11 ? { contasIbanBic, outrasContas } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11;
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro10 || quadro11;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro10, quadro11 };
   }
 
   function lerDespesasEFatura() {
@@ -4298,6 +4392,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("aj093PagamentosConta").value = "";
       document.querySelector("#tabelaAnexoJ094A tbody").innerHTML = "";
       document.getElementById("aj094bOptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoJ10A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ10B tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ11T01 tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ11T02 tbody").innerHTML = "";
 
@@ -4510,6 +4606,29 @@ indicares, assume-se o escalão mais baixo.</small></p>
           if (q9.optaEnglobamento94 !== undefined) {
             document.getElementById("aj094bOptaEnglobamento").value = q9.optaEnglobamento94 ? "S" : "N";
           }
+        }
+        if (j.quadro10) {
+          const q10 = j.quadro10;
+          (q10.q10a || []).forEach(l => {
+            adicionarLinhaAnexoJ10A();
+            const tr = document.querySelector("#tabelaAnexoJ10A tbody tr:last-child");
+            tr.querySelector(".aj10a-quadro").value = l.quadro || "";
+            tr.querySelector(".aj10a-nlinha").value = l.nlinha || "";
+            tr.querySelector(".aj10a-anorendimentos").value = l.anoRendimentos || "";
+            tr.querySelector(".aj10a-rendimento").value = l.rendimento || "";
+            tr.querySelector(".aj10a-nanos").value = l.nanos || "";
+          });
+          (q10.q10b || []).forEach(l => {
+            adicionarLinhaAnexoJ10B();
+            const tr = document.querySelector("#tabelaAnexoJ10B tbody tr:last-child");
+            tr.querySelector(".aj10b-quadro").value = l.quadro || "";
+            tr.querySelector(".aj10b-nlinha").value = l.nlinha || "";
+            tr.querySelector(".aj10b-anorendimentos").value = l.anoRendimentos || "";
+            tr.querySelector(".aj10b-rendimento").value = l.rendimento || "";
+            tr.querySelector(".aj10b-contribsocial").value = l.contribSocial || "";
+            tr.querySelector(".aj10b-impostoestrangeiro").value = l.impostoPagoEstrangeiro || "";
+            tr.querySelector(".aj10b-retencaofonte").value = l.retencaoFonte || "";
+          });
         }
         if (j.quadro11) {
           const q11 = j.quadro11;
