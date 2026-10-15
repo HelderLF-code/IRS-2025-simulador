@@ -1706,14 +1706,185 @@ function buildAnexoJ(model) {
     `</AnexoJ>`;
 }
 
+// Anexo L (residente não habitual / incentivo fiscal à investigação científica e inovação —
+// IFICI), Quadro 4 (rendimentos obtidos em território nacional, por atividades de elevado
+// valor acrescentado ou no âmbito do IFICI): 4A (categoria A, Anexo A), 4B (categoria B
+// regime simplificado, Anexo B), 4C (categoria B contabilidade organizada, Anexo C) e 4D
+// (categoria B rendimentos imputados, Anexo D). Nomes de campo confirmados contra um
+// exemplo real.
+function buildQuadro04AAnexoL(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({
+    NIFEntidade: l.nifEntidade, CodRendimento: l.codRendimento,
+    CodAtividadeP2010: l.codAtividadeP2010, CodAtividadeP2019: l.codAtividadeP2019,
+    CodAtividadeP2024: l.codAtividadeP2024, CodEntidade: l.codEntidade, Rendimento: moeda(l.rendimento)
+  }));
+  return listaComLinhas("AnexoLq04AT01", campos);
+}
+
+function buildQuadro04BAnexoL(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({
+    NIFEntidade: l.nifEntidade, CampoQ4AnexoB: l.campoQ4AnexoB,
+    CodAtividadeP2010: l.codAtividadeP2010, CodAtividadeP2019: l.codAtividadeP2019,
+    CodAtividadeP2024: l.codAtividadeP2024, CodEntidade: l.codEntidade, Rendimento: moeda(l.rendimento)
+  }));
+  return listaComLinhas("AnexoLq04BT01", campos);
+}
+
+function buildQuadro04CAnexoL(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({
+    NIFEntidade: l.nifEntidade,
+    CodAtividadeP2010: l.codAtividadeP2010, CodAtividadeP2019: l.codAtividadeP2019,
+    CodAtividadeP2024: l.codAtividadeP2024, CodEntidade: l.codEntidade,
+    Lucro: moeda(l.lucro), Prejuizo: moeda(l.prejuizo)
+  }));
+  return listaComLinhas("AnexoLq04CT01", campos);
+}
+
+function buildQuadro04DAnexoL(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({
+    NIFEntidade: l.nifEntidade, CampoQ4AnexoD: l.campoQ4AnexoD,
+    CodAtividadeP2010: l.codAtividadeP2010, CodAtividadeP2019: l.codAtividadeP2019,
+    CodAtividadeP2024: l.codAtividadeP2024, CodEntidade: l.codEntidade, Rendimento: moeda(l.rendimento)
+  }));
+  return listaComLinhas("AnexoLq04DT01", campos);
+}
+
+function buildQuadro04AnexoL(q04) {
+  if (!q04) return `<Quadro04/>`;
+  return `<Quadro04>` +
+    buildQuadro04AAnexoL(q04.linhasA) +
+    buildQuadro04BAnexoL(q04.linhasB) +
+    buildQuadro04CAnexoL(q04.linhasC) +
+    buildQuadro04DAnexoL(q04.linhasD) +
+    `</Quadro04>`;
+}
+
+function temDadosQuadro04AnexoL(q04) {
+  if (!q04) return false;
+  return (q04.linhasA && q04.linhasA.length > 0) || (q04.linhasB && q04.linhasB.length > 0) ||
+    (q04.linhasC && q04.linhasC.length > 0) || (q04.linhasD && q04.linhasD.length > 0);
+}
+
+// Anexo L, Quadro 5 (rendimentos obtidos no estrangeiro — Anexo J — por residentes não
+// habituais): 5A (categorias A e B de elevado valor acrescentado) e 5B (categoria H e
+// outros rendimentos previstos no n.º 12 do art.º 72.º CIRS, anos 2020+). O campo
+// "SemImpostoPagoNoEstrangeiro" usa o valor literal "true" quando assinalado, à semelhança
+// da convenção já confirmada em vários campos complementares do Anexo J. Nomes de campo
+// confirmados contra um exemplo real.
+function buildQuadro05AAnexoL(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({
+    Quadro: l.quadro, NLinha: l.nlinha,
+    CodAtividadeP2010: l.codAtividadeP2010, CodAtividadeP2019: l.codAtividadeP2019,
+    CatAouB: l.catAouB, CodPais: l.codPais, Rendimento: moeda(l.rendimento),
+    ComImpostoPagoNoEstrangeiro: moeda(l.comImpostoPagoEstrangeiro),
+    SemImpostoPagoNoEstrangeiro: l.semImpostoPagoEstrangeiro ? "true" : undefined
+  }));
+  return listaComLinhas("AnexoLq05AT01", campos);
+}
+
+function buildQuadro05BAnexoL(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({
+    Quadro: l.quadro, NLinha: l.nlinha, CodRendimento: l.codRendimento,
+    CatAouH: l.catAouH, CodPais: l.codPais, Rendimento: moeda(l.rendimento),
+    ComImpostoPagoNoEstrangeiro: moeda(l.comImpostoPagoEstrangeiro),
+    SemImpostoPagoNoEstrangeiro: l.semImpostoPagoEstrangeiro ? "true" : undefined
+  }));
+  return listaComLinhas("AnexoLq05BT01", campos);
+}
+
+function buildQuadro05AnexoL(q05) {
+  if (!q05) return `<Quadro05/>`;
+  return `<Quadro05>` + buildQuadro05AAnexoL(q05.linhasA) + buildQuadro05BAnexoL(q05.linhasB) + `</Quadro05>`;
+}
+
+function temDadosQuadro05AnexoL(q05) {
+  if (!q05) return false;
+  return (q05.linhasA && q05.linhasA.length > 0) || (q05.linhasB && q05.linhasB.length > 0);
+}
+
+// Anexo L, Quadros 6 e 7 (opções por regimes de tributação). Escolhas exclusivas (tributação
+// autónoma vs. englobamento, método de isenção vs. crédito de imposto) são exportadas como
+// um único campo cuja tag inclui o número do próprio campo escolhido (ex: campo 01 marcado
+// → "AnexoLq06B01" com o valor "1"; campo 02 marcado → "AnexoLq06B02" com o valor "2"), e o
+// campo da opção não escolhida fica simplesmente ausente — confirmado contra um exemplo
+// real para os campos 01, 03, 05, 07, 11 e 13 do Quadro 6 e para o campo 01 do Quadro 7; os
+// restantes campos da mesma família (02, 04, 06, 08-10, 12, 14 do Quadro 6; 02-04 do Quadro
+// 7) seguem o mesmo padrão por simetria directa, mas não foram vistos preenchidos no
+// exemplo. O Quadro 6B pergunta 1 (campo 07, "tornou-se residente até 31/03/2020?") e
+// pergunta 2 (campo 09, "opta pelo novo regime?") usam, cada uma, uma única tag fixa com
+// valor "S"/"N", tal como outros campos SIM/NÃO do Anexo J.
+function campoTagAnexoL06(n) { return `AnexoLq06B${String(n).padStart(2, "0")}`; }
+function campoTagAnexoL07(n) { return `AnexoLq07B${String(n).padStart(2, "0")}`; }
+
+function buildQuadro06AnexoL(q06) {
+  if (!q06) return `<Quadro06/>`;
+  let corpo = "";
+  if (q06.opcaoCatA) corpo += el(campoTagAnexoL06(q06.opcaoCatA), q06.opcaoCatA);
+  if (q06.opcaoCatB) corpo += el(campoTagAnexoL06(q06.opcaoCatB), q06.opcaoCatB);
+  if (q06.tornouResidenteAte202003 !== undefined) corpo += el(campoTagAnexoL06(7), q06.tornouResidenteAte202003 ? "S" : "N");
+  if (q06.optaNovoRegime !== undefined) corpo += el(campoTagAnexoL06(9), q06.optaNovoRegime ? "S" : "N");
+  if (q06.opcaoRendimentosQ5B) corpo += el(campoTagAnexoL06(q06.opcaoRendimentosQ5B), q06.opcaoRendimentosQ5B);
+  if (q06.metodoQ6C1) corpo += el(campoTagAnexoL06(q06.metodoQ6C1), q06.metodoQ6C1);
+  if (q06.metodoQ6C2) corpo += el(campoTagAnexoL06(q06.metodoQ6C2), q06.metodoQ6C2);
+  return `<Quadro06>${corpo}</Quadro06>`;
+}
+
+function temDadosQuadro06AnexoL(q06) {
+  if (!q06) return false;
+  return q06.opcaoCatA !== undefined || q06.opcaoCatB !== undefined ||
+    q06.tornouResidenteAte202003 !== undefined || q06.optaNovoRegime !== undefined ||
+    q06.opcaoRendimentosQ5B !== undefined || q06.metodoQ6C1 !== undefined || q06.metodoQ6C2 !== undefined;
+}
+
+function buildQuadro07AnexoL(q07) {
+  if (!q07) return `<Quadro07/>`;
+  let corpo = "";
+  if (q07.opcaoCatA) corpo += el(campoTagAnexoL07(q07.opcaoCatA), q07.opcaoCatA);
+  if (q07.opcaoCatB) corpo += el(campoTagAnexoL07(q07.opcaoCatB), q07.opcaoCatB);
+  return `<Quadro07>${corpo}</Quadro07>`;
+}
+
+function temDadosQuadro07AnexoL(q07) {
+  if (!q07) return false;
+  return q07.opcaoCatA !== undefined || q07.opcaoCatB !== undefined;
+}
+
+// Anexo L (residente não habitual / incentivo fiscal à investigação científica e inovação),
+// 7 quadros, todos com interface própria. Nomes de campo confirmados contra um exemplo
+// real, exceto onde assinalado nas notas acima.
 function buildAnexoL(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
+  const l = model.anexoL || {};
+  const pass = model.anexoLPassthrough || {};
+
+  const quadro01 = `<Quadro01>` +
+    (l.regime === "RNH" ? el("AnexoLq01B01", 1) : l.regime === "IFICI" ? el("AnexoLq01B02", 2) : "") +
+    `</Quadro01>`;
   const campoC02 = tributacaoConjunta ? el("AnexoLq03C02", nifB) : "";
+  const quadro03 = `<Quadro03>` +
+    el("AnexoLq03C01", nifA) + campoC02 + el("AnexoLq03C03", l.titularNif || nifA) +
+    (l.obteveEstatutoRNHAte2019 !== undefined ? el("AnexoLq03B04", l.obteveEstatutoRNHAte2019 ? "S" : "N") : "") +
+    `</Quadro03>`;
+
+  const quadro04 = temDadosQuadro04AnexoL(l.quadro04) ? buildQuadro04AnexoL(l.quadro04) : (pass.Quadro04 || `<Quadro04/>`);
+  const quadro05 = temDadosQuadro05AnexoL(l.quadro05) ? buildQuadro05AnexoL(l.quadro05) : (pass.Quadro05 || `<Quadro05/>`);
+  const quadro06 = temDadosQuadro06AnexoL(l.quadro06) ? buildQuadro06AnexoL(l.quadro06) : (pass.Quadro06 || `<Quadro06/>`);
+  const quadro07 = temDadosQuadro07AnexoL(l.quadro07) ? buildQuadro07AnexoL(l.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
+
   return `<AnexoL id="${esc(nifA)}">` +
-    `<Quadro01/>` +
+    quadro01 +
     `<Quadro02>${el("AnexoLq02C01", ano)}</Quadro02>` +
-    `<Quadro03>${el("AnexoLq03C01", nifA)}${campoC02}${el("AnexoLq03C03", nifA)}</Quadro03>` +
-    Array.from({ length: 4 }, (_, i) => `<Quadro${String(i + 4).padStart(2, "0")}/>`).join("") +
+    quadro03 +
+    quadro04 +
+    quadro05 +
+    quadro06 +
+    quadro07 +
     `</AnexoL>`;
 }
 
@@ -1746,7 +1917,7 @@ function buildModelo3XML(model) {
     partes.push(pass.AnexoG1 || buildAnexoEsqueleto("AnexoG1", "AnexoG1", model, ["04", "05", "06", "07", "08"], true));
     partes.push(buildAnexoH(model));
     partes.push(buildAnexoJ(model));
-    partes.push(pass.AnexoL || buildAnexoL(model));
+    partes.push(buildAnexoL(model));
     partes.push(pass.AnexoSS || buildAnexoSS(model));
   }
 

@@ -167,7 +167,7 @@ function parseAnexoA(anexoA) {
 }
 
 function parseAnexosPassthrough(raiz) {
-  const nomes = ["AnexoG1", "AnexoL", "AnexoSS"];
+  const nomes = ["AnexoG1", "AnexoSS"];
   const passthrough = {};
   nomes.forEach(nome => {
     const el = filho(raiz, nome);
@@ -1084,6 +1084,138 @@ function parseAnexoJ(anexoJ) {
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }
 
+// Anexo L, Quadro 4 (rendimentos obtidos em território nacional): 4A/4B/4C/4D. Nomes de
+// campo confirmados contra um exemplo real.
+function parseQuadro04AAnexoL(q04) {
+  return parseLinhasGenerico(filho(q04, "AnexoLq04AT01")).map(l => ({
+    nifEntidade: l.NIFEntidade, codRendimento: l.CodRendimento,
+    codAtividadeP2010: l.CodAtividadeP2010, codAtividadeP2019: l.CodAtividadeP2019,
+    codAtividadeP2024: l.CodAtividadeP2024, codEntidade: l.CodEntidade, rendimento: l.Rendimento
+  }));
+}
+
+function parseQuadro04BAnexoL(q04) {
+  return parseLinhasGenerico(filho(q04, "AnexoLq04BT01")).map(l => ({
+    nifEntidade: l.NIFEntidade, campoQ4AnexoB: l.CampoQ4AnexoB,
+    codAtividadeP2010: l.CodAtividadeP2010, codAtividadeP2019: l.CodAtividadeP2019,
+    codAtividadeP2024: l.CodAtividadeP2024, codEntidade: l.CodEntidade, rendimento: l.Rendimento
+  }));
+}
+
+function parseQuadro04CAnexoL(q04) {
+  return parseLinhasGenerico(filho(q04, "AnexoLq04CT01")).map(l => ({
+    nifEntidade: l.NIFEntidade,
+    codAtividadeP2010: l.CodAtividadeP2010, codAtividadeP2019: l.CodAtividadeP2019,
+    codAtividadeP2024: l.CodAtividadeP2024, codEntidade: l.CodEntidade,
+    lucro: l.Lucro, prejuizo: l.Prejuizo
+  }));
+}
+
+function parseQuadro04DAnexoL(q04) {
+  return parseLinhasGenerico(filho(q04, "AnexoLq04DT01")).map(l => ({
+    nifEntidade: l.NIFEntidade, campoQ4AnexoD: l.CampoQ4AnexoD,
+    codAtividadeP2010: l.CodAtividadeP2010, codAtividadeP2019: l.CodAtividadeP2019,
+    codAtividadeP2024: l.CodAtividadeP2024, codEntidade: l.CodEntidade, rendimento: l.Rendimento
+  }));
+}
+
+function parseQuadro04AnexoL(q04) {
+  if (!temConteudo(q04)) return undefined;
+  const linhasA = parseQuadro04AAnexoL(q04), linhasB = parseQuadro04BAnexoL(q04),
+    linhasC = parseQuadro04CAnexoL(q04), linhasD = parseQuadro04DAnexoL(q04);
+  if (!linhasA.length && !linhasB.length && !linhasC.length && !linhasD.length) return undefined;
+  return { linhasA, linhasB, linhasC, linhasD };
+}
+
+// Anexo L, Quadro 5 (rendimentos obtidos no estrangeiro, Anexo J, por residentes não
+// habituais): 5A/5B. O campo "SemImpostoPagoNoEstrangeiro" usa o valor literal "true".
+// Nomes de campo confirmados contra um exemplo real.
+function parseQuadro05AAnexoL(q05) {
+  return parseLinhasGenerico(filho(q05, "AnexoLq05AT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha,
+    codAtividadeP2010: l.CodAtividadeP2010, codAtividadeP2019: l.CodAtividadeP2019,
+    catAouB: l.CatAouB, codPais: l.CodPais, rendimento: l.Rendimento,
+    comImpostoPagoEstrangeiro: l.ComImpostoPagoNoEstrangeiro,
+    semImpostoPagoEstrangeiro: l.SemImpostoPagoNoEstrangeiro === "true"
+  }));
+}
+
+function parseQuadro05BAnexoL(q05) {
+  return parseLinhasGenerico(filho(q05, "AnexoLq05BT01")).map(l => ({
+    quadro: l.Quadro, nlinha: l.NLinha, codRendimento: l.CodRendimento,
+    catAouH: l.CatAouH, codPais: l.CodPais, rendimento: l.Rendimento,
+    comImpostoPagoEstrangeiro: l.ComImpostoPagoNoEstrangeiro,
+    semImpostoPagoEstrangeiro: l.SemImpostoPagoNoEstrangeiro === "true"
+  }));
+}
+
+function parseQuadro05AnexoL(q05) {
+  if (!temConteudo(q05)) return undefined;
+  const linhasA = parseQuadro05AAnexoL(q05), linhasB = parseQuadro05BAnexoL(q05);
+  if (!linhasA.length && !linhasB.length) return undefined;
+  return { linhasA, linhasB };
+}
+
+// Anexo L, Quadros 6 e 7 (opções por regimes de tributação). Ver nota em build.js sobre a
+// codificação das escolhas exclusivas (tag = "AnexoLq0XB" + número do campo escolhido,
+// valor = esse mesmo número).
+function parseQuadro06AnexoL(q06) {
+  if (!temConteudo(q06)) return undefined;
+  const opcaoCatA = texto(q06, "AnexoLq06B01") !== undefined ? 1 : texto(q06, "AnexoLq06B02") !== undefined ? 2 : undefined;
+  const opcaoCatB = texto(q06, "AnexoLq06B03") !== undefined ? 3 : texto(q06, "AnexoLq06B04") !== undefined ? 4 : undefined;
+  const tornouResidenteAte202003 = texto(q06, "AnexoLq06B07") !== undefined ? texto(q06, "AnexoLq06B07") === "S" : undefined;
+  const optaNovoRegime = texto(q06, "AnexoLq06B09") !== undefined ? texto(q06, "AnexoLq06B09") === "S" : undefined;
+  const opcaoRendimentosQ5B = texto(q06, "AnexoLq06B11") !== undefined ? 11 : texto(q06, "AnexoLq06B12") !== undefined ? 12 : undefined;
+  const metodoQ6C1 = texto(q06, "AnexoLq06B05") !== undefined ? 5 : texto(q06, "AnexoLq06B06") !== undefined ? 6 : undefined;
+  const metodoQ6C2 = texto(q06, "AnexoLq06B13") !== undefined ? 13 : texto(q06, "AnexoLq06B14") !== undefined ? 14 : undefined;
+  if (opcaoCatA === undefined && opcaoCatB === undefined && tornouResidenteAte202003 === undefined &&
+    optaNovoRegime === undefined && opcaoRendimentosQ5B === undefined && metodoQ6C1 === undefined && metodoQ6C2 === undefined) {
+    return undefined;
+  }
+  return { opcaoCatA, opcaoCatB, tornouResidenteAte202003, optaNovoRegime, opcaoRendimentosQ5B, metodoQ6C1, metodoQ6C2 };
+}
+
+function parseQuadro07AnexoL(q07) {
+  if (!temConteudo(q07)) return undefined;
+  const opcaoCatA = texto(q07, "AnexoLq07B01") !== undefined ? 1 : texto(q07, "AnexoLq07B02") !== undefined ? 2 : undefined;
+  const opcaoCatB = texto(q07, "AnexoLq07B03") !== undefined ? 3 : texto(q07, "AnexoLq07B04") !== undefined ? 4 : undefined;
+  if (opcaoCatA === undefined && opcaoCatB === undefined) return undefined;
+  return { opcaoCatA, opcaoCatB };
+}
+
+// Anexo L (residente não habitual / incentivo fiscal à investigação científica e inovação),
+// 7 quadros, todos com interface própria. Nomes de campo confirmados contra um exemplo
+// real, exceto onde assinalado nas notas de build.js.
+function parseAnexoL(anexoL) {
+  if (!anexoL) return { anexoL: undefined, anexoLPassthrough: {} };
+  const q01 = filho(anexoL, "Quadro01");
+  const q03 = filho(anexoL, "Quadro03");
+  const q04 = filho(anexoL, "Quadro04");
+  const q05 = filho(anexoL, "Quadro05");
+  const q06 = filho(anexoL, "Quadro06");
+  const q07 = filho(anexoL, "Quadro07");
+
+  const regime = texto(q01, "AnexoLq01B01") !== undefined ? "RNH" : texto(q01, "AnexoLq01B02") !== undefined ? "IFICI" : undefined;
+  const titularNif = texto(q03, "AnexoLq03C03");
+  const obteveEstatutoRNHAte2019 = texto(q03, "AnexoLq03B04") !== undefined ? texto(q03, "AnexoLq03B04") === "S" : undefined;
+
+  const quadro04 = parseQuadro04AnexoL(q04);
+  const quadro05 = parseQuadro05AnexoL(q05);
+  const quadro06 = parseQuadro06AnexoL(q06);
+  const quadro07 = parseQuadro07AnexoL(q07);
+
+  const passthrough = {};
+  if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
+  if (temConteudo(q05) && !quadro05) passthrough.Quadro05 = serializar(q05);
+  if (temConteudo(q06) && !quadro06) passthrough.Quadro06 = serializar(q06);
+  if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
+
+  const anexoLModel = (regime || titularNif || obteveEstatutoRNHAte2019 !== undefined || quadro04 || quadro05 || quadro06 || quadro07)
+    ? { regime, titularNif, obteveEstatutoRNHAte2019, quadro04, quadro05, quadro06, quadro07 } : undefined;
+
+  return { anexoL: anexoLModel, anexoLPassthrough: passthrough };
+}
+
 function parseModelo3XML(xmlTexto) {
   const doc = new DOMParser().parseFromString(xmlTexto, "application/xml");
   const erro = doc.querySelector("parsererror");
@@ -1103,6 +1235,7 @@ function parseModelo3XML(xmlTexto) {
   const anexoG = filho(raiz, "AnexoG");
   const anexoH = filho(raiz, "AnexoH");
   const anexoJ = filho(raiz, "AnexoJ");
+  const anexoL = filho(raiz, "AnexoL");
 
   const { agregado, rostoPassthrough } = parseRosto(rosto);
   const { anexoA: anexoAModel, extrasAnexoA } = parseAnexoA(anexoA);
@@ -1111,6 +1244,7 @@ function parseModelo3XML(xmlTexto) {
   const { anexoG: anexoGModel, anexoGPassthrough } = parseAnexoG(anexoG);
   const { anexoH: anexoHModel, anexoHPassthrough } = parseAnexoH(anexoH);
   const { anexoJ: anexoJModel, anexoJPassthrough } = parseAnexoJ(anexoJ);
+  const { anexoL: anexoLModel, anexoLPassthrough } = parseAnexoL(anexoL);
   const anexosPassthrough = parseAnexosPassthrough(raiz);
 
   return {
@@ -1127,6 +1261,8 @@ function parseModelo3XML(xmlTexto) {
     anexoHPassthrough,
     anexoJ: anexoJModel,
     anexoJPassthrough,
+    anexoL: anexoLModel,
+    anexoLPassthrough,
     rostoPassthrough,
     anexosPassthrough
   };

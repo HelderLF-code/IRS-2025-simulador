@@ -209,6 +209,29 @@ regenerar o `simulador-irs.html`.
   ficheiro real da AT para validar os nomes escolhidos. Este anexo espelha as categorias
   A/H/B/F/E/G do território português, mas para rendimentos obtidos fora de Portugal — e
   tem agora os 11 quadros com interface própria.
+- Anexo L (residente não habitual — RNH — e incentivo fiscal à investigação científica e
+  inovação — IFICI, art.º 58.º-A EBF): os 7 quadros têm interface própria. Quadro 1 (regime:
+  RNH ou IFICI), Quadro 3A/3B (titular e se obteve o estatuto de RNH até 31/12/2019), Quadro
+  4 (rendimentos obtidos em território nacional já mencionados nos Anexos A/B/C/D, por
+  atividade de elevado valor acrescentado ou IFICI — 4A/4B/4C/4D, cada um com NIF da
+  entidade, campo de referência no anexo de origem, códigos de atividade RNH (Portarias
+  12/2010 e 230/2019) e IFICI (Portaria 352/2024/1) e código de entidade IFICI), Quadro 5
+  (rendimentos obtidos no estrangeiro, já mencionados no Anexo J — 5A para as categorias A e
+  B de elevado valor acrescentado, 5B para a categoria H e outros rendimentos do n.º 12 do
+  art.º 72.º CIRS, anos 2020+, com os códigos A91/A92/A93 quando a origem é o Quadro 4A),
+  Quadro 6 (opções de tributação para RNH — autónoma/englobamento separadas por categoria A
+  e B, pergunta sobre ter-se tornado residente até 31/03/2020, opção pelo novo regime do
+  n.º 12 do art.º 72.º, e método de eliminação da dupla tributação internacional, separado
+  para os anos até 2019/regime transitório — Q6C1 — e para 2020 em diante — Q6C2) e Quadro 7
+  (as mesmas opções de autónoma/englobamento, mas para o regime do incentivo fiscal à
+  investigação científica e inovação). As escolhas exclusivas (tributação autónoma vs.
+  englobamento; método de isenção vs. crédito de imposto) são exportadas como um único
+  campo cuja própria tag inclui o número do campo escolhido (ex: campo 01 marcado → tag
+  "AnexoLq06B01" com o valor "1"), ficando o campo da opção não escolhida simplesmente
+  ausente — confirmado contra um exemplo real para vários desses campos; os restantes da
+  mesma família seguem o mesmo padrão por simetria direta, mas não foram vistos preenchidos
+  no exemplo. Nomes de campo confirmados contra um exemplo real. O cálculo da estimativa
+  ainda não tem em conta nenhum dos regimes deste anexo.
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
@@ -244,11 +267,11 @@ regenerar o `simulador-irs.html`.
   Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
   fora dos separadores.
 
-A estrutura XML dos Anexos G1, L, SS ainda **não** está mapeada em detalhe — são emitidos
+A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
-11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H (os Anexos G e J, com os 11
-quadros do Anexo J, já estão mapeados — embora os nomes de campo do Quadro 10 do Anexo J
-não estejam confirmados contra dados reais, ver nota acima). Ao **importar** uma declaração que
+11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H (os Anexos G, J e L já estão
+mapeados na íntegra — embora os nomes de campo do Quadro 10 do Anexo J não estejam
+confirmados contra dados reais, ver nota acima). Ao **importar** uma declaração que
 já tenha dados nessas secções, esses dados são preservados tal como estavam (mas ainda não
 podem ser vistos/editados na interface) e mantidos ao exportar de novo — para não haver
 perda de informação.
@@ -291,15 +314,17 @@ perda de informação.
    anexo (6, 8, 9, 10, 11, 12, 13, 14, 18 — vários dependem de taxas de tributação autónoma
    do art.º 72.º CIRS ainda por confirmar, para quando não se opta pelo englobamento no
    Quadro 15; os Quadros 10/11A/11B/14, sem essa dependência, são bons candidatos para a
-   próxima ronda). Cada anexo novo por implementar do zero (G1, L, SS) vai precisar de um
+   próxima ronda). Cada anexo novo por implementar do zero (G1, SS) vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
-   para os Anexos A, B, E, G, H e J.
+   para os Anexos A, B, E, G, H, J e L.
 6. **Anexo J — confirmar os nomes de campo do Quadro 10** (rendimentos de anos anteriores,
    regime do art.º 74.º CIRS) contra um exemplo real preenchido — implementado por
    extrapolação a partir do padrão confirmado do Quadro 14 do Anexo G (ver nota acima),
    porque o único exemplo disponível tem este quadro vazio. Todos os 11 quadros do Anexo J
    têm agora interface própria, mas nenhum ainda entra na estimativa — o crédito de imposto
    por dupla tributação internacional (art.º 81.º CIRS) também ainda não está implementado.
+   O Anexo L (RNH/IFICI) está na mesma situação: os 7 quadros têm interface própria, mas
+   nenhum ainda entra na estimativa.
    O Quadro 5A (código H03 — pensões de alimentos) e o Quadro 7B
    (rendimentos prediais) têm taxas autónomas confirmadas (20% e 28%, respetivamente, art.º
    72.º CIRS); o Quadro 8B (rendimentos de capitais, quando não se opta pelo englobamento)

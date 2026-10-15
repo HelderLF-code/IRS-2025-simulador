@@ -66,6 +66,7 @@
     <button type="button" data-secao="efatura" onclick="mostrarSecao('efatura')">Despesas e-Fatura</button>
     <button type="button" data-secao="anexoH" onclick="mostrarSecao('anexoH')">Anexo H</button>
     <button type="button" data-secao="anexoJ" onclick="mostrarSecao('anexoJ')">Anexo J</button>
+    <button type="button" data-secao="anexoL" onclick="mostrarSecao('anexoL')">Anexo L</button>
   </nav>
   <div class="conteudo-secoes">
 
@@ -1431,6 +1432,166 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <button type="button" onclick="adicionarLinhaAnexoJ11T02()">+ Adicionar</button>
 </div>
 
+<div class="painel" id="painel-anexoL">
+<h2>Anexo L — Residente Não Habitual / Incentivo Fiscal à Investigação Científica e Inovação (IFICI)</h2>
+<p class="aviso-topo">
+  Para titulares com o estatuto de residente não habitual (RNH) ou beneficiários do regime
+  de incentivo fiscal à investigação científica e inovação (IFICI, art.º 58.º-A EBF).
+  Captura e exportação XML completas (nomes de campo confirmados contra um exemplo real);
+  o cálculo da estimativa ainda não tem em conta os regimes deste anexo.
+</p>
+
+<h3>Regime (Quadro 1)</h3>
+<div class="row">
+  <div><label>Regime <small class="hint">(campo 01 ou 02)</small></label>
+    <select id="alRegime"><option value="">-</option><option value="RNH">Residente não habitual</option><option value="IFICI">Incentivo fiscal à investigação científica e inovação</option></select>
+  </div>
+</div>
+
+<h3>Identificação do titular (Quadro 3A) e atividade de elevado valor acrescentado (Quadro 3B)</h3>
+<div class="row">
+  <div><label>NIF do titular <small class="hint">(campo 03 — em branco assume o sujeito passivo A)</small></label><input id="alTitular" size="10"></div>
+  <div><label>Obteve o estatuto de RNH até 31/12/2019? <small class="hint">(campos 04/05, só se exerce atividade de elevado valor acrescentado)</small></label>
+    <select id="alObteveRNHAte2019"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+</div>
+
+<h2>Quadro 4 — Rendimentos obtidos em território nacional</h2>
+<p class="aviso-topo">
+  Rendimentos de atividades de elevado valor acrescentado ou do regime do incentivo fiscal à
+  investigação científica e inovação, já mencionados nos Anexos A, B, C ou D. Os códigos de
+  atividade (colunas "RNH 12/2010", "RNH 230/2019" e "IFICI 352/2024") e de entidade (IFICI)
+  constam das tabelas no final das instruções do Anexo L.
+</p>
+
+<h3>Categoria A — trabalho dependente (Anexo A) — Quadro 4A</h3>
+<table id="tabelaAnexoL04A">
+  <thead><tr>
+    <th>NIF entidade pagadora</th><th>Código rendimento (Anexo A)</th>
+    <th>Cód. atividade RNH 12/2010</th><th>Cód. atividade RNH 230/2019</th>
+    <th>Cód. atividade IFICI 352/2024</th><th>Cód. entidade IFICI</th><th>Rendimento (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoL04A()">+ Adicionar</button>
+
+<h3>Categoria B — regime simplificado (Anexo B) — Quadro 4B</h3>
+<table id="tabelaAnexoL04B">
+  <thead><tr>
+    <th>NIF entidade pagadora</th><th>Campo do Quadro 4 do Anexo B</th>
+    <th>Cód. atividade RNH 12/2010</th><th>Cód. atividade RNH 230/2019</th>
+    <th>Cód. atividade IFICI 352/2024</th><th>Cód. entidade IFICI</th><th>Rendimento (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoL04B()">+ Adicionar</button>
+
+<h3>Categoria B — contabilidade organizada (Anexo C) — Quadro 4C</h3>
+<table id="tabelaAnexoL04C">
+  <thead><tr>
+    <th>NIF entidade pagadora</th>
+    <th>Cód. atividade RNH 12/2010</th><th>Cód. atividade RNH 230/2019</th>
+    <th>Cód. atividade IFICI 352/2024</th><th>Cód. entidade IFICI</th><th>Lucro (€)</th><th>Prejuízo (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoL04C()">+ Adicionar</button>
+
+<h3>Categoria B — rendimentos imputados (Anexo D) — Quadro 4D</h3>
+<table id="tabelaAnexoL04D">
+  <thead><tr>
+    <th>NIF entidade imputadora</th><th>Campo do Quadro 4 do Anexo D</th>
+    <th>Cód. atividade RNH 12/2010</th><th>Cód. atividade RNH 230/2019</th>
+    <th>Cód. atividade IFICI 352/2024</th><th>Cód. entidade IFICI</th><th>Rendimento líquido imputado (€)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoL04D()">+ Adicionar</button>
+
+<h2>Quadro 5 — Rendimentos obtidos no estrangeiro (Anexo J) — residentes não habituais</h2>
+<datalist id="listaQuadroOrigemAnexoL05A">
+  <option value="Q4A">Q4A — trabalho dependente</option>
+  <option value="Q6A">Q6A — empresariais/profissionais</option>
+</datalist>
+<datalist id="listaQuadroOrigemAnexoL05B">
+  <option value="Q4A">Q4A — trabalho dependente</option>
+  <option value="Q5A">Q5A — pensões</option>
+</datalist>
+<datalist id="listaCodigoRendimentoAnexoL05B">
+  <option value="A91">A91 — rendimentos da categoria A, al. d) do n.º 1 do art.º 2.º CIRS</option>
+  <option value="A92">A92 — rendimentos da categoria A, subalínea 3) da al. b) do n.º 3 do art.º 2.º CIRS</option>
+  <option value="A93">A93 — rendimentos da categoria A, subalínea 11) da al. b) do n.º 3 do art.º 2.º CIRS</option>
+</datalist>
+
+<h3>Categorias A e B — rendimentos de elevado valor acrescentado (Quadro 5A)</h3>
+<table id="tabelaAnexoL05A">
+  <thead><tr>
+    <th>Quadro de origem</th><th>Campo/linha de origem</th>
+    <th>Cód. atividade RNH 12/2010</th><th>Cód. atividade RNH 230/2019</th>
+    <th>Cat. A ou B</th><th>País</th><th>Rendimento (€)</th>
+    <th>Com imposto pago no estrangeiro (€)</th><th>Sem imposto pago no estrangeiro</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoL05A()">+ Adicionar</button>
+
+<h3>Categoria H e outros rendimentos do n.º 12 do art.º 72.º CIRS, anos 2020+ (Quadro 5B)</h3>
+<table id="tabelaAnexoL05B">
+  <thead><tr>
+    <th>Quadro de origem</th><th>Campo/linha de origem</th>
+    <th>Código rendimento (se Q4A: A91/A92/A93)</th>
+    <th>Cat. A ou H</th><th>País</th><th>Rendimento (€)</th>
+    <th>Imposto pago no estrangeiro (€)</th><th>Sem imposto pago no estrangeiro</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoL05B()">+ Adicionar</button>
+
+<h2>Quadro 6 — Opções por regimes de tributação (residentes não habituais)</h2>
+<h3>Rendimentos de atividades de elevado valor acrescentado (Quadro 6A)</h3>
+<div class="row">
+  <div><label>Categoria A <small class="hint">(campos 01/02)</small></label>
+    <select id="al06aCatA"><option value="">-</option><option value="1">Tributação autónoma</option><option value="2">Opta pelo englobamento</option></select>
+  </div>
+  <div><label>Categoria B <small class="hint">(campos 03/04)</small></label>
+    <select id="al06aCatB"><option value="">-</option><option value="3">Tributação autónoma</option><option value="4">Opta pelo englobamento</option></select>
+  </div>
+</div>
+
+<h3>Rendimentos do n.º 12 do art.º 72.º CIRS do Quadro 5B, anos 2020+ (Quadro 6B)</h3>
+<div class="row">
+  <div><label>Tornou-se fiscalmente residente até 31/03/2020? <small class="hint">(campos 07/08)</small></label>
+    <select id="al06bTornouResidente"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+  <div><label>Opta pelo novo regime do n.º 12 do art.º 72.º? <small class="hint">(campos 09/10 — só se a pergunta anterior for Sim)</small></label>
+    <select id="al06bOptaNovoRegime"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
+  </div>
+  <div><label>Rendimentos das Categorias H/A do Quadro 5B <small class="hint">(campos 11/12)</small></label>
+    <select id="al06bOpcaoQ5B"><option value="">-</option><option value="11">Tributação autónoma</option><option value="12">Opta pelo englobamento</option></select>
+  </div>
+</div>
+
+<h3>Eliminação da dupla tributação internacional (Quadro 6C)</h3>
+<div class="row">
+  <div><label>Método, anos 2019 e anteriores / regime transitório <small class="hint">(Q6C1, campos 05/06)</small></label>
+    <select id="al06cMetodoQ6C1"><option value="">-</option><option value="5">Método de isenção</option><option value="6">Método de crédito de imposto</option></select>
+  </div>
+  <div><label>Método, anos 2020 e seguintes <small class="hint">(Q6C2, campos 13/14)</small></label>
+    <select id="al06cMetodoQ6C2"><option value="">-</option><option value="13">Método de isenção</option><option value="14">Método de crédito de imposto</option></select>
+  </div>
+</div>
+
+<h2>Quadro 7 — Opções por regimes de tributação (incentivo fiscal à investigação científica e inovação)</h2>
+<div class="row">
+  <div><label>Categoria A <small class="hint">(campos 01/02)</small></label>
+    <select id="al07CatA"><option value="">-</option><option value="1">Tributação autónoma</option><option value="2">Opta pelo englobamento</option></select>
+  </div>
+  <div><label>Categoria B <small class="hint">(campos 03/04)</small></label>
+    <select id="al07CatB"><option value="">-</option><option value="3">Tributação autónoma</option><option value="4">Opta pelo englobamento</option></select>
+  </div>
+</div>
+</div>
+
   </div>
 </div>
 
@@ -1471,7 +1632,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   // Dados de uma declaração importada que a interface ainda não sabe editar
   // diretamente (Anexos B/E/G/G1/H/J/L/SS, alguns quadros do Rosto, e secções
   // do Anexo A sem tabela própria). Guardam-se aqui para não se perderem ao exportar.
-  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoGPassthrough: {}, anexoHPassthrough: {}, anexoJPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
+  let dadosPreservados = { extrasAnexoA: {}, anexoBExtrasQ03: {}, anexoBPassthrough: {}, anexoGPassthrough: {}, anexoHPassthrough: {}, anexoJPassthrough: {}, anexoLPassthrough: {}, rostoPassthrough: {}, anexosPassthrough: {} };
 
   document.getElementById("tributacaoConjunta").addEventListener("change", (e) => {
     document.getElementById("campoNifB").style.display = e.target.checked ? "flex" : "none";
@@ -3549,6 +3710,233 @@ indicares, assume-se o escalão mais baixo.</small></p>
     return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro10, quadro11 };
   }
 
+  window.adicionarLinhaAnexoL04A = function () {
+    const tbody = document.querySelector("#tabelaAnexoL04A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="al04a-nifentidade" size="10"></td>
+      <td><input class="al04a-codrendimento" size="4"></td>
+      <td><input class="al04a-codatividadep2010" size="4"></td>
+      <td><input class="al04a-codatividadep2019" size="6"></td>
+      <td><input class="al04a-codatividadep2024" size="6"></td>
+      <td><input class="al04a-codentidade" size="4"></td>
+      <td><input class="al04a-rendimento" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04AAnexoL() {
+    return [...document.querySelectorAll("#tabelaAnexoL04A tbody tr")].map(tr => ({
+      nifEntidade: tr.querySelector(".al04a-nifentidade").value || undefined,
+      codRendimento: tr.querySelector(".al04a-codrendimento").value || undefined,
+      codAtividadeP2010: tr.querySelector(".al04a-codatividadep2010").value || undefined,
+      codAtividadeP2019: tr.querySelector(".al04a-codatividadep2019").value || undefined,
+      codAtividadeP2024: tr.querySelector(".al04a-codatividadep2024").value || undefined,
+      codEntidade: tr.querySelector(".al04a-codentidade").value || undefined,
+      rendimento: tr.querySelector(".al04a-rendimento").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoL04B = function () {
+    const tbody = document.querySelector("#tabelaAnexoL04B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="al04b-nifentidade" size="10"></td>
+      <td><input class="al04b-campoq4anexob" size="4"></td>
+      <td><input class="al04b-codatividadep2010" size="4"></td>
+      <td><input class="al04b-codatividadep2019" size="6"></td>
+      <td><input class="al04b-codatividadep2024" size="6"></td>
+      <td><input class="al04b-codentidade" size="4"></td>
+      <td><input class="al04b-rendimento" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04BAnexoL() {
+    return [...document.querySelectorAll("#tabelaAnexoL04B tbody tr")].map(tr => ({
+      nifEntidade: tr.querySelector(".al04b-nifentidade").value || undefined,
+      campoQ4AnexoB: tr.querySelector(".al04b-campoq4anexob").value || undefined,
+      codAtividadeP2010: tr.querySelector(".al04b-codatividadep2010").value || undefined,
+      codAtividadeP2019: tr.querySelector(".al04b-codatividadep2019").value || undefined,
+      codAtividadeP2024: tr.querySelector(".al04b-codatividadep2024").value || undefined,
+      codEntidade: tr.querySelector(".al04b-codentidade").value || undefined,
+      rendimento: tr.querySelector(".al04b-rendimento").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoL04C = function () {
+    const tbody = document.querySelector("#tabelaAnexoL04C tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="al04c-nifentidade" size="10"></td>
+      <td><input class="al04c-codatividadep2010" size="4"></td>
+      <td><input class="al04c-codatividadep2019" size="6"></td>
+      <td><input class="al04c-codatividadep2024" size="6"></td>
+      <td><input class="al04c-codentidade" size="4"></td>
+      <td><input class="al04c-lucro" type="number" step="0.01"></td>
+      <td><input class="al04c-prejuizo" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04CAnexoL() {
+    return [...document.querySelectorAll("#tabelaAnexoL04C tbody tr")].map(tr => ({
+      nifEntidade: tr.querySelector(".al04c-nifentidade").value || undefined,
+      codAtividadeP2010: tr.querySelector(".al04c-codatividadep2010").value || undefined,
+      codAtividadeP2019: tr.querySelector(".al04c-codatividadep2019").value || undefined,
+      codAtividadeP2024: tr.querySelector(".al04c-codatividadep2024").value || undefined,
+      codEntidade: tr.querySelector(".al04c-codentidade").value || undefined,
+      lucro: tr.querySelector(".al04c-lucro").value || 0,
+      prejuizo: tr.querySelector(".al04c-prejuizo").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoL04D = function () {
+    const tbody = document.querySelector("#tabelaAnexoL04D tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="al04d-nifentidade" size="10"></td>
+      <td><input class="al04d-campoq4anexod" size="4"></td>
+      <td><input class="al04d-codatividadep2010" size="4"></td>
+      <td><input class="al04d-codatividadep2019" size="6"></td>
+      <td><input class="al04d-codatividadep2024" size="6"></td>
+      <td><input class="al04d-codentidade" size="4"></td>
+      <td><input class="al04d-rendimento" type="number" step="0.01"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro04DAnexoL() {
+    return [...document.querySelectorAll("#tabelaAnexoL04D tbody tr")].map(tr => ({
+      nifEntidade: tr.querySelector(".al04d-nifentidade").value || undefined,
+      campoQ4AnexoD: tr.querySelector(".al04d-campoq4anexod").value || undefined,
+      codAtividadeP2010: tr.querySelector(".al04d-codatividadep2010").value || undefined,
+      codAtividadeP2019: tr.querySelector(".al04d-codatividadep2019").value || undefined,
+      codAtividadeP2024: tr.querySelector(".al04d-codatividadep2024").value || undefined,
+      codEntidade: tr.querySelector(".al04d-codentidade").value || undefined,
+      rendimento: tr.querySelector(".al04d-rendimento").value || 0
+    }));
+  }
+
+  window.adicionarLinhaAnexoL05A = function () {
+    const tbody = document.querySelector("#tabelaAnexoL05A tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="al05a-quadro" size="5" list="listaQuadroOrigemAnexoL05A"></td>
+      <td><input class="al05a-nlinha" size="6"></td>
+      <td><input class="al05a-codatividadep2010" size="4"></td>
+      <td><input class="al05a-codatividadep2019" size="6"></td>
+      <td><input class="al05a-catAouB" size="2" maxlength="1"></td>
+      <td><input class="al05a-pais" size="4"></td>
+      <td><input class="al05a-rendimento" type="number" step="0.01"></td>
+      <td><input class="al05a-comimposto" type="number" step="0.01"></td>
+      <td><input type="checkbox" class="al05a-semimposto"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro05AAnexoL() {
+    return [...document.querySelectorAll("#tabelaAnexoL05A tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".al05a-quadro").value || undefined,
+      nlinha: tr.querySelector(".al05a-nlinha").value || undefined,
+      codAtividadeP2010: tr.querySelector(".al05a-codatividadep2010").value || undefined,
+      codAtividadeP2019: tr.querySelector(".al05a-codatividadep2019").value || undefined,
+      catAouB: tr.querySelector(".al05a-catAouB").value || undefined,
+      codPais: tr.querySelector(".al05a-pais").value || undefined,
+      rendimento: tr.querySelector(".al05a-rendimento").value || 0,
+      comImpostoPagoEstrangeiro: tr.querySelector(".al05a-comimposto").value || 0,
+      semImpostoPagoEstrangeiro: tr.querySelector(".al05a-semimposto").checked
+    }));
+  }
+
+  window.adicionarLinhaAnexoL05B = function () {
+    const tbody = document.querySelector("#tabelaAnexoL05B tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="al05b-quadro" size="5" list="listaQuadroOrigemAnexoL05B"></td>
+      <td><input class="al05b-nlinha" size="6"></td>
+      <td><input class="al05b-codrendimento" size="4" list="listaCodigoRendimentoAnexoL05B"></td>
+      <td><input class="al05b-catAouH" size="2" maxlength="1"></td>
+      <td><input class="al05b-pais" size="4"></td>
+      <td><input class="al05b-rendimento" type="number" step="0.01"></td>
+      <td><input class="al05b-comimposto" type="number" step="0.01"></td>
+      <td><input type="checkbox" class="al05b-semimposto"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro05BAnexoL() {
+    return [...document.querySelectorAll("#tabelaAnexoL05B tbody tr")].map(tr => ({
+      quadro: tr.querySelector(".al05b-quadro").value || undefined,
+      nlinha: tr.querySelector(".al05b-nlinha").value || undefined,
+      codRendimento: tr.querySelector(".al05b-codrendimento").value || undefined,
+      catAouH: tr.querySelector(".al05b-catAouH").value || undefined,
+      codPais: tr.querySelector(".al05b-pais").value || undefined,
+      rendimento: tr.querySelector(".al05b-rendimento").value || 0,
+      comImpostoPagoEstrangeiro: tr.querySelector(".al05b-comimposto").value || 0,
+      semImpostoPagoEstrangeiro: tr.querySelector(".al05b-semimposto").checked
+    }));
+  }
+
+  function lerAnexoL() {
+    const regime = document.getElementById("alRegime").value || undefined;
+    const titularNif = document.getElementById("alTitular").value || undefined;
+    const obteveRNHValor = document.getElementById("alObteveRNHAte2019").value;
+    const obteveEstatutoRNHAte2019 = obteveRNHValor === "" ? undefined : obteveRNHValor === "S";
+
+    const linhasA = lerQuadro04AAnexoL();
+    const linhasB = lerQuadro04BAnexoL();
+    const linhasC = lerQuadro04CAnexoL();
+    const linhasD = lerQuadro04DAnexoL();
+    const temQuadro04 = linhasA.length || linhasB.length || linhasC.length || linhasD.length;
+    const quadro04 = temQuadro04 ? { linhasA, linhasB, linhasC, linhasD } : undefined;
+
+    const linhas05A = lerQuadro05AAnexoL();
+    const linhas05B = lerQuadro05BAnexoL();
+    const temQuadro05 = linhas05A.length || linhas05B.length;
+    const quadro05 = temQuadro05 ? { linhasA: linhas05A, linhasB: linhas05B } : undefined;
+
+    const opcaoCatA06 = document.getElementById("al06aCatA").value || undefined;
+    const opcaoCatB06 = document.getElementById("al06aCatB").value || undefined;
+    const tornouResidenteValor = document.getElementById("al06bTornouResidente").value;
+    const tornouResidenteAte202003 = tornouResidenteValor === "" ? undefined : tornouResidenteValor === "S";
+    const optaNovoRegimeValor = document.getElementById("al06bOptaNovoRegime").value;
+    const optaNovoRegime = optaNovoRegimeValor === "" ? undefined : optaNovoRegimeValor === "S";
+    const opcaoRendimentosQ5B = document.getElementById("al06bOpcaoQ5B").value || undefined;
+    const metodoQ6C1 = document.getElementById("al06cMetodoQ6C1").value || undefined;
+    const metodoQ6C2 = document.getElementById("al06cMetodoQ6C2").value || undefined;
+    const temQuadro06 = opcaoCatA06 || opcaoCatB06 || tornouResidenteAte202003 !== undefined ||
+      optaNovoRegime !== undefined || opcaoRendimentosQ5B || metodoQ6C1 || metodoQ6C2;
+    const quadro06 = temQuadro06 ? {
+      opcaoCatA: opcaoCatA06 ? Number(opcaoCatA06) : undefined,
+      opcaoCatB: opcaoCatB06 ? Number(opcaoCatB06) : undefined,
+      tornouResidenteAte202003, optaNovoRegime,
+      opcaoRendimentosQ5B: opcaoRendimentosQ5B ? Number(opcaoRendimentosQ5B) : undefined,
+      metodoQ6C1: metodoQ6C1 ? Number(metodoQ6C1) : undefined,
+      metodoQ6C2: metodoQ6C2 ? Number(metodoQ6C2) : undefined
+    } : undefined;
+
+    const opcaoCatA07 = document.getElementById("al07CatA").value || undefined;
+    const opcaoCatB07 = document.getElementById("al07CatB").value || undefined;
+    const temQuadro07 = opcaoCatA07 || opcaoCatB07;
+    const quadro07 = temQuadro07 ? {
+      opcaoCatA: opcaoCatA07 ? Number(opcaoCatA07) : undefined,
+      opcaoCatB: opcaoCatB07 ? Number(opcaoCatB07) : undefined
+    } : undefined;
+
+    const temDados = regime || titularNif || obteveEstatutoRNHAte2019 !== undefined ||
+      quadro04 || quadro05 || quadro06 || quadro07;
+    if (!temDados) return undefined;
+
+    return { regime, titularNif, obteveEstatutoRNHAte2019, quadro04, quadro05, quadro06, quadro07 };
+  }
+
   function lerDespesasEFatura() {
     return {
       geraisFamiliares: document.getElementById("despesaGeraisFamiliares").value || 0,
@@ -3692,6 +4080,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       anexoHPassthrough: dadosPreservados.anexoHPassthrough,
       anexoJ: lerAnexoJ(),
       anexoJPassthrough: dadosPreservados.anexoJPassthrough,
+      anexoL: lerAnexoL(),
+      anexoLPassthrough: dadosPreservados.anexoLPassthrough,
       rostoPassthrough: dadosPreservados.rostoPassthrough,
       anexosPassthrough: dadosPreservados.anexosPassthrough
     };
@@ -4396,6 +4786,24 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.querySelector("#tabelaAnexoJ10B tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ11T01 tbody").innerHTML = "";
       document.querySelector("#tabelaAnexoJ11T02 tbody").innerHTML = "";
+      document.getElementById("alRegime").value = "";
+      document.getElementById("alTitular").value = "";
+      document.getElementById("alObteveRNHAte2019").value = "";
+      document.querySelector("#tabelaAnexoL04A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoL04B tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoL04C tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoL04D tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoL05A tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoL05B tbody").innerHTML = "";
+      document.getElementById("al06aCatA").value = "";
+      document.getElementById("al06aCatB").value = "";
+      document.getElementById("al06bTornouResidente").value = "";
+      document.getElementById("al06bOptaNovoRegime").value = "";
+      document.getElementById("al06bOpcaoQ5B").value = "";
+      document.getElementById("al06cMetodoQ6C1").value = "";
+      document.getElementById("al06cMetodoQ6C2").value = "";
+      document.getElementById("al07CatA").value = "";
+      document.getElementById("al07CatB").value = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -4646,6 +5054,108 @@ indicares, assume-se o escalão mais baixo.</small></p>
         }
       }
 
+      if (dados.anexoL) {
+        const al = dados.anexoL;
+        document.getElementById("alRegime").value = al.regime || "";
+        document.getElementById("alTitular").value = al.titularNif || "";
+        if (al.obteveEstatutoRNHAte2019 !== undefined) {
+          document.getElementById("alObteveRNHAte2019").value = al.obteveEstatutoRNHAte2019 ? "S" : "N";
+        }
+        if (al.quadro04) {
+          const q4 = al.quadro04;
+          (q4.linhasA || []).forEach(l => {
+            adicionarLinhaAnexoL04A();
+            const tr = document.querySelector("#tabelaAnexoL04A tbody tr:last-child");
+            tr.querySelector(".al04a-nifentidade").value = l.nifEntidade || "";
+            tr.querySelector(".al04a-codrendimento").value = l.codRendimento || "";
+            tr.querySelector(".al04a-codatividadep2010").value = l.codAtividadeP2010 || "";
+            tr.querySelector(".al04a-codatividadep2019").value = l.codAtividadeP2019 || "";
+            tr.querySelector(".al04a-codatividadep2024").value = l.codAtividadeP2024 || "";
+            tr.querySelector(".al04a-codentidade").value = l.codEntidade || "";
+            tr.querySelector(".al04a-rendimento").value = l.rendimento || "";
+          });
+          (q4.linhasB || []).forEach(l => {
+            adicionarLinhaAnexoL04B();
+            const tr = document.querySelector("#tabelaAnexoL04B tbody tr:last-child");
+            tr.querySelector(".al04b-nifentidade").value = l.nifEntidade || "";
+            tr.querySelector(".al04b-campoq4anexob").value = l.campoQ4AnexoB || "";
+            tr.querySelector(".al04b-codatividadep2010").value = l.codAtividadeP2010 || "";
+            tr.querySelector(".al04b-codatividadep2019").value = l.codAtividadeP2019 || "";
+            tr.querySelector(".al04b-codatividadep2024").value = l.codAtividadeP2024 || "";
+            tr.querySelector(".al04b-codentidade").value = l.codEntidade || "";
+            tr.querySelector(".al04b-rendimento").value = l.rendimento || "";
+          });
+          (q4.linhasC || []).forEach(l => {
+            adicionarLinhaAnexoL04C();
+            const tr = document.querySelector("#tabelaAnexoL04C tbody tr:last-child");
+            tr.querySelector(".al04c-nifentidade").value = l.nifEntidade || "";
+            tr.querySelector(".al04c-codatividadep2010").value = l.codAtividadeP2010 || "";
+            tr.querySelector(".al04c-codatividadep2019").value = l.codAtividadeP2019 || "";
+            tr.querySelector(".al04c-codatividadep2024").value = l.codAtividadeP2024 || "";
+            tr.querySelector(".al04c-codentidade").value = l.codEntidade || "";
+            tr.querySelector(".al04c-lucro").value = l.lucro || "";
+            tr.querySelector(".al04c-prejuizo").value = l.prejuizo || "";
+          });
+          (q4.linhasD || []).forEach(l => {
+            adicionarLinhaAnexoL04D();
+            const tr = document.querySelector("#tabelaAnexoL04D tbody tr:last-child");
+            tr.querySelector(".al04d-nifentidade").value = l.nifEntidade || "";
+            tr.querySelector(".al04d-campoq4anexod").value = l.campoQ4AnexoD || "";
+            tr.querySelector(".al04d-codatividadep2010").value = l.codAtividadeP2010 || "";
+            tr.querySelector(".al04d-codatividadep2019").value = l.codAtividadeP2019 || "";
+            tr.querySelector(".al04d-codatividadep2024").value = l.codAtividadeP2024 || "";
+            tr.querySelector(".al04d-codentidade").value = l.codEntidade || "";
+            tr.querySelector(".al04d-rendimento").value = l.rendimento || "";
+          });
+        }
+        if (al.quadro05) {
+          const q5 = al.quadro05;
+          (q5.linhasA || []).forEach(l => {
+            adicionarLinhaAnexoL05A();
+            const tr = document.querySelector("#tabelaAnexoL05A tbody tr:last-child");
+            tr.querySelector(".al05a-quadro").value = l.quadro || "";
+            tr.querySelector(".al05a-nlinha").value = l.nlinha || "";
+            tr.querySelector(".al05a-codatividadep2010").value = l.codAtividadeP2010 || "";
+            tr.querySelector(".al05a-codatividadep2019").value = l.codAtividadeP2019 || "";
+            tr.querySelector(".al05a-catAouB").value = l.catAouB || "";
+            tr.querySelector(".al05a-pais").value = l.codPais || "";
+            tr.querySelector(".al05a-rendimento").value = l.rendimento || "";
+            tr.querySelector(".al05a-comimposto").value = l.comImpostoPagoEstrangeiro || "";
+            tr.querySelector(".al05a-semimposto").checked = !!l.semImpostoPagoEstrangeiro;
+          });
+          (q5.linhasB || []).forEach(l => {
+            adicionarLinhaAnexoL05B();
+            const tr = document.querySelector("#tabelaAnexoL05B tbody tr:last-child");
+            tr.querySelector(".al05b-quadro").value = l.quadro || "";
+            tr.querySelector(".al05b-nlinha").value = l.nlinha || "";
+            tr.querySelector(".al05b-codrendimento").value = l.codRendimento || "";
+            tr.querySelector(".al05b-catAouH").value = l.catAouH || "";
+            tr.querySelector(".al05b-pais").value = l.codPais || "";
+            tr.querySelector(".al05b-rendimento").value = l.rendimento || "";
+            tr.querySelector(".al05b-comimposto").value = l.comImpostoPagoEstrangeiro || "";
+            tr.querySelector(".al05b-semimposto").checked = !!l.semImpostoPagoEstrangeiro;
+          });
+        }
+        if (al.quadro06) {
+          const q6 = al.quadro06;
+          document.getElementById("al06aCatA").value = q6.opcaoCatA || "";
+          document.getElementById("al06aCatB").value = q6.opcaoCatB || "";
+          if (q6.tornouResidenteAte202003 !== undefined) {
+            document.getElementById("al06bTornouResidente").value = q6.tornouResidenteAte202003 ? "S" : "N";
+          }
+          if (q6.optaNovoRegime !== undefined) {
+            document.getElementById("al06bOptaNovoRegime").value = q6.optaNovoRegime ? "S" : "N";
+          }
+          document.getElementById("al06bOpcaoQ5B").value = q6.opcaoRendimentosQ5B || "";
+          document.getElementById("al06cMetodoQ6C1").value = q6.metodoQ6C1 || "";
+          document.getElementById("al06cMetodoQ6C2").value = q6.metodoQ6C2 || "";
+        }
+        if (al.quadro07) {
+          const q7 = al.quadro07;
+          document.getElementById("al07CatA").value = q7.opcaoCatA || "";
+          document.getElementById("al07CatB").value = q7.opcaoCatB || "";
+        }
+      }
 
       const camposAnexoBNaInterface = [
         "regimeSimplificado", "atoIsolado", "naturezaProfComInd", "naturezaAgricola",
@@ -4868,6 +5378,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
         anexoGPassthrough: dados.anexoGPassthrough || {},
         anexoHPassthrough: dados.anexoHPassthrough || {},
         anexoJPassthrough: dados.anexoJPassthrough || {},
+        anexoLPassthrough: dados.anexoLPassthrough || {},
         rostoPassthrough: dados.rostoPassthrough || {},
         anexosPassthrough: dados.anexosPassthrough || {}
       };
@@ -4877,6 +5388,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
       const quadrosGPreservados = Object.keys(dadosPreservados.anexoGPassthrough);
       const quadrosHPreservados = Object.keys(dadosPreservados.anexoHPassthrough);
       const quadrosJPreservados = Object.keys(dadosPreservados.anexoJPassthrough);
+      const quadrosLPreservados = Object.keys(dadosPreservados.anexoLPassthrough);
       const aviso = document.getElementById("avisoImportacao");
       aviso.style.display = "block";
       aviso.innerHTML = `<strong>Importado.</strong> Ano ${dados.agregado.ano}, NIF ${dados.agregado.nifA}, ` +
@@ -4897,6 +5409,10 @@ indicares, assume-se o escalão mais baixo.</small></p>
           : "") +
         (quadrosJPreservados.length
           ? `<br>Nota: ${quadrosJPreservados.map(q => q.replace("Quadro", "Quadro ")).join(", ")} do Anexo J ` +
+            `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
+          : "") +
+        (quadrosLPreservados.length
+          ? `<br>Nota: ${quadrosLPreservados.map(q => q.replace("Quadro", "Quadro ")).join(", ")} do Anexo L ` +
             `têm dados que a aplicação ainda não sabe mostrar/editar — serão mantidos tal como estavam.`
           : "") +
         (secoesPreservadas.length
