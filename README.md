@@ -266,18 +266,37 @@ regenerar o `simulador-irs.html`.
   navegação, para não ficar uma página só a crescer à medida que se adicionam anexos.
   Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
   fora dos separadores.
-- **Modelos CSV para preencher linhas fora da aplicação** (ex: em Excel): em tabelas
-  selecionadas, os botões "Descarregar modelo (CSV)" / "Importar CSV preenchido" permitem
-  descarregar um ficheiro CSV com os cabeçalhos da tabela (e algumas linhas em branco),
-  preenchê-lo em Excel ou outra folha de cálculo, e voltar a importá-lo para que as linhas
-  apareçam automaticamente na tabela — sem ter de digitar uma a uma na aplicação. Usa ";"
-  como separador de campos (evita ambiguidade com a vírgula decimal do Excel em português)
-  e aceita tanto o formato decimal português ("1.234,56") como o internacional ("1234.56")
-  nas colunas numéricas. Por agora, piloto em 3 tabelas — Anexo A (rendimentos), Anexo B
-  (rendimentos brutos) e Anexo G Quadro 4 (alienação de imóveis) — como prova de conceito
-  antes de se estender às restantes ~76 tabelas de linhas da aplicação. O mecanismo é
-  genérico (`CONFIG_MODELOS_CSV` em `index.html`): alargar a outra tabela é só acrescentar
-  uma entrada à configuração e os dois botões junto à tabela em causa.
+- **Modelos Excel (.xlsx) para preencher linhas fora da aplicação**: em tabelas
+  selecionadas, os botões "Descarregar modelo (Excel)" / "Importar Excel preenchido"
+  permitem descarregar um ficheiro `.xlsx` real com os cabeçalhos da tabela e, nas colunas
+  de código (ex: código de rendimento, titular, tipo de imóvel), uma lista pendente
+  (dropdown) com os valores válidos — construída a partir dos mesmos `<datalist>` já
+  usados na interface, para nunca haver duas fontes de verdade diferentes para os mesmos
+  códigos. Depois de preenchido em Excel (ou LibreOffice Calc, Google Sheets, etc.) e
+  voltado a importar, as linhas aparecem automaticamente na tabela, sem ter de digitar uma
+  a uma na aplicação.
+
+  O ficheiro `.xlsx` é construído **à mão, sem bibliotecas externas** (`index.html`,
+  secção "Modelos Excel"): é tecnicamente um ZIP com XML lá dentro, escrito byte a byte
+  (incluindo o CRC32 e a estrutura de diretório central do ZIP) e gerado sempre sem
+  compressão ("store"), o que simplifica a escrita. A leitura (do ficheiro já editado e
+  gravado pelo Excel) tem de lidar com compressão "deflate", que é o que o Excel usa
+  sempre ao gravar — para isso usam-se as APIs nativas do browser
+  `CompressionStream`/`DecompressionStream` (sem bibliotecas; precisam de um browser
+  razoavelmente recente, 2022 em diante). A leitura resolve a folha de dados pelo *nome*
+  ("Dados") através de `workbook.xml` + `workbook.xml.rels` — não por um caminho fixo —
+  e sabe interpretar tanto texto inline como a tabela de "shared strings" que o Excel usa
+  ao gravar, para aguentar um ficheiro real reaberto e editado em Excel, não só o que a
+  própria aplicação gerou. Testado com um ciclo completo: gerar o modelo, preenchê-lo
+  programaticamente com a biblioteca Python `openpyxl` (simulando o Excel, incluindo a
+  compressão "deflate" e referências de "shared strings" que o Excel escreve), e
+  reimportar — valores de texto, números e os campos com dropdown ficam todos corretos.
+
+  Por agora, piloto em 3 tabelas — Anexo A (rendimentos), Anexo B (rendimentos brutos) e
+  Anexo G Quadro 4 (alienação de imóveis) — como prova de conceito antes de se estender
+  às restantes ~76 tabelas de linhas da aplicação. O mecanismo é genérico
+  (`CONFIG_MODELOS_TABELA` em `index.html`): alargar a outra tabela é só acrescentar uma
+  entrada à configuração e os dois botões junto à tabela em causa.
 
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
@@ -352,10 +371,10 @@ perda de informação.
    `data/parametros_2025.js` (a validar). Falta ainda o limite geral e decrescente por
    escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos
    coletáveis mais altos — a app aplica os limites por categoria mas não esse teto global.
-9. **Alargar os modelos CSV às restantes tabelas** — por agora só o Anexo A (rendimentos),
+9. **Alargar os modelos Excel às restantes tabelas** — por agora só o Anexo A (rendimentos),
    o Anexo B (rendimentos brutos) e o Anexo G Quadro 4 (imóveis) têm os botões de
-   descarregar/importar modelo CSV, como prova de conceito. Validado o formato com o
-   utilizador, falta estender a configuração `CONFIG_MODELOS_CSV` às restantes ~76 tabelas
+   descarregar/importar modelo Excel, como prova de conceito. Validado o formato com o
+   utilizador, falta estender a configuração `CONFIG_MODELOS_TABELA` às restantes ~76 tabelas
    de linhas da aplicação (Anexos B, E, G, H, J, L).
 
 ## Convenção: campos de código

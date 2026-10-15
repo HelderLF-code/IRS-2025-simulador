@@ -56,7 +56,7 @@
   <div id="avisoImportacao" style="display:none; margin-top:10px; font-size:0.85rem;"></div>
 </fieldset>
 
-<input type="file" id="csvImportarGenerico" accept=".csv" style="display:none" onchange="processarImportacaoCSV()">
+<input type="file" id="csvImportarGenerico" accept=".xlsx" style="display:none" onchange="processarImportacaoXLSX()">
 
 <div class="layout">
   <nav class="barra-secoes">
@@ -147,8 +147,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoA()">+ Adicionar rendimento</button>
-<button type="button" onclick="descarregarModeloCSV('tabelaAnexoA')">Descarregar modelo (CSV)</button>
-<button type="button" onclick="iniciarImportacaoCSV('tabelaAnexoA')">Importar CSV preenchido</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoA')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoA')">Importar Excel preenchido</button>
 </div>
 
 <div class="painel" id="painel-anexoB">
@@ -211,8 +211,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
-<button type="button" onclick="descarregarModeloCSV('tabelaAnexoBRendimentos')">Descarregar modelo (CSV)</button>
-<button type="button" onclick="iniciarImportacaoCSV('tabelaAnexoBRendimentos')">Importar CSV preenchido</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoBRendimentos')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoBRendimentos')">Importar Excel preenchido</button>
 
 <fieldset>
   <div class="row">
@@ -476,8 +476,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04()">+ Adicionar imóvel</button>
-<button type="button" onclick="descarregarModeloCSV('tabelaAnexoG04')">Descarregar modelo (CSV)</button>
-<button type="button" onclick="iniciarImportacaoCSV('tabelaAnexoG04')">Importar CSV preenchido</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04')">Importar Excel preenchido</button>
 
 <h3>Imóveis recuperados/reabilitação (Quadro 4A)</h3>
 <table id="tabelaAnexoG04A">
@@ -5699,89 +5699,323 @@ if (typeof module !== "undefined" && module.exports) {
     if (botao) botao.classList.add("ativo");
   };
 
-  // --- Modelos CSV para preencher linhas de rendimentos fora da aplicação (ex: em Excel) ---
-  // Cada tabela de linhas pode ter um modelo CSV descarregável (cabeçalhos tirados do
-  // próprio <thead>, para nunca ficarem dessincronizados) e um importador que volta a
-  // preencher as linhas a partir de um ficheiro CSV. Separador ";" (não ";" como decimal,
-  // que em Excel em português é sempre a vírgula) para não haver ambiguidade com o
-  // separador decimal português (vírgula). Piloto em 3 tabelas; para alargar a outra
-  // tabela, basta adicionar uma entrada a CONFIG_MODELOS_CSV e os dois botões no HTML.
-  const CONFIG_MODELOS_CSV = {
-    tabelaAnexoA: {
-      nomeFicheiro: "modelo-anexoA-rendimentos",
-      adicionar: "adicionarLinhaAnexoA",
-      colunas: [
-        { classe: "a-nif" }, { classe: "a-codigo" }, { classe: "a-titular" },
-        { classe: "a-rendimento", numero: true }, { classe: "a-retencao", numero: true },
-        { classe: "a-contribuicao", numero: true }
-      ]
-    },
-    tabelaAnexoBRendimentos: {
-      nomeFicheiro: "modelo-anexoB-rendimentos",
-      adicionar: "adicionarLinhaAnexoBRendimento",
-      colunas: [
-        { classe: "ab-r-codigo" }, { classe: "ab-r-valor", numero: true }
-      ]
-    },
-    tabelaAnexoG04: {
-      nomeFicheiro: "modelo-anexoG-quadro4-imoveis",
-      adicionar: "adicionarLinhaAnexoG04",
-      colunas: [
-        { classe: "ag04-titular" }, { classe: "ag04-anorealizacao" }, { classe: "ag04-mesrealizacao" },
-        { classe: "ag04-diarealizacao" }, { classe: "ag04-valorrealizacao", numero: true },
-        { classe: "ag04-anoaquisicao" }, { classe: "ag04-mesaquisicao" }, { classe: "ag04-diaaquisicao" },
-        { classe: "ag04-valoraquisicao", numero: true }, { classe: "ag04-despesas", numero: true },
-        { classe: "ag04-freguesia" }, { classe: "ag04-tipo" }, { classe: "ag04-artigo" },
-        { classe: "ag04-fraccao" }, { classe: "ag04-quota", numero: true }
-      ]
-    }
-  };
-  const CSV_SEPARADOR = ";";
-  const CSV_LINHAS_EM_BRANCO = 5;
+  // --- Modelos Excel (.xlsx) para preencher linhas de rendimentos fora da aplicação ---
+  // Ficheiro .xlsx construído à mão (sem bibliotecas externas): é um ZIP com XML lá
+  // dentro. A escrita usa sempre o método "store" (sem compressão) — mais simples, e o
+  // tamanho dos ficheiros envolvidos é pequeno. A leitura (ficheiro já editado e guardado
+  // pelo Excel/LibreOffice) tem de suportar o método "deflate", porque é o que estas
+  // aplicações usam sempre ao gravar — para isso usam-se as APIs nativas do browser
+  // CompressionStream/DecompressionStream (sem bibliotecas), disponíveis em browsers
+  // razoavelmente recentes (2022+).
 
-  function cabecalhosTabela(tabelaId) {
-    return [...document.querySelectorAll(`#${tabelaId} thead th`)]
-      .map(th => th.textContent.trim())
-      .filter(Boolean);
+  // -- CRC32 (necessário no cabeçalho de cada entrada do ZIP) --
+  const TABELA_CRC32 = (() => {
+    const tabela = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) {
+      let c = n;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      tabela[n] = c >>> 0;
+    }
+    return tabela;
+  })();
+
+  function crc32(bytes) {
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) c = TABELA_CRC32[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
   }
 
-  function escaparCampoCSV(valor) {
-    const s = valor === undefined || valor === null ? "" : String(valor);
-    if (s.includes(CSV_SEPARADOR) || s.includes('"') || s.includes("\n") || s.includes("\r")) {
-      return '"' + s.replace(/"/g, '""') + '"';
+  // -- Buffer de bytes auxiliar (little-endian, como o formato ZIP exige) --
+  function criarBufferBinario() {
+    const partes = [];
+    return {
+      bytes(arr) { partes.push(arr); },
+      u16(v) { partes.push(new Uint8Array([v & 0xFF, (v >>> 8) & 0xFF])); },
+      u32(v) { partes.push(new Uint8Array([v & 0xFF, (v >>> 8) & 0xFF, (v >>> 16) & 0xFF, (v >>> 24) & 0xFF])); },
+      texto(s) { partes.push(new TextEncoder().encode(s)); },
+      finalizar() {
+        const total = partes.reduce((a, p) => a + p.length, 0);
+        const resultado = new Uint8Array(total);
+        let offset = 0;
+        partes.forEach(p => { resultado.set(p, offset); offset += p.length; });
+        return resultado;
+      }
+    };
+  }
+
+  // -- Escrita do ZIP (método "store", sem compressão) --
+  function construirZip(ficheiros) {
+    const hora = 0, data = ((2025 - 1980) << 9) | (1 << 5) | 1; // data fixa, irrelevante para o Excel
+    const entradas = ficheiros.map(f => ({ nome: f.nome, bytes: f.bytes, nomeBytes: new TextEncoder().encode(f.nome), crc: crc32(f.bytes) }));
+
+    const localBuf = criarBufferBinario();
+    const offsets = [];
+    let offsetAtual = 0;
+    entradas.forEach(e => {
+      offsets.push(offsetAtual);
+      localBuf.u32(0x04034b50);
+      localBuf.u16(20); localBuf.u16(0); localBuf.u16(0);
+      localBuf.u16(hora); localBuf.u16(data);
+      localBuf.u32(e.crc);
+      localBuf.u32(e.bytes.length); localBuf.u32(e.bytes.length);
+      localBuf.u16(e.nomeBytes.length); localBuf.u16(0);
+      localBuf.bytes(e.nomeBytes);
+      localBuf.bytes(e.bytes);
+      offsetAtual += 30 + e.nomeBytes.length + e.bytes.length;
+    });
+
+    const centralBuf = criarBufferBinario();
+    entradas.forEach((e, i) => {
+      centralBuf.u32(0x02014b50);
+      centralBuf.u16(20); centralBuf.u16(20); centralBuf.u16(0); centralBuf.u16(0);
+      centralBuf.u16(hora); centralBuf.u16(data);
+      centralBuf.u32(e.crc);
+      centralBuf.u32(e.bytes.length); centralBuf.u32(e.bytes.length);
+      centralBuf.u16(e.nomeBytes.length); centralBuf.u16(0); centralBuf.u16(0);
+      centralBuf.u16(0); centralBuf.u16(0); centralBuf.u32(0);
+      centralBuf.u32(offsets[i]);
+      centralBuf.bytes(e.nomeBytes);
+    });
+
+    const localBytes = localBuf.finalizar();
+    const centralBytes = centralBuf.finalizar();
+
+    const eocdBuf = criarBufferBinario();
+    eocdBuf.u32(0x06054b50);
+    eocdBuf.u16(0); eocdBuf.u16(0);
+    eocdBuf.u16(entradas.length); eocdBuf.u16(entradas.length);
+    eocdBuf.u32(centralBytes.length); eocdBuf.u32(localBytes.length);
+    eocdBuf.u16(0);
+    const eocdBytes = eocdBuf.finalizar();
+
+    const resultado = new Uint8Array(localBytes.length + centralBytes.length + eocdBytes.length);
+    resultado.set(localBytes, 0);
+    resultado.set(centralBytes, localBytes.length);
+    resultado.set(eocdBytes, localBytes.length + centralBytes.length);
+    return resultado;
+  }
+
+  // -- Leitura do ZIP (suporta "store" e "deflate", via DecompressionStream) --
+  async function inflateRaw(bytes) {
+    const ds = new DecompressionStream("deflate-raw");
+    const stream = new Blob([bytes]).stream().pipeThrough(ds);
+    const buffer = await new Response(stream).arrayBuffer();
+    return new Uint8Array(buffer);
+  }
+
+  async function lerZip(bytes) {
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    let eocdOffset = -1;
+    const minOffset = Math.max(0, bytes.length - 65557);
+    for (let i = bytes.length - 22; i >= minOffset; i--) {
+      if (view.getUint32(i, true) === 0x06054b50) { eocdOffset = i; break; }
+    }
+    if (eocdOffset === -1) throw new Error("Não parece ser um ficheiro .xlsx válido (ZIP não encontrado).");
+
+    const totalEntradas = view.getUint16(eocdOffset + 10, true);
+    const offsetCentral = view.getUint32(eocdOffset + 16, true);
+
+    const entradas = [];
+    let p = offsetCentral;
+    for (let i = 0; i < totalEntradas; i++) {
+      if (view.getUint32(p, true) !== 0x02014b50) throw new Error("Ficheiro .xlsx com estrutura ZIP inválida.");
+      const metodo = view.getUint16(p + 10, true);
+      const tamComprimido = view.getUint32(p + 20, true);
+      const tamNome = view.getUint16(p + 28, true);
+      const tamExtra = view.getUint16(p + 30, true);
+      const tamComentario = view.getUint16(p + 32, true);
+      const offsetLocal = view.getUint32(p + 42, true);
+      const nome = new TextDecoder("utf-8").decode(bytes.subarray(p + 46, p + 46 + tamNome));
+      entradas.push({ nome, metodo, tamComprimido, offsetLocal });
+      p += 46 + tamNome + tamExtra + tamComentario;
+    }
+
+    const ficheiros = {};
+    for (const e of entradas) {
+      const tamNomeLocal = view.getUint16(e.offsetLocal + 26, true);
+      const tamExtraLocal = view.getUint16(e.offsetLocal + 28, true);
+      const inicioDados = e.offsetLocal + 30 + tamNomeLocal + tamExtraLocal;
+      const dadosComprimidos = bytes.subarray(inicioDados, inicioDados + e.tamComprimido);
+      if (e.metodo === 0) ficheiros[e.nome] = dadosComprimidos;
+      else if (e.metodo === 8) ficheiros[e.nome] = await inflateRaw(dadosComprimidos);
+      else throw new Error(`Método de compressão ZIP não suportado (${e.metodo}).`);
+    }
+    return ficheiros;
+  }
+
+  // -- Construção do conteúdo .xlsx (workbook com folha de dados + folha de listas) --
+  function colunaLetra(indiceZero) {
+    let n = indiceZero + 1, s = "";
+    while (n > 0) {
+      const r = (n - 1) % 26;
+      s = String.fromCharCode(65 + r) + s;
+      n = Math.floor((n - 1) / 26);
     }
     return s;
   }
 
-  function parsarLinhaCSV(linha) {
-    const campos = [];
-    let atual = "";
-    let dentroAspas = false;
-    for (let i = 0; i < linha.length; i++) {
-      const c = linha[i];
-      if (dentroAspas) {
-        if (c === '"') {
-          if (linha[i + 1] === '"') { atual += '"'; i++; } else { dentroAspas = false; }
-        } else {
-          atual += c;
-        }
-      } else if (c === '"') {
-        dentroAspas = true;
-      } else if (c === CSV_SEPARADOR) {
-        campos.push(atual);
-        atual = "";
-      } else {
-        atual += c;
-      }
-    }
-    campos.push(atual);
-    return campos;
+  function escXML(valor) {
+    return String(valor === undefined || valor === null ? "" : valor)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  // Aceita tanto "1234.56" como o formato português "1.234,56" ou "1234,56".
+  function celulaTextoXML(ref, texto, negrito) {
+    return `<c r="${ref}"${negrito ? ' s="1"' : ""} t="inlineStr"><is><t xml:space="preserve">${escXML(texto)}</t></is></c>`;
+  }
+
+  // sheetsConfig: [{ nome, linhas: [[texto,...]], negritoLinha1 }]
+  // validacoes: [{ colunaDados (0-based), linhaInicio, linhaFim, folhaListas, colunaListas (0-based), linhasListas }]
+  function construirXLSX(folhaDados, folhaListas, validacoes) {
+    const XMLNS_SS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+    const XMLNS_R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+
+    function folhaXML(linhas, comValidacoes) {
+      let maxCol = 0;
+      const linhasXML = linhas.map((linha, iLinha) => {
+        const celulas = linha.map((valor, iCol) => {
+          maxCol = Math.max(maxCol, iCol);
+          if (valor === "" || valor === undefined || valor === null) return "";
+          return celulaTextoXML(`${colunaLetra(iCol)}${iLinha + 1}`, valor, iLinha === 0);
+        }).join("");
+        return celulas ? `<row r="${iLinha + 1}">${celulas}</row>` : "";
+      }).filter(Boolean).join("");
+
+      const dimensao = `A1:${colunaLetra(maxCol)}${Math.max(linhas.length, 1)}`;
+      const validacoesXML = comValidacoes && validacoes.length
+        ? `<dataValidations count="${validacoes.length}">` +
+          validacoes.map(v =>
+            `<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" ` +
+            `sqref="${colunaLetra(v.colunaDados)}${v.linhaInicio}:${colunaLetra(v.colunaDados)}${v.linhaFim}">` +
+            `<formula1>${escXML(v.folhaListas)}!$${colunaLetra(v.colunaListas)}$2:$${colunaLetra(v.colunaListas)}$${v.linhasListas + 1}</formula1>` +
+            `</dataValidation>`
+          ).join("") +
+          `</dataValidations>`
+        : "";
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+        `<worksheet xmlns="${XMLNS_SS}"><dimension ref="${dimensao}"/><sheetData>${linhasXML}</sheetData>${validacoesXML}</worksheet>`;
+    }
+
+    const sheet1XML = folhaXML(folhaDados.linhas, true);
+    const sheet2XML = folhaXML(folhaListas.linhas, false);
+
+    const contentTypesXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+      `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">` +
+      `<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>` +
+      `<Default Extension="xml" ContentType="application/xml"/>` +
+      `<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>` +
+      `<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>` +
+      `<Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>` +
+      `<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>` +
+      `</Types>`;
+
+    const relsRaizXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+      `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+      `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>` +
+      `</Relationships>`;
+
+    const workbookXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+      `<workbook xmlns="${XMLNS_SS}" xmlns:r="${XMLNS_R}"><sheets>` +
+      `<sheet name="${escXML(folhaDados.nome)}" sheetId="1" r:id="rId1"/>` +
+      `<sheet name="${escXML(folhaListas.nome)}" sheetId="2" r:id="rId2"/>` +
+      `</sheets></workbook>`;
+
+    const workbookRelsXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+      `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">` +
+      `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>` +
+      `<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/>` +
+      `<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>` +
+      `</Relationships>`;
+
+    const stylesXML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+      `<styleSheet xmlns="${XMLNS_SS}">` +
+      `<fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts>` +
+      `<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>` +
+      `<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>` +
+      `<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>` +
+      `<cellXfs count="2">` +
+      `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>` +
+      `<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>` +
+      `</cellXfs>` +
+      `</styleSheet>`;
+
+    const enc = new TextEncoder();
+    return construirZip([
+      { nome: "[Content_Types].xml", bytes: enc.encode(contentTypesXML) },
+      { nome: "_rels/.rels", bytes: enc.encode(relsRaizXML) },
+      { nome: "xl/workbook.xml", bytes: enc.encode(workbookXML) },
+      { nome: "xl/_rels/workbook.xml.rels", bytes: enc.encode(workbookRelsXML) },
+      { nome: "xl/styles.xml", bytes: enc.encode(stylesXML) },
+      { nome: "xl/worksheets/sheet1.xml", bytes: enc.encode(sheet1XML) },
+      { nome: "xl/worksheets/sheet2.xml", bytes: enc.encode(sheet2XML) }
+    ]);
+  }
+
+  // -- Leitura de um .xlsx já preenchido (resolve a folha por NOME, como o Excel pode
+  // reordenar/renomear ficheiros internos ao gravar) --
+  async function lerXLSX(bytes, nomeFolha) {
+    const partes = await lerZip(bytes);
+    const decoder = new TextDecoder("utf-8");
+    const parser = new DOMParser();
+
+    const workbookDoc = parser.parseFromString(decoder.decode(partes["xl/workbook.xml"]), "application/xml");
+    const folhaEl = [...workbookDoc.getElementsByTagName("sheet")].find(s => s.getAttribute("name") === nomeFolha);
+    if (!folhaEl) throw new Error(`Não encontrei a folha "${nomeFolha}" neste ficheiro.`);
+    const rId = folhaEl.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id") || folhaEl.getAttribute("r:id");
+
+    const relsDoc = parser.parseFromString(decoder.decode(partes["xl/_rels/workbook.xml.rels"]), "application/xml");
+    const relEl = [...relsDoc.getElementsByTagName("Relationship")].find(r => r.getAttribute("Id") === rId);
+    if (!relEl) throw new Error("Não consegui localizar a folha dentro do ficheiro .xlsx.");
+    // O "Target" pode ser relativo a "xl/" (o normal, usado pelo nosso escritor) ou um
+    // caminho absoluto dentro do pacote começado por "/" (visto em ficheiros gravados por
+    // outro software, como o openpyxl) — neste segundo caso não se deve prefixar com "xl/".
+    const targetFolha = relEl.getAttribute("Target");
+    const caminhoFolha = targetFolha.startsWith("/") ? targetFolha.slice(1) : "xl/" + targetFolha.replace(/^\.\//, "");
+
+    let sharedStrings = null;
+    if (partes["xl/sharedStrings.xml"]) {
+      const ssDoc = parser.parseFromString(decoder.decode(partes["xl/sharedStrings.xml"]), "application/xml");
+      sharedStrings = [...ssDoc.getElementsByTagName("si")].map(si => [...si.getElementsByTagName("t")].map(t => t.textContent).join(""));
+    }
+
+    const folhaDoc = parser.parseFromString(decoder.decode(partes[caminhoFolha]), "application/xml");
+    const linhasEl = [...folhaDoc.getElementsByTagName("row")];
+
+    function valorCelula(c) {
+      const tipo = c.getAttribute("t");
+      if (tipo === "inlineStr") {
+        return [...c.getElementsByTagName("t")].map(t => t.textContent).join("");
+      }
+      const vEl = c.getElementsByTagName("v")[0];
+      if (!vEl) return "";
+      if (tipo === "s") {
+        const indice = Number(vEl.textContent);
+        return sharedStrings && sharedStrings[indice] !== undefined ? sharedStrings[indice] : "";
+      }
+      return vEl.textContent;
+    }
+
+    return linhasEl.map(linhaEl => {
+      const celulas = [...linhaEl.getElementsByTagName("c")];
+      const linha = [];
+      celulas.forEach(c => {
+        const ref = c.getAttribute("r") || "";
+        const letras = ref.match(/^[A-Z]+/);
+        const indice = letras ? letras[0].split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0) - 1 : linha.length;
+        linha[indice] = valorCelula(c);
+      });
+      return linha;
+    });
+  }
+
+  // Aceita tanto "1234.56" como o formato português "1.234,56" ou "1234,56" — no caso
+  // comum (célula numérica de verdade), o Excel já guarda o valor com "." internamente,
+  // qualquer que seja a configuração regional; isto serve de rede de segurança para
+  // quando a célula vem como texto.
   function parsarNumeroPT(texto) {
     let s = String(texto === undefined || texto === null ? "" : texto).trim();
     if (s === "") return "";
+    if (/^-?\d+(\.\d+)?$/.test(s)) return s;
     if (s.includes(",") && s.includes(".")) {
       s = s.replace(/\./g, "").replace(",", ".");
     } else if (s.includes(",")) {
@@ -5790,67 +6024,149 @@ if (typeof module !== "undefined" && module.exports) {
     return s;
   }
 
-  window.descarregarModeloCSV = function (tabelaId) {
-    const config = CONFIG_MODELOS_CSV[tabelaId];
+  function cabecalhosTabela(tabelaId) {
+    return [...document.querySelectorAll(`#${tabelaId} thead th`)]
+      .map(th => th.textContent.trim())
+      .filter(Boolean);
+  }
+
+  // Cada tabela de linhas pode ter um modelo .xlsx descarregável (cabeçalhos tirados do
+  // próprio <thead>, para nunca ficarem dessincronizados) e um importador que volta a
+  // preencher as linhas a partir do ficheiro depois de editado. As colunas com "opcoes"
+  // ganham um dropdown no Excel (lista de valores válidos numa segunda folha "Listas"),
+  // construído a partir do datalist já existente no HTML (fonte única) ou de uma lista
+  // fixa pequena. Piloto em 3 tabelas; para alargar a outra tabela, basta acrescentar uma
+  // entrada a CONFIG_MODELOS_TABELA e os dois botões no HTML.
+  const CONFIG_MODELOS_TABELA = {
+    tabelaAnexoA: {
+      nomeFicheiro: "modelo-anexoA-rendimentos",
+      adicionar: "adicionarLinhaAnexoA",
+      colunas: [
+        { classe: "a-nif" },
+        { classe: "a-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoA", titulo: "Código Anexo A" } },
+        { classe: "a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"], titulo: "Titular" } },
+        { classe: "a-rendimento", numero: true },
+        { classe: "a-retencao", numero: true },
+        { classe: "a-contribuicao", numero: true }
+      ]
+    },
+    tabelaAnexoBRendimentos: {
+      nomeFicheiro: "modelo-anexoB-rendimentos",
+      adicionar: "adicionarLinhaAnexoBRendimento",
+      colunas: [
+        { classe: "ab-r-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoB", titulo: "Código Anexo B" } },
+        { classe: "ab-r-valor", numero: true }
+      ]
+    },
+    tabelaAnexoG04: {
+      nomeFicheiro: "modelo-anexoG-quadro4-imoveis",
+      adicionar: "adicionarLinhaAnexoG04",
+      colunas: [
+        { classe: "ag04-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"], titulo: "Titular" } },
+        { classe: "ag04-anorealizacao" }, { classe: "ag04-mesrealizacao" }, { classe: "ag04-diarealizacao" },
+        { classe: "ag04-valorrealizacao", numero: true },
+        { classe: "ag04-anoaquisicao" }, { classe: "ag04-mesaquisicao" }, { classe: "ag04-diaaquisicao" },
+        { classe: "ag04-valoraquisicao", numero: true }, { classe: "ag04-despesas", numero: true },
+        { classe: "ag04-freguesia" },
+        { classe: "ag04-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"], titulo: "Tipo" } },
+        { classe: "ag04-artigo" }, { classe: "ag04-fraccao" }, { classe: "ag04-quota", numero: true }
+      ]
+    }
+  };
+  const XLSX_LINHAS_EM_BRANCO = 30; // alcance das listas pendentes para novas linhas
+
+  function opcoesColuna(opcoes) {
+    if (opcoes.tipo === "fixo") {
+      return opcoes.valores.map(v => [v]);
+    }
+    return [...document.querySelectorAll(`#${opcoes.id} option`)].map(o => [o.value, o.textContent.trim()]);
+  }
+
+  window.descarregarModeloXLSX = function (tabelaId) {
+    const config = CONFIG_MODELOS_TABELA[tabelaId];
     if (!config) return;
     const cabecalhos = cabecalhosTabela(tabelaId);
-    const linhas = [cabecalhos.map(escaparCampoCSV).join(CSV_SEPARADOR)];
-    for (let i = 0; i < CSV_LINHAS_EM_BRANCO; i++) {
-      linhas.push(config.colunas.map(() => "").join(CSV_SEPARADOR));
-    }
-    const conteudo = "﻿" + linhas.join("\r\n") + "\r\n";
-    const blob = new Blob([conteudo], { type: "text/csv;charset=utf-8" });
+
+    const linhasDados = [cabecalhos];
+    for (let i = 0; i < XLSX_LINHAS_EM_BRANCO; i++) linhasDados.push([]);
+
+    const linhasListas = [[]];
+    const validacoes = [];
+    let colAtual = 0;
+    config.colunas.forEach((coluna, idxColunaDados) => {
+      if (!coluna.opcoes) return;
+      const valores = opcoesColuna(coluna.opcoes);
+      const temDescricao = coluna.opcoes.tipo === "datalist";
+      linhasListas[0][colAtual] = `${coluna.opcoes.titulo} — código`;
+      if (temDescricao) linhasListas[0][colAtual + 1] = `${coluna.opcoes.titulo} — descrição`;
+      valores.forEach((v, i) => {
+        if (!linhasListas[i + 1]) linhasListas[i + 1] = [];
+        linhasListas[i + 1][colAtual] = v[0];
+        if (temDescricao) linhasListas[i + 1][colAtual + 1] = v[1] || "";
+      });
+      validacoes.push({
+        colunaDados: idxColunaDados, linhaInicio: 2, linhaFim: XLSX_LINHAS_EM_BRANCO + 1,
+        folhaListas: "Listas", colunaListas: colAtual, linhasListas: valores.length
+      });
+      colAtual += temDescricao ? 2 : 1;
+    });
+
+    const zipBytes = construirXLSX(
+      { nome: "Dados", linhas: linhasDados },
+      { nome: "Listas", linhas: linhasListas },
+      validacoes
+    );
+    const blob = new Blob([zipBytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${config.nomeFicheiro}.csv`;
+    a.download = `${config.nomeFicheiro}.xlsx`;
     a.click();
   };
 
-  let tabelaCsvAlvo = null;
+  let tabelaXlsxAlvo = null;
 
-  window.iniciarImportacaoCSV = function (tabelaId) {
-    tabelaCsvAlvo = tabelaId;
+  window.iniciarImportacaoXLSX = function (tabelaId) {
+    tabelaXlsxAlvo = tabelaId;
     const input = document.getElementById("csvImportarGenerico");
     input.value = "";
     input.click();
   };
 
-  window.processarImportacaoCSV = function () {
+  window.processarImportacaoXLSX = function () {
     const input = document.getElementById("csvImportarGenerico");
     const ficheiro = input.files[0];
-    const tabelaId = tabelaCsvAlvo;
+    const tabelaId = tabelaXlsxAlvo;
     if (!ficheiro || !tabelaId) return;
-    const config = CONFIG_MODELOS_CSV[tabelaId];
+    const config = CONFIG_MODELOS_TABELA[tabelaId];
     if (!config) return;
 
     const leitor = new FileReader();
-    leitor.onload = function () {
-      let texto = leitor.result;
-      if (texto.charCodeAt(0) === 0xFEFF) texto = texto.slice(1);
-      const todasLinhas = texto.split(/\r\n|\n|\r/).filter(l => l.trim() !== "");
-      if (todasLinhas.length < 2) {
-        alert("O ficheiro não tem linhas de dados (só o cabeçalho, ou está vazio).");
+    leitor.onload = async function () {
+      let linhas;
+      try {
+        linhas = await lerXLSX(new Uint8Array(leitor.result), "Dados");
+      } catch (erro) {
+        alert("Não foi possível ler este ficheiro .xlsx: " + erro.message);
         return;
       }
-      const linhasDados = todasLinhas.slice(1); // ignora o cabeçalho
+      const linhasDados = linhas.slice(1); // ignora o cabeçalho
       let importadas = 0;
       linhasDados.forEach(linha => {
-        const campos = parsarLinhaCSV(linha);
-        if (campos.every(c => c.trim() === "")) return; // linha em branco
+        if (!linha || linha.every(c => c === undefined || String(c).trim() === "")) return; // linha em branco
         window[config.adicionar]();
         const tbody = document.querySelector(`#${tabelaId} tbody`);
         const tr = tbody.lastElementChild;
         config.colunas.forEach((coluna, idx) => {
           const campoEl = tr.querySelector(`.${coluna.classe}`);
           if (!campoEl) return;
-          const valorBruto = (campos[idx] || "").trim();
+          const valorBruto = linha[idx] === undefined ? "" : String(linha[idx]).trim();
           campoEl.value = coluna.numero ? parsarNumeroPT(valorBruto) : valorBruto;
         });
         importadas++;
       });
       alert(`${importadas} linha(s) importada(s) para a tabela.`);
     };
-    leitor.readAsText(ficheiro, "UTF-8");
+    leitor.readAsArrayBuffer(ficheiro);
   };
 
   // Dados de uma declaração importada que a interface ainda não sabe editar
