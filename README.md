@@ -266,6 +266,18 @@ regenerar o `simulador-irs.html`.
   navegação, para não ficar uma página só a crescer à medida que se adicionam anexos.
   Os botões "Calcular estimativa" / "Exportar XML" / "Gerar carta" ficam sempre visíveis,
   fora dos separadores.
+- **Modelos CSV para preencher linhas fora da aplicação** (ex: em Excel): em tabelas
+  selecionadas, os botões "Descarregar modelo (CSV)" / "Importar CSV preenchido" permitem
+  descarregar um ficheiro CSV com os cabeçalhos da tabela (e algumas linhas em branco),
+  preenchê-lo em Excel ou outra folha de cálculo, e voltar a importá-lo para que as linhas
+  apareçam automaticamente na tabela — sem ter de digitar uma a uma na aplicação. Usa ";"
+  como separador de campos (evita ambiguidade com a vírgula decimal do Excel em português)
+  e aceita tanto o formato decimal português ("1.234,56") como o internacional ("1234.56")
+  nas colunas numéricas. Por agora, piloto em 3 tabelas — Anexo A (rendimentos), Anexo B
+  (rendimentos brutos) e Anexo G Quadro 4 (alienação de imóveis) — como prova de conceito
+  antes de se estender às restantes ~76 tabelas de linhas da aplicação. O mecanismo é
+  genérico (`CONFIG_MODELOS_CSV` em `index.html`): alargar a outra tabela é só acrescentar
+  uma entrada à configuração e os dois botões junto à tabela em causa.
 
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
@@ -340,6 +352,11 @@ perda de informação.
    `data/parametros_2025.js` (a validar). Falta ainda o limite geral e decrescente por
    escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos
    coletáveis mais altos — a app aplica os limites por categoria mas não esse teto global.
+9. **Alargar os modelos CSV às restantes tabelas** — por agora só o Anexo A (rendimentos),
+   o Anexo B (rendimentos brutos) e o Anexo G Quadro 4 (imóveis) têm os botões de
+   descarregar/importar modelo CSV, como prova de conceito. Validado o formato com o
+   utilizador, falta estender a configuração `CONFIG_MODELOS_CSV` às restantes ~76 tabelas
+   de linhas da aplicação (Anexos B, E, G, H, J, L).
 
 ## Convenção: campos de código
 

@@ -56,6 +56,8 @@
   <div id="avisoImportacao" style="display:none; margin-top:10px; font-size:0.85rem;"></div>
 </fieldset>
 
+<input type="file" id="csvImportarGenerico" accept=".csv" style="display:none" onchange="processarImportacaoCSV()">
+
 <div class="layout">
   <nav class="barra-secoes">
     <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Rosto</button>
@@ -145,6 +147,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoA()">+ Adicionar rendimento</button>
+<button type="button" onclick="descarregarModeloCSV('tabelaAnexoA')">Descarregar modelo (CSV)</button>
+<button type="button" onclick="iniciarImportacaoCSV('tabelaAnexoA')">Importar CSV preenchido</button>
 </div>
 
 <div class="painel" id="painel-anexoB">
@@ -207,6 +211,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
+<button type="button" onclick="descarregarModeloCSV('tabelaAnexoBRendimentos')">Descarregar modelo (CSV)</button>
+<button type="button" onclick="iniciarImportacaoCSV('tabelaAnexoBRendimentos')">Importar CSV preenchido</button>
 
 <fieldset>
   <div class="row">
@@ -470,6 +476,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04()">+ Adicionar imóvel</button>
+<button type="button" onclick="descarregarModeloCSV('tabelaAnexoG04')">Descarregar modelo (CSV)</button>
+<button type="button" onclick="iniciarImportacaoCSV('tabelaAnexoG04')">Importar CSV preenchido</button>
 
 <h3>Imóveis recuperados/reabilitação (Quadro 4A)</h3>
 <table id="tabelaAnexoG04A">
@@ -5689,6 +5697,160 @@ if (typeof module !== "undefined" && module.exports) {
     if (painel) painel.classList.add("ativo");
     const botao = document.querySelector(`.barra-secoes button[data-secao="${nome}"]`);
     if (botao) botao.classList.add("ativo");
+  };
+
+  // --- Modelos CSV para preencher linhas de rendimentos fora da aplicação (ex: em Excel) ---
+  // Cada tabela de linhas pode ter um modelo CSV descarregável (cabeçalhos tirados do
+  // próprio <thead>, para nunca ficarem dessincronizados) e um importador que volta a
+  // preencher as linhas a partir de um ficheiro CSV. Separador ";" (não ";" como decimal,
+  // que em Excel em português é sempre a vírgula) para não haver ambiguidade com o
+  // separador decimal português (vírgula). Piloto em 3 tabelas; para alargar a outra
+  // tabela, basta adicionar uma entrada a CONFIG_MODELOS_CSV e os dois botões no HTML.
+  const CONFIG_MODELOS_CSV = {
+    tabelaAnexoA: {
+      nomeFicheiro: "modelo-anexoA-rendimentos",
+      adicionar: "adicionarLinhaAnexoA",
+      colunas: [
+        { classe: "a-nif" }, { classe: "a-codigo" }, { classe: "a-titular" },
+        { classe: "a-rendimento", numero: true }, { classe: "a-retencao", numero: true },
+        { classe: "a-contribuicao", numero: true }
+      ]
+    },
+    tabelaAnexoBRendimentos: {
+      nomeFicheiro: "modelo-anexoB-rendimentos",
+      adicionar: "adicionarLinhaAnexoBRendimento",
+      colunas: [
+        { classe: "ab-r-codigo" }, { classe: "ab-r-valor", numero: true }
+      ]
+    },
+    tabelaAnexoG04: {
+      nomeFicheiro: "modelo-anexoG-quadro4-imoveis",
+      adicionar: "adicionarLinhaAnexoG04",
+      colunas: [
+        { classe: "ag04-titular" }, { classe: "ag04-anorealizacao" }, { classe: "ag04-mesrealizacao" },
+        { classe: "ag04-diarealizacao" }, { classe: "ag04-valorrealizacao", numero: true },
+        { classe: "ag04-anoaquisicao" }, { classe: "ag04-mesaquisicao" }, { classe: "ag04-diaaquisicao" },
+        { classe: "ag04-valoraquisicao", numero: true }, { classe: "ag04-despesas", numero: true },
+        { classe: "ag04-freguesia" }, { classe: "ag04-tipo" }, { classe: "ag04-artigo" },
+        { classe: "ag04-fraccao" }, { classe: "ag04-quota", numero: true }
+      ]
+    }
+  };
+  const CSV_SEPARADOR = ";";
+  const CSV_LINHAS_EM_BRANCO = 5;
+
+  function cabecalhosTabela(tabelaId) {
+    return [...document.querySelectorAll(`#${tabelaId} thead th`)]
+      .map(th => th.textContent.trim())
+      .filter(Boolean);
+  }
+
+  function escaparCampoCSV(valor) {
+    const s = valor === undefined || valor === null ? "" : String(valor);
+    if (s.includes(CSV_SEPARADOR) || s.includes('"') || s.includes("\n") || s.includes("\r")) {
+      return '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
+  function parsarLinhaCSV(linha) {
+    const campos = [];
+    let atual = "";
+    let dentroAspas = false;
+    for (let i = 0; i < linha.length; i++) {
+      const c = linha[i];
+      if (dentroAspas) {
+        if (c === '"') {
+          if (linha[i + 1] === '"') { atual += '"'; i++; } else { dentroAspas = false; }
+        } else {
+          atual += c;
+        }
+      } else if (c === '"') {
+        dentroAspas = true;
+      } else if (c === CSV_SEPARADOR) {
+        campos.push(atual);
+        atual = "";
+      } else {
+        atual += c;
+      }
+    }
+    campos.push(atual);
+    return campos;
+  }
+
+  // Aceita tanto "1234.56" como o formato português "1.234,56" ou "1234,56".
+  function parsarNumeroPT(texto) {
+    let s = String(texto === undefined || texto === null ? "" : texto).trim();
+    if (s === "") return "";
+    if (s.includes(",") && s.includes(".")) {
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else if (s.includes(",")) {
+      s = s.replace(",", ".");
+    }
+    return s;
+  }
+
+  window.descarregarModeloCSV = function (tabelaId) {
+    const config = CONFIG_MODELOS_CSV[tabelaId];
+    if (!config) return;
+    const cabecalhos = cabecalhosTabela(tabelaId);
+    const linhas = [cabecalhos.map(escaparCampoCSV).join(CSV_SEPARADOR)];
+    for (let i = 0; i < CSV_LINHAS_EM_BRANCO; i++) {
+      linhas.push(config.colunas.map(() => "").join(CSV_SEPARADOR));
+    }
+    const conteudo = "﻿" + linhas.join("\r\n") + "\r\n";
+    const blob = new Blob([conteudo], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${config.nomeFicheiro}.csv`;
+    a.click();
+  };
+
+  let tabelaCsvAlvo = null;
+
+  window.iniciarImportacaoCSV = function (tabelaId) {
+    tabelaCsvAlvo = tabelaId;
+    const input = document.getElementById("csvImportarGenerico");
+    input.value = "";
+    input.click();
+  };
+
+  window.processarImportacaoCSV = function () {
+    const input = document.getElementById("csvImportarGenerico");
+    const ficheiro = input.files[0];
+    const tabelaId = tabelaCsvAlvo;
+    if (!ficheiro || !tabelaId) return;
+    const config = CONFIG_MODELOS_CSV[tabelaId];
+    if (!config) return;
+
+    const leitor = new FileReader();
+    leitor.onload = function () {
+      let texto = leitor.result;
+      if (texto.charCodeAt(0) === 0xFEFF) texto = texto.slice(1);
+      const todasLinhas = texto.split(/\r\n|\n|\r/).filter(l => l.trim() !== "");
+      if (todasLinhas.length < 2) {
+        alert("O ficheiro não tem linhas de dados (só o cabeçalho, ou está vazio).");
+        return;
+      }
+      const linhasDados = todasLinhas.slice(1); // ignora o cabeçalho
+      let importadas = 0;
+      linhasDados.forEach(linha => {
+        const campos = parsarLinhaCSV(linha);
+        if (campos.every(c => c.trim() === "")) return; // linha em branco
+        window[config.adicionar]();
+        const tbody = document.querySelector(`#${tabelaId} tbody`);
+        const tr = tbody.lastElementChild;
+        config.colunas.forEach((coluna, idx) => {
+          const campoEl = tr.querySelector(`.${coluna.classe}`);
+          if (!campoEl) return;
+          const valorBruto = (campos[idx] || "").trim();
+          campoEl.value = coluna.numero ? parsarNumeroPT(valorBruto) : valorBruto;
+        });
+        importadas++;
+      });
+      alert(`${importadas} linha(s) importada(s) para a tabela.`);
+    };
+    leitor.readAsText(ficheiro, "UTF-8");
   };
 
   // Dados de uma declaração importada que a interface ainda não sabe editar
