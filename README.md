@@ -188,10 +188,16 @@ regenerar o `simulador-irs.html`.
   campo de opção do Quadro 9.2C é exportado com a tag "AnexoJq092B01" — continuação da
   numeração de campos do Quadro 9.2B, e não "092C01" como seria de esperar pelo número do
   quadro nas instruções — e que o Quadro 9.4A usa "CodPaisFonte" em vez de "CodPais" como
-  nos restantes sub-quadros. Este anexo espelha as categorias A/H/B/F/E/G do território
-  português, mas para rendimentos obtidos fora de Portugal — tem 11 quadros; os Quadros 10
-  e 11 (rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface
-  própria.
+  nos restantes sub-quadros; e Quadro 11 completo (contas de depósito/títulos abertas em
+  instituição financeira não residente em Portugal — art.º 63.º-A n.ºs 8/9 LGT) — Tabela 1
+  (identificação por IBAN, até 34 carateres, e BIC, até 11 carateres) e Tabela 2 (outro
+  número de identificação, quando a conta não pode ser identificada por IBAN nem BIC). Nomes
+  de campo confirmados contra um exemplo real. Este anexo espelha as categorias A/H/B/F/E/G
+  do território português, mas para rendimentos obtidos fora de Portugal — tem 11 quadros;
+  o Quadro 10 (rendimentos de anos anteriores) ainda não tem interface própria — o exemplo
+  disponível tem esse quadro vazio, sem nomes de campo para confirmar (ao contrário dos
+  restantes quadros do Anexo J, onde cada campo foi confirmado contra dados reais antes de
+  implementar).
 - Cálculo: Categoria A/H (dedução específica só quando há rendimento dessa categoria) +
   Categoria B em regime simplificado (coeficientes do art.º 31.º do CIRS, e o "acréscimo
   ao rendimento" quando as despesas comprovadas não atingem 15% dos rendimentos sujeitos
@@ -228,9 +234,9 @@ regenerar o `simulador-irs.html`.
   fora dos separadores.
 
 A estrutura XML dos Anexos G1, L, SS ainda **não** está mapeada em detalhe — são emitidos
-apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
-10-11 do Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H
-(os Anexos G e J, Quadros 3A/4/5/6/7/8/9, já estão mapeados). Ao **importar** uma declaração que
+apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica ao Quadro 10 do
+Anexo J, aos Quadros 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H (os
+Anexos G e J, Quadros 3A/4/5/6/7/8/9/11, já estão mapeados). Ao **importar** uma declaração que
 já tenha dados nessas secções, esses dados são preservados tal como estavam (mas ainda não
 podem ser vistos/editados na interface) e mantidos ao exportar de novo — para não haver
 perda de informação.
@@ -276,9 +282,12 @@ perda de informação.
    próxima ronda). Cada anexo novo por implementar do zero (G1, L, SS) vai precisar de um
    exemplo XML preenchido + as respetivas instruções de preenchimento, tal como foi feito
    para os Anexos A, B, E, G, H e J.
-6. **Anexo J — Quadros 10 e 11** (rendimentos de anos anteriores, contas no
-   estrangeiro) — já tenho as instruções e um exemplo preenchido, falta implementar. Nenhum
-   quadro entra ainda na estimativa (nem sequer os Quadros 4/5/6/7/8/9, já mapeados) — o
+6. **Anexo J — Quadro 10** (rendimentos de anos anteriores incluídos nos Quadros 4, 5, 6,
+   7, 8 ou 9.1B, regime do art.º 74.º CIRS) — tenho as instruções, mas o exemplo disponível
+   tem este quadro vazio, sem nomes de campo para confirmar; falta um exemplo preenchido
+   antes de implementar (o Quadro 11, puramente informativo — identificação de contas no
+   estrangeiro, sem valores — já está mapeado e não tem este problema). Nenhum quadro do
+   Anexo J entra ainda na estimativa (nem sequer os Quadros 4/5/6/7/8/9, já mapeados) — o
    crédito de imposto por dupla tributação internacional (art.º 81.º CIRS) também ainda não
    está implementado. O Quadro 5A (código H03 — pensões de alimentos) e o Quadro 7B
    (rendimentos prediais) têm taxas autónomas confirmadas (20% e 28%, respetivamente, art.º

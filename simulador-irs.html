@@ -1011,11 +1011,11 @@ indicares, assume-se o escalão mais baixo.</small></p>
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
   (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
   (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B), o Quadro 7
-  (prediais, Categoria F), o Quadro 8 (capitais, Categoria E) e o Quadro 9 (mais-valias e
-  outros incrementos patrimoniais, Categoria G) — nomes de campo confirmados contra um
-  exemplo real. Os Quadros 10 e 11 (rendimentos de anos anteriores, contas no estrangeiro)
-  ainda não têm interface própria; se importares uma declaração com dados nesses quadros,
-  ficam preservados tal como estavam.
+  (prediais, Categoria F), o Quadro 8 (capitais, Categoria E), o Quadro 9 (mais-valias e
+  outros incrementos patrimoniais, Categoria G) e o Quadro 11 (contas no estrangeiro) —
+  nomes de campo confirmados contra um exemplo real. O Quadro 10 (rendimentos de anos
+  anteriores) ainda não tem interface própria; se importares uma declaração com dados
+  nesse quadro, ficam preservados tal como estavam.
 </p>
 
 <h3>Identificação do titular do rendimento (Quadro 3A)</h3>
@@ -1371,6 +1371,27 @@ indicares, assume-se o escalão mais baixo.</small></p>
     <select id="aj094bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
   </div>
 </div>
+
+<h2>Quadro 11 — Contas no estrangeiro</h2>
+<p class="aviso-topo">
+  Contas de depósito ou de títulos abertas em instituição financeira não residente em
+  Portugal, ou em sucursal fora de Portugal de instituição financeira residente, em nome do
+  titular do Quadro 3A ou de que seja beneficiário/autorizado a movimentar (art.º 63.º-A
+  n.ºs 8/9 da LGT).
+</p>
+<h3>Identificação por IBAN/BIC (Tabela 1)</h3>
+<table id="tabelaAnexoJ11T01">
+  <thead><tr><th>IBAN (máx. 34 carateres)</th><th>BIC (máx. 11 carateres)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ11T01()">+ Adicionar</button>
+
+<h3>Outra identificação, quando não há IBAN nem BIC (Tabela 2)</h3>
+<table id="tabelaAnexoJ11T02">
+  <thead><tr><th>Outro número de identificação</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ11T02()">+ Adicionar</button>
 </div>
 
   </div>
@@ -3663,13 +3684,44 @@ function temDadosQuadro09AnexoJ(q09) {
     (q09.q94a && q09.q94a.length > 0) || q09.optaEnglobamento94 !== undefined;
 }
 
+// Anexo J, Quadro 11 (contas de depósito ou de títulos abertas em instituição financeira
+// não residente, ou em sucursal fora de Portugal de instituição financeira residente —
+// art.º 63.º-A n.os 8/9 LGT). Tabela 1 identifica as contas por IBAN/BIC; a Tabela 2 é usada
+// quando a conta não pode ser identificada por IBAN nem BIC. Nomes de campo confirmados
+// contra um exemplo real.
+function buildQuadro11T01AnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({ Iban: l.iban, Bic: l.bic }));
+  return listaComLinhas("AnexoJq11T01", campos);
+}
+
+function buildQuadro11T02AnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({ OutrosNumIdentificacao: l.outrosNumIdentificacao }));
+  return listaComLinhas("AnexoJq11T02", campos);
+}
+
+function buildQuadro11AnexoJ(q11) {
+  if (!q11) return `<Quadro11/>`;
+  return `<Quadro11>` +
+    buildQuadro11T01AnexoJ(q11.contasIbanBic || []) +
+    buildQuadro11T02AnexoJ(q11.outrasContas || []) +
+    `</Quadro11>`;
+}
+
+function temDadosQuadro11AnexoJ(q11) {
+  if (!q11) return false;
+  return (q11.contasIbanBic && q11.contasIbanBic.length > 0) || (q11.outrasContas && q11.outrasContas.length > 0);
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
 // empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
-// implementados, com nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
-// (rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
-// ficam preservados em passthrough quando importados.
+// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
+// Quadro 11 (contas no estrangeiro) implementados, com nomes de campo confirmados contra um
+// exemplo real. O Quadro 10 (rendimentos de anos anteriores) ainda não tem interface
+// própria — fica preservado em passthrough quando importado; o exemplo disponível tem esse
+// quadro vazio, sem nomes de campo para confirmar.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -3694,8 +3746,8 @@ function buildAnexoJ(model) {
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
   const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
   const quadro09 = temDadosQuadro09AnexoJ(j.quadro09) ? buildQuadro09AnexoJ(j.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
-  const quadrosRestantes = ["Quadro10", "Quadro11"]
-    .map(q => pass[q] || `<${q}/>`).join("");
+  const quadro10 = pass.Quadro10 || `<Quadro10/>`;
+  const quadro11 = temDadosQuadro11AnexoJ(j.quadro11) ? buildQuadro11AnexoJ(j.quadro11) : (pass.Quadro11 || `<Quadro11/>`);
 
   return `<AnexoJ id="${esc(nifA)}">` +
     `<Quadro02>${el("AnexoJq02C01", ano)}</Quadro02>` +
@@ -3706,7 +3758,8 @@ function buildAnexoJ(model) {
     quadro07 +
     quadro08 +
     quadro09 +
-    quadrosRestantes +
+    quadro10 +
+    quadro11 +
     `</AnexoJ>`;
 }
 
@@ -4762,12 +4815,33 @@ function parseQuadro09AnexoJ(q09) {
   };
 }
 
+// Anexo J, Quadro 11 (contas de depósito/títulos abertas em instituição financeira no
+// estrangeiro). Tabela 1 (IBAN/BIC) e Tabela 2 (outro número de identificação, quando a
+// conta não pode ser identificada por IBAN nem BIC). Nomes de campo confirmados contra um
+// exemplo real.
+function parseQuadro11T01AnexoJ(q11) {
+  return parseLinhasGenerico(filho(q11, "AnexoJq11T01")).map(l => ({ iban: l.Iban, bic: l.Bic }));
+}
+
+function parseQuadro11T02AnexoJ(q11) {
+  return parseLinhasGenerico(filho(q11, "AnexoJq11T02")).map(l => ({ outrosNumIdentificacao: l.OutrosNumIdentificacao }));
+}
+
+function parseQuadro11AnexoJ(q11) {
+  if (!temConteudo(q11)) return undefined;
+  const contasIbanBic = parseQuadro11T01AnexoJ(q11);
+  const outrasContas = parseQuadro11T02AnexoJ(q11);
+  if (!contasIbanBic.length && !outrasContas.length) return undefined;
+  return { contasIbanBic, outrasContas };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
 // empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
-// implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
-// (rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
+// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
+// Quadro 11 (contas no estrangeiro) implementados, nomes de campo confirmados contra um
+// exemplo real. O Quadro 10 (rendimentos de anos anteriores) fica preservado em
+// passthrough — o exemplo disponível tem esse quadro vazio, sem nomes de campo a confirmar.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
@@ -4777,6 +4851,7 @@ function parseAnexoJ(anexoJ) {
   const q07 = filho(anexoJ, "Quadro07");
   const q08 = filho(anexoJ, "Quadro08");
   const q09 = filho(anexoJ, "Quadro09");
+  const q11 = filho(anexoJ, "Quadro11");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
@@ -4787,6 +4862,7 @@ function parseAnexoJ(anexoJ) {
   const quadro07 = parseQuadro07AnexoJ(q07);
   const quadro08 = parseQuadro08AnexoJ(q08);
   const quadro09 = parseQuadro09AnexoJ(q09);
+  const quadro11 = parseQuadro11AnexoJ(q11);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
@@ -4795,14 +4871,12 @@ function parseAnexoJ(anexoJ) {
   if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !quadro08) passthrough.Quadro08 = serializar(q08);
   if (temConteudo(q09) && !quadro09) passthrough.Quadro09 = serializar(q09);
-  for (const i of [10, 11]) {
-    const numero = String(i).padStart(2, "0");
-    const elQ = filho(anexoJ, `Quadro${numero}`);
-    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
-  }
+  if (temConteudo(q11) && !quadro11) passthrough.Quadro11 = serializar(q11);
+  const q10 = filho(anexoJ, "Quadro10");
+  if (temConteudo(q10)) passthrough.Quadro10 = serializar(q10);
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }
@@ -6950,6 +7024,40 @@ if (typeof module !== "undefined" && module.exports) {
     }));
   }
 
+  window.adicionarLinhaAnexoJ11T01 = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ11T01 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj11t01-iban" size="34" maxlength="34"></td>
+      <td><input class="aj11t01-bic" size="11" maxlength="11"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro11T01AnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ11T01 tbody tr")].map(tr => ({
+      iban: tr.querySelector(".aj11t01-iban").value || undefined,
+      bic: tr.querySelector(".aj11t01-bic").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ11T02 = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ11T02 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj11t02-outronum" size="20"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro11T02AnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ11T02 tbody tr")].map(tr => ({
+      outrosNumIdentificacao: tr.querySelector(".aj11t02-outronum").value || undefined
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -7021,10 +7129,15 @@ if (typeof module !== "undefined" && module.exports) {
       optaEnglobamento92, pagamentosPorConta93, q94a, optaEnglobamento94
     } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09;
+    const contasIbanBic = lerQuadro11T01AnexoJ();
+    const outrasContas = lerQuadro11T02AnexoJ();
+    const temQuadro11 = contasIbanBic.length || outrasContas.length;
+    const quadro11 = temQuadro11 ? { contasIbanBic, outrasContas } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 };
   }
 
   function lerDespesasEFatura() {
@@ -7870,6 +7983,8 @@ if (typeof module !== "undefined" && module.exports) {
       document.getElementById("aj093PagamentosConta").value = "";
       document.querySelector("#tabelaAnexoJ094A tbody").innerHTML = "";
       document.getElementById("aj094bOptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoJ11T01 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ11T02 tbody").innerHTML = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -8080,6 +8195,20 @@ if (typeof module !== "undefined" && module.exports) {
           if (q9.optaEnglobamento94 !== undefined) {
             document.getElementById("aj094bOptaEnglobamento").value = q9.optaEnglobamento94 ? "S" : "N";
           }
+        }
+        if (j.quadro11) {
+          const q11 = j.quadro11;
+          (q11.contasIbanBic || []).forEach(l => {
+            adicionarLinhaAnexoJ11T01();
+            const tr = document.querySelector("#tabelaAnexoJ11T01 tbody tr:last-child");
+            tr.querySelector(".aj11t01-iban").value = l.iban || "";
+            tr.querySelector(".aj11t01-bic").value = l.bic || "";
+          });
+          (q11.outrasContas || []).forEach(l => {
+            adicionarLinhaAnexoJ11T02();
+            const tr = document.querySelector("#tabelaAnexoJ11T02 tbody tr:last-child");
+            tr.querySelector(".aj11t02-outronum").value = l.outrosNumIdentificacao || "";
+          });
         }
       }
 

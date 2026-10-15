@@ -990,12 +990,33 @@ function parseQuadro09AnexoJ(q09) {
   };
 }
 
+// Anexo J, Quadro 11 (contas de depósito/títulos abertas em instituição financeira no
+// estrangeiro). Tabela 1 (IBAN/BIC) e Tabela 2 (outro número de identificação, quando a
+// conta não pode ser identificada por IBAN nem BIC). Nomes de campo confirmados contra um
+// exemplo real.
+function parseQuadro11T01AnexoJ(q11) {
+  return parseLinhasGenerico(filho(q11, "AnexoJq11T01")).map(l => ({ iban: l.Iban, bic: l.Bic }));
+}
+
+function parseQuadro11T02AnexoJ(q11) {
+  return parseLinhasGenerico(filho(q11, "AnexoJq11T02")).map(l => ({ outrosNumIdentificacao: l.OutrosNumIdentificacao }));
+}
+
+function parseQuadro11AnexoJ(q11) {
+  if (!temConteudo(q11)) return undefined;
+  const contasIbanBic = parseQuadro11T01AnexoJ(q11);
+  const outrasContas = parseQuadro11T02AnexoJ(q11);
+  if (!contasIbanBic.length && !outrasContas.length) return undefined;
+  return { contasIbanBic, outrasContas };
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
 // empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
-// implementados, nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
-// (rendimentos de anos anteriores, contas no estrangeiro) ficam preservados em passthrough.
+// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
+// Quadro 11 (contas no estrangeiro) implementados, nomes de campo confirmados contra um
+// exemplo real. O Quadro 10 (rendimentos de anos anteriores) fica preservado em
+// passthrough — o exemplo disponível tem esse quadro vazio, sem nomes de campo a confirmar.
 function parseAnexoJ(anexoJ) {
   if (!anexoJ) return { anexoJ: undefined, anexoJPassthrough: {} };
   const q03 = filho(anexoJ, "Quadro03");
@@ -1005,6 +1026,7 @@ function parseAnexoJ(anexoJ) {
   const q07 = filho(anexoJ, "Quadro07");
   const q08 = filho(anexoJ, "Quadro08");
   const q09 = filho(anexoJ, "Quadro09");
+  const q11 = filho(anexoJ, "Quadro11");
 
   const titularNif = texto(q03, "AnexoJq03C03");
   const nacionalidades = [texto(q03, "AnexoJq03C04"), texto(q03, "AnexoJq03C05"), texto(q03, "AnexoJq03C06")]
@@ -1015,6 +1037,7 @@ function parseAnexoJ(anexoJ) {
   const quadro07 = parseQuadro07AnexoJ(q07);
   const quadro08 = parseQuadro08AnexoJ(q08);
   const quadro09 = parseQuadro09AnexoJ(q09);
+  const quadro11 = parseQuadro11AnexoJ(q11);
 
   const passthrough = {};
   if (temConteudo(q04) && !quadro04) passthrough.Quadro04 = serializar(q04);
@@ -1023,14 +1046,12 @@ function parseAnexoJ(anexoJ) {
   if (temConteudo(q07) && !quadro07) passthrough.Quadro07 = serializar(q07);
   if (temConteudo(q08) && !quadro08) passthrough.Quadro08 = serializar(q08);
   if (temConteudo(q09) && !quadro09) passthrough.Quadro09 = serializar(q09);
-  for (const i of [10, 11]) {
-    const numero = String(i).padStart(2, "0");
-    const elQ = filho(anexoJ, `Quadro${numero}`);
-    if (temConteudo(elQ)) passthrough[`Quadro${numero}`] = serializar(elQ);
-  }
+  if (temConteudo(q11) && !quadro11) passthrough.Quadro11 = serializar(q11);
+  const q10 = filho(anexoJ, "Quadro10");
+  if (temConteudo(q10)) passthrough.Quadro10 = serializar(q10);
 
-  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09)
-    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 } : undefined;
+  const anexoJModel = (titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11)
+    ? { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 } : undefined;
 
   return { anexoJ: anexoJModel, anexoJPassthrough: passthrough };
 }

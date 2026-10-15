@@ -1011,11 +1011,11 @@ indicares, assume-se o escalão mais baixo.</small></p>
   para rendimentos obtidos fora de Portugal). Por agora estão implementados o Quadro 3A
   (identificação do titular), o Quadro 4 (trabalho dependente, Categoria A), o Quadro 5
   (pensões, Categoria H), o Quadro 6 (empresariais/profissionais, Categoria B), o Quadro 7
-  (prediais, Categoria F), o Quadro 8 (capitais, Categoria E) e o Quadro 9 (mais-valias e
-  outros incrementos patrimoniais, Categoria G) — nomes de campo confirmados contra um
-  exemplo real. Os Quadros 10 e 11 (rendimentos de anos anteriores, contas no estrangeiro)
-  ainda não têm interface própria; se importares uma declaração com dados nesses quadros,
-  ficam preservados tal como estavam.
+  (prediais, Categoria F), o Quadro 8 (capitais, Categoria E), o Quadro 9 (mais-valias e
+  outros incrementos patrimoniais, Categoria G) e o Quadro 11 (contas no estrangeiro) —
+  nomes de campo confirmados contra um exemplo real. O Quadro 10 (rendimentos de anos
+  anteriores) ainda não tem interface própria; se importares uma declaração com dados
+  nesse quadro, ficam preservados tal como estavam.
 </p>
 
 <h3>Identificação do titular do rendimento (Quadro 3A)</h3>
@@ -1371,6 +1371,27 @@ indicares, assume-se o escalão mais baixo.</small></p>
     <select id="aj094bOptaEnglobamento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select>
   </div>
 </div>
+
+<h2>Quadro 11 — Contas no estrangeiro</h2>
+<p class="aviso-topo">
+  Contas de depósito ou de títulos abertas em instituição financeira não residente em
+  Portugal, ou em sucursal fora de Portugal de instituição financeira residente, em nome do
+  titular do Quadro 3A ou de que seja beneficiário/autorizado a movimentar (art.º 63.º-A
+  n.ºs 8/9 da LGT).
+</p>
+<h3>Identificação por IBAN/BIC (Tabela 1)</h3>
+<table id="tabelaAnexoJ11T01">
+  <thead><tr><th>IBAN (máx. 34 carateres)</th><th>BIC (máx. 11 carateres)</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ11T01()">+ Adicionar</button>
+
+<h3>Outra identificação, quando não há IBAN nem BIC (Tabela 2)</h3>
+<table id="tabelaAnexoJ11T02">
+  <thead><tr><th>Outro número de identificação</th><th></th></tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaAnexoJ11T02()">+ Adicionar</button>
 </div>
 
   </div>
@@ -3318,6 +3339,40 @@ indicares, assume-se o escalão mais baixo.</small></p>
     }));
   }
 
+  window.adicionarLinhaAnexoJ11T01 = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ11T01 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj11t01-iban" size="34" maxlength="34"></td>
+      <td><input class="aj11t01-bic" size="11" maxlength="11"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro11T01AnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ11T01 tbody tr")].map(tr => ({
+      iban: tr.querySelector(".aj11t01-iban").value || undefined,
+      bic: tr.querySelector(".aj11t01-bic").value || undefined
+    }));
+  }
+
+  window.adicionarLinhaAnexoJ11T02 = function () {
+    const tbody = document.querySelector("#tabelaAnexoJ11T02 tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="aj11t02-outronum" size="20"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerQuadro11T02AnexoJ() {
+    return [...document.querySelectorAll("#tabelaAnexoJ11T02 tbody tr")].map(tr => ({
+      outrosNumIdentificacao: tr.querySelector(".aj11t02-outronum").value || undefined
+    }));
+  }
+
   function lerAnexoJ() {
     const titularNif = document.getElementById("aj03Titular").value || undefined;
     const nacionalidades = [
@@ -3389,10 +3444,15 @@ indicares, assume-se o escalão mais baixo.</small></p>
       optaEnglobamento92, pagamentosPorConta93, q94a, optaEnglobamento94
     } : undefined;
 
-    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09;
+    const contasIbanBic = lerQuadro11T01AnexoJ();
+    const outrasContas = lerQuadro11T02AnexoJ();
+    const temQuadro11 = contasIbanBic.length || outrasContas.length;
+    const quadro11 = temQuadro11 ? { contasIbanBic, outrasContas } : undefined;
+
+    const temDados = titularNif || nacionalidades.length || quadro04 || quadro05 || quadro06 || quadro07 || quadro08 || quadro09 || quadro11;
     if (!temDados) return undefined;
 
-    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09 };
+    return { titularNif, nacionalidades, quadro04, quadro05, quadro06, quadro07, quadro08, quadro09, quadro11 };
   }
 
   function lerDespesasEFatura() {
@@ -4238,6 +4298,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
       document.getElementById("aj093PagamentosConta").value = "";
       document.querySelector("#tabelaAnexoJ094A tbody").innerHTML = "";
       document.getElementById("aj094bOptaEnglobamento").value = "";
+      document.querySelector("#tabelaAnexoJ11T01 tbody").innerHTML = "";
+      document.querySelector("#tabelaAnexoJ11T02 tbody").innerHTML = "";
 
       if (dados.anexoJ) {
         const j = dados.anexoJ;
@@ -4448,6 +4510,20 @@ indicares, assume-se o escalão mais baixo.</small></p>
           if (q9.optaEnglobamento94 !== undefined) {
             document.getElementById("aj094bOptaEnglobamento").value = q9.optaEnglobamento94 ? "S" : "N";
           }
+        }
+        if (j.quadro11) {
+          const q11 = j.quadro11;
+          (q11.contasIbanBic || []).forEach(l => {
+            adicionarLinhaAnexoJ11T01();
+            const tr = document.querySelector("#tabelaAnexoJ11T01 tbody tr:last-child");
+            tr.querySelector(".aj11t01-iban").value = l.iban || "";
+            tr.querySelector(".aj11t01-bic").value = l.bic || "";
+          });
+          (q11.outrasContas || []).forEach(l => {
+            adicionarLinhaAnexoJ11T02();
+            const tr = document.querySelector("#tabelaAnexoJ11T02 tbody tr:last-child");
+            tr.querySelector(".aj11t02-outronum").value = l.outrosNumIdentificacao || "";
+          });
         }
       }
 

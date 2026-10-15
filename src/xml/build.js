@@ -1585,13 +1585,44 @@ function temDadosQuadro09AnexoJ(q09) {
     (q09.q94a && q09.q94a.length > 0) || q09.optaEnglobamento94 !== undefined;
 }
 
+// Anexo J, Quadro 11 (contas de depósito ou de títulos abertas em instituição financeira
+// não residente, ou em sucursal fora de Portugal de instituição financeira residente —
+// art.º 63.º-A n.os 8/9 LGT). Tabela 1 identifica as contas por IBAN/BIC; a Tabela 2 é usada
+// quando a conta não pode ser identificada por IBAN nem BIC. Nomes de campo confirmados
+// contra um exemplo real.
+function buildQuadro11T01AnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({ Iban: l.iban, Bic: l.bic }));
+  return listaComLinhas("AnexoJq11T01", campos);
+}
+
+function buildQuadro11T02AnexoJ(linhas) {
+  if (!linhas || !linhas.length) return "";
+  const campos = linhas.map(l => ({ OutrosNumIdentificacao: l.outrosNumIdentificacao }));
+  return listaComLinhas("AnexoJq11T02", campos);
+}
+
+function buildQuadro11AnexoJ(q11) {
+  if (!q11) return `<Quadro11/>`;
+  return `<Quadro11>` +
+    buildQuadro11T01AnexoJ(q11.contasIbanBic || []) +
+    buildQuadro11T02AnexoJ(q11.outrasContas || []) +
+    `</Quadro11>`;
+}
+
+function temDadosQuadro11AnexoJ(q11) {
+  if (!q11) return false;
+  return (q11.contasIbanBic && q11.contasIbanBic.length > 0) || (q11.outrasContas && q11.outrasContas.length > 0);
+}
+
 // Anexo J (rendimentos obtidos no estrangeiro): Quadro 3A (identificação do titular),
 // Quadro 4 (categoria A), Quadro 5 (categoria H — pensões), Quadro 6 (categoria B —
 // empresariais/profissionais), Quadro 7 (categoria F — prediais), Quadro 8 (categoria E —
-// capitais) e Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais)
-// implementados, com nomes de campo confirmados contra um exemplo real. Os Quadros 10 e 11
-// (rendimentos de anos anteriores, contas no estrangeiro) ainda não têm interface própria —
-// ficam preservados em passthrough quando importados.
+// capitais), Quadro 9 (categoria G — mais-valias e outros incrementos patrimoniais) e
+// Quadro 11 (contas no estrangeiro) implementados, com nomes de campo confirmados contra um
+// exemplo real. O Quadro 10 (rendimentos de anos anteriores) ainda não tem interface
+// própria — fica preservado em passthrough quando importado; o exemplo disponível tem esse
+// quadro vazio, sem nomes de campo para confirmar.
 function buildAnexoJ(model) {
   const { ano, nifA, nifB, tributacaoConjunta } = model.agregado;
   const j = model.anexoJ || {};
@@ -1616,8 +1647,8 @@ function buildAnexoJ(model) {
   const quadro07 = temDadosQuadro07AnexoJ(j.quadro07) ? buildQuadro07AnexoJ(j.quadro07) : (pass.Quadro07 || `<Quadro07/>`);
   const quadro08 = temDadosQuadro08AnexoJ(j.quadro08) ? buildQuadro08AnexoJ(j.quadro08) : (pass.Quadro08 || `<Quadro08/>`);
   const quadro09 = temDadosQuadro09AnexoJ(j.quadro09) ? buildQuadro09AnexoJ(j.quadro09) : (pass.Quadro09 || `<Quadro09/>`);
-  const quadrosRestantes = ["Quadro10", "Quadro11"]
-    .map(q => pass[q] || `<${q}/>`).join("");
+  const quadro10 = pass.Quadro10 || `<Quadro10/>`;
+  const quadro11 = temDadosQuadro11AnexoJ(j.quadro11) ? buildQuadro11AnexoJ(j.quadro11) : (pass.Quadro11 || `<Quadro11/>`);
 
   return `<AnexoJ id="${esc(nifA)}">` +
     `<Quadro02>${el("AnexoJq02C01", ano)}</Quadro02>` +
@@ -1628,7 +1659,8 @@ function buildAnexoJ(model) {
     quadro07 +
     quadro08 +
     quadro09 +
-    quadrosRestantes +
+    quadro10 +
+    quadro11 +
     `</AnexoJ>`;
 }
 
