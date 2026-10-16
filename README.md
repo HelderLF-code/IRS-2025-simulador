@@ -269,12 +269,20 @@ regenerar o `simulador-irs.html`.
 - **Modelos Excel (.xlsx) para preencher linhas fora da aplicação**: em tabelas
   selecionadas, os botões "Descarregar modelo (Excel)" / "Importar Excel preenchido"
   permitem descarregar um ficheiro `.xlsx` real com os cabeçalhos da tabela e, nas colunas
-  de código (ex: código de rendimento, titular, tipo de imóvel), uma lista pendente
-  (dropdown) com os valores válidos — construída a partir dos mesmos `<datalist>` já
-  usados na interface, para nunca haver duas fontes de verdade diferentes para os mesmos
+  de código (ex: código de rendimento, titular, tipo de imóvel, país da fonte), uma lista
+  pendente (dropdown) com os valores válidos — construída a partir dos mesmos `<datalist>`
+  já usados na interface, para nunca haver duas fontes de verdade diferentes para os mesmos
   códigos. Depois de preenchido em Excel (ou LibreOffice Calc, Google Sheets, etc.) e
   voltado a importar, as linhas aparecem automaticamente na tabela, sem ter de digitar uma
   a uma na aplicação.
+
+  As 27 colunas de país (código do país da fonte/contraparte/entidade gestora, nos Anexos
+  G, H, J e L) têm uma lista pendente comum (`<datalist id="listaPaises">`, 244 países,
+  territórios e regiões) construída a partir da Tabela X — a lista oficial de países e
+  respetivos códigos que consta no final das instruções de preenchimento dos Anexos G, J e
+  L — e que passou também a estar disponível diretamente na interface (não só no modelo
+  Excel), ao contrário dos outros campos de código que já tinham `<datalist>` próprio desde
+  o início.
 
   O ficheiro `.xlsx` é construído **à mão, sem bibliotecas externas** (`index.html`,
   secção "Modelos Excel"): é tecnicamente um ZIP com XML lá dentro, escrito byte a byte

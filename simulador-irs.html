@@ -58,6 +58,253 @@
 
 <input type="file" id="csvImportarGenerico" accept=".xlsx" style="display:none" onchange="processarImportacaoXLSX()">
 
+<datalist id="listaPaises">
+  <option value="4">4 — Afeganistão</option>
+  <option value="710">710 — África do Sul</option>
+  <option value="248">248 — Alanda</option>
+  <option value="8">8 — Albânia</option>
+  <option value="276">276 — Alemanha</option>
+  <option value="20">20 — Andorra</option>
+  <option value="24">24 — Angola</option>
+  <option value="660">660 — Anguilla</option>
+  <option value="807">807 — Antiga República Jugoslava da Macedónia</option>
+  <option value="28">28 — Antígua e Barbuda</option>
+  <option value="682">682 — Arábia Saudita</option>
+  <option value="12">12 — Argélia</option>
+  <option value="32">32 — Argentina</option>
+  <option value="51">51 — Arménia</option>
+  <option value="533">533 — Aruba</option>
+  <option value="36">36 — Austrália</option>
+  <option value="40">40 — Áustria</option>
+  <option value="31">31 — Azerbaijão</option>
+  <option value="44">44 — Baamas</option>
+  <option value="50">50 — Bangladesh</option>
+  <option value="52">52 — Barbados</option>
+  <option value="48">48 — Barém</option>
+  <option value="56">56 — Bélgica</option>
+  <option value="84">84 — Belize</option>
+  <option value="204">204 — Benim</option>
+  <option value="60">60 — Bermudas</option>
+  <option value="112">112 — Bielorrússia</option>
+  <option value="68">68 — Bolívia</option>
+  <option value="535">535 — Bonaire, Saint Eustatius e Saba</option>
+  <option value="70">70 — Bósnia-Herzegovina</option>
+  <option value="72">72 — Botsuana</option>
+  <option value="76">76 — Brasil</option>
+  <option value="96">96 — Brunei</option>
+  <option value="100">100 — Bulgária</option>
+  <option value="854">854 — Burquina Faso</option>
+  <option value="108">108 — Burundi</option>
+  <option value="64">64 — Butão</option>
+  <option value="132">132 — Cabo Verde</option>
+  <option value="120">120 — Camarões</option>
+  <option value="116">116 — Camboja</option>
+  <option value="124">124 — Canadá</option>
+  <option value="634">634 — Catar</option>
+  <option value="398">398 — Cazaquistão</option>
+  <option value="148">148 — Chade</option>
+  <option value="152">152 — Chile</option>
+  <option value="156">156 — China</option>
+  <option value="196">196 — Chipre</option>
+  <option value="170">170 — Colômbia</option>
+  <option value="174">174 — Comores</option>
+  <option value="178">178 — Congo</option>
+  <option value="408">408 — Coreia do Norte</option>
+  <option value="410">410 — Coreia do Sul</option>
+  <option value="384">384 — Costa do Marfim</option>
+  <option value="188">188 — Costa Rica</option>
+  <option value="191">191 — Croácia</option>
+  <option value="192">192 — Cuba</option>
+  <option value="531">531 — Curaçau</option>
+  <option value="208">208 — Dinamarca</option>
+  <option value="212">212 — Dominica</option>
+  <option value="818">818 — Egito</option>
+  <option value="784">784 — Emirados Árabes Unidos</option>
+  <option value="218">218 — Equador</option>
+  <option value="232">232 — Eritreia</option>
+  <option value="703">703 — Eslováquia</option>
+  <option value="705">705 — Eslovénia</option>
+  <option value="724">724 — Espanha</option>
+  <option value="275">275 — Estado da Palestina</option>
+  <option value="840">840 — Estados Unidos da América</option>
+  <option value="233">233 — Estónia</option>
+  <option value="231">231 — Etiópia</option>
+  <option value="234">234 — Faroé</option>
+  <option value="242">242 — Fiji</option>
+  <option value="608">608 — Filipinas</option>
+  <option value="246">246 — Finlândia</option>
+  <option value="250">250 — França</option>
+  <option value="266">266 — Gabão</option>
+  <option value="270">270 — Gâmbia</option>
+  <option value="288">288 — Gana</option>
+  <option value="268">268 — Geórgia</option>
+  <option value="292">292 — Gibraltar</option>
+  <option value="308">308 — Granada</option>
+  <option value="300">300 — Grécia</option>
+  <option value="304">304 — Gronelândia</option>
+  <option value="312">312 — Guadalupe</option>
+  <option value="316">316 — Guame</option>
+  <option value="320">320 — Guatemala</option>
+  <option value="831">831 — Guernesey</option>
+  <option value="328">328 — Guiana</option>
+  <option value="254">254 — Guiana Francesa</option>
+  <option value="324">324 — Guiné</option>
+  <option value="226">226 — Guiné Equatorial</option>
+  <option value="624">624 — Guiné-Bissau</option>
+  <option value="332">332 — Haiti</option>
+  <option value="340">340 — Honduras</option>
+  <option value="344">344 — Hong-Kong</option>
+  <option value="348">348 — Hungria</option>
+  <option value="887">887 — Iémen</option>
+  <option value="833">833 — Ilha de Man</option>
+  <option value="162">162 — Ilha do Natal</option>
+  <option value="574">574 — Ilha Norfolk</option>
+  <option value="980">980 — Ilha de Queshm (Irão)</option>
+  <option value="136">136 — Ilhas Caimão</option>
+  <option value="184">184 — Ilhas Cook</option>
+  <option value="166">166 — Ilhas dos Cocos</option>
+  <option value="238">238 — Ilhas Falkland (Malvinas)</option>
+  <option value="580">580 — Ilhas Marianas do Norte</option>
+  <option value="584">584 — Ilhas Marshall</option>
+  <option value="612">612 — Ilhas Pitcairn</option>
+  <option value="90">90 — Ilhas Salomão</option>
+  <option value="796">796 — Ilhas Turcas e Caicos</option>
+  <option value="92">92 — Ilhas Virgens Britânicas</option>
+  <option value="850">850 — Ilhas Virgens dos Estados Unidos</option>
+  <option value="356">356 — Índia</option>
+  <option value="360">360 — Indonésia</option>
+  <option value="364">364 — Irão</option>
+  <option value="368">368 — Iraque</option>
+  <option value="372">372 — Irlanda</option>
+  <option value="352">352 — Islândia</option>
+  <option value="376">376 — Israel</option>
+  <option value="380">380 — Itália</option>
+  <option value="388">388 — Jamaica</option>
+  <option value="392">392 — Japão</option>
+  <option value="832">832 — Jersey</option>
+  <option value="262">262 — Jibuti</option>
+  <option value="400">400 — Jordânia</option>
+  <option value="414">414 — Koweit</option>
+  <option value="981">981 — Labuán (Malásia)</option>
+  <option value="418">418 — Laos</option>
+  <option value="426">426 — Lesoto</option>
+  <option value="428">428 — Letónia</option>
+  <option value="422">422 — Líbano</option>
+  <option value="430">430 — Libéria</option>
+  <option value="434">434 — Líbia</option>
+  <option value="438">438 — Liechtenstein</option>
+  <option value="440">440 — Lituânia</option>
+  <option value="442">442 — Luxemburgo</option>
+  <option value="446">446 — Macau</option>
+  <option value="450">450 — Madagáscar</option>
+  <option value="175">175 — Maiote</option>
+  <option value="458">458 — Malásia</option>
+  <option value="454">454 — Maláui</option>
+  <option value="462">462 — Maldivas</option>
+  <option value="466">466 — Mali</option>
+  <option value="470">470 — Malta</option>
+  <option value="504">504 — Marrocos</option>
+  <option value="474">474 — Martinica</option>
+  <option value="480">480 — Maurícia</option>
+  <option value="478">478 — Mauritânia</option>
+  <option value="484">484 — México</option>
+  <option value="104">104 — Mianmar/Birmânia</option>
+  <option value="583">583 — Micronésia</option>
+  <option value="508">508 — Moçambique</option>
+  <option value="498">498 — Moldávia</option>
+  <option value="492">492 — Mónaco</option>
+  <option value="496">496 — Mongólia</option>
+  <option value="500">500 — Monserrate</option>
+  <option value="499">499 — Montenegro</option>
+  <option value="516">516 — Namíbia</option>
+  <option value="520">520 — Nauru</option>
+  <option value="524">524 — Nepal</option>
+  <option value="558">558 — Nicarágua</option>
+  <option value="562">562 — Níger</option>
+  <option value="566">566 — Nigéria</option>
+  <option value="570">570 — Niuê</option>
+  <option value="578">578 — Noruega</option>
+  <option value="540">540 — Nova Caledónia</option>
+  <option value="554">554 — Nova Zelândia</option>
+  <option value="512">512 — Omã</option>
+  <option value="528">528 — Países Baixos</option>
+  <option value="585">585 — Palau</option>
+  <option value="591">591 — Panamá</option>
+  <option value="598">598 — Papua-Nova Guiné</option>
+  <option value="586">586 — Paquistão</option>
+  <option value="600">600 — Paraguai</option>
+  <option value="604">604 — Peru</option>
+  <option value="258">258 — Polinésia Francesa</option>
+  <option value="616">616 — Polónia</option>
+  <option value="630">630 — Porto Rico</option>
+  <option value="620">620 — Portugal</option>
+  <option value="404">404 — Quénia</option>
+  <option value="417">417 — Quirguistão</option>
+  <option value="296">296 — Quiribáti</option>
+  <option value="826">826 — Reino Unido</option>
+  <option value="140">140 — República Centro-Africana</option>
+  <option value="203">203 — República Checa</option>
+  <option value="180">180 — República Democrática do Congo</option>
+  <option value="214">214 — República Dominicana</option>
+  <option value="638">638 — Reunião</option>
+  <option value="642">642 — Roménia</option>
+  <option value="646">646 — Ruanda</option>
+  <option value="643">643 — Rússia</option>
+  <option value="663">663 — Saint-Martin (Francesa)</option>
+  <option value="222">222 — Salvador</option>
+  <option value="882">882 — Samoa</option>
+  <option value="16">16 — Samoa Americana</option>
+  <option value="654">654 — Santa Helena, Ascensão e Tristão da Cunha</option>
+  <option value="662">662 — Santa Lúcia</option>
+  <option value="336">336 — Santa Sé / Estado da Cidade do Vaticano</option>
+  <option value="652">652 — São Bartolomeu</option>
+  <option value="659">659 — São Cristóvão e Neves</option>
+  <option value="674">674 — São Marinho</option>
+  <option value="666">666 — São Pedro e Miquelão</option>
+  <option value="678">678 — São Tomé e Príncipe</option>
+  <option value="670">670 — São Vicente e Granadinas</option>
+  <option value="732">732 — Sara Ocidental</option>
+  <option value="690">690 — Seicheles</option>
+  <option value="686">686 — Senegal</option>
+  <option value="694">694 — Serra Leoa</option>
+  <option value="688">688 — Sérvia</option>
+  <option value="702">702 — Singapura</option>
+  <option value="534">534 — Sint Maarten (Holandesa)</option>
+  <option value="760">760 — Síria</option>
+  <option value="706">706 — Somália</option>
+  <option value="144">144 — Sri Lanca</option>
+  <option value="748">748 — Suazilândia</option>
+  <option value="729">729 — Sudão</option>
+  <option value="728">728 — Sudão do Sul</option>
+  <option value="752">752 — Suécia</option>
+  <option value="756">756 — Suíça</option>
+  <option value="740">740 — Suriname</option>
+  <option value="744">744 — Svalbard e Jan Mayen</option>
+  <option value="764">764 — Tailândia</option>
+  <option value="158">158 — Taiwan</option>
+  <option value="762">762 — Tajiquistão</option>
+  <option value="834">834 — Tanzânia</option>
+  <option value="626">626 — Timor-Leste</option>
+  <option value="768">768 — Togo</option>
+  <option value="776">776 — Tonga</option>
+  <option value="772">772 — Toquelau</option>
+  <option value="780">780 — Trindade e Tobago</option>
+  <option value="788">788 — Tunísia</option>
+  <option value="795">795 — Turquemenistão</option>
+  <option value="792">792 — Turquia</option>
+  <option value="798">798 — Tuvalu</option>
+  <option value="804">804 — Ucrânia</option>
+  <option value="800">800 — Uganda</option>
+  <option value="858">858 — Uruguai</option>
+  <option value="860">860 — Usbequistão</option>
+  <option value="548">548 — Vanuatu</option>
+  <option value="862">862 — Venezuela</option>
+  <option value="704">704 — Vietname</option>
+  <option value="876">876 — Wallis e Futuna</option>
+  <option value="894">894 — Zâmbia</option>
+  <option value="716">716 — Zimbabué</option>
+</datalist>
+
 <div class="layout">
   <nav class="barra-secoes">
     <button type="button" class="ativo" data-secao="agregado" onclick="mostrarSecao('agregado')">Rosto</button>
@@ -413,8 +660,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB10')">Descarregar modelo (Excel)</button>
 <button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB10')">Importar Excel preenchido</button>
 <div class="row">
-  <div><label>Destino — Estado membro UE/EEE (código país) <small class="hint">(10C)</small></label><input id="anexoB10DestinoUE" type="text" size="4"></div>
-  <div><label>Destino — outro país (código) <small class="hint">(10C)</small></label><input id="anexoB10DestinoOutro" type="text" size="4"></div>
+  <div><label>Destino — Estado membro UE/EEE (código país) <small class="hint">(10C)</small></label><input id="anexoB10DestinoUE" type="text" size="4" list="listaPaises"></div>
+  <div><label>Destino — outro país (código) <small class="hint">(10C)</small></label><input id="anexoB10DestinoOutro" type="text" size="4" list="listaPaises"></div>
   <div><label>Modalidade de pagamento <small class="hint">(10C — só "imediato" confirmado num exemplo real)</small></label>
     <select id="anexoB10Modalidade">
       <option value="">(não indicado)</option>
@@ -889,8 +1136,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 
 <h4>C — Local da transferência da residência</h4>
 <div class="row">
-  <div><label>País — Estado membro UE/EEE <small class="hint">(C09)</small></label><input id="ag12PaisUE" size="4"></div>
-  <div><label>País — outro território <small class="hint">(C10)</small></label><input id="ag12PaisOutro" size="4"></div>
+  <div><label>País — Estado membro UE/EEE <small class="hint">(C09)</small></label><input id="ag12PaisUE" size="4" list="listaPaises"></div>
+  <div><label>País — outro território <small class="hint">(C10)</small></label><input id="ag12PaisOutro" size="4" list="listaPaises"></div>
   <div><label>Modalidade de pagamento <small class="hint">(B11/12/13 — a confirmar)</small></label>
     <select id="ag12Modalidade"><option value="">-</option><option value="1">1 — Imediato</option><option value="2">2 — Diferido</option><option value="3">3 — Fracionado</option></select>
   </div>
@@ -1194,7 +1441,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <div><label>Ano de conclusão do ciclo de estudos <small class="hint">(492a)</small></label><input id="aj04eAnoConclusao" type="number" size="6"></div>
   <div><label>Nível de qualificação QNQ <small class="hint">(492b)</small></label><input id="aj04eNivelQNQ" size="4" list="listaNivelQNQAnexoJ"></div>
   <div><label>NIF do estabelecimento de ensino (PT) <small class="hint">(492c)</small></label><input id="aj04eNifEstabelecimento" size="10"></div>
-  <div><label>Código do país (se estudos concluídos fora de Portugal) <small class="hint">(492d)</small></label><input id="aj04eCodPais" size="4"></div>
+  <div><label>Código do país (se estudos concluídos fora de Portugal) <small class="hint">(492d)</small></label><input id="aj04eCodPais" size="4" list="listaPaises"></div>
 </div>
 
 <h3>Opção pelo regime do art.º 12.º-B — IRS Jovem, anos de 2025 e seguintes (Quadro 4E.1)</h3>
@@ -6228,7 +6475,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ab07c-profissao", opcoes: { tipo: "datalist", id: "listaProfissoesDesgasteRapido" } },
         { classe: "ab07c-valor", numero: true },
         { classe: "ab07c-nifpt" },
-        { classe: "ab07c-pais" },
+        { classe: "ab07c-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ab07c-numfiscal" }
       ]
     },
@@ -6544,7 +6791,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag05a2-mes", numero: true },
         { classe: "ag05a2-valor", numero: true },
         { classe: "ag05a2-nifpt" },
-        { classe: "ag05a2-pais" },
+        { classe: "ag05a2-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ag05a2-numfiscal" },
         { classe: "ag05a2-beneficiario", opcoes: { tipo: "fixo", valores: ["A", "B"] } }
       ]
@@ -6594,7 +6841,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag09-diaaquisicao", numero: true },
         { classe: "ag09-valoraquisicao", numero: true },
         { classe: "ag09-despesas", numero: true },
-        { classe: "ag09-pais" },
+        { classe: "ag09-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ag09-respeitavm", checkbox: true }
       ]
     },
@@ -6708,7 +6955,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag13-codoperacao", opcoes: { tipo: "datalist", id: "listaCodigoOperacaoG13" } },
         { classe: "ag13-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "ag13-rendimento", numero: true },
-        { classe: "ag13-pais" }
+        { classe: "ag13-pais", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
     tabelaAnexoG14: {
@@ -6758,7 +7005,7 @@ if (typeof module !== "undefined" && module.exports) {
       colunas: [
         { classe: "ag18a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "ag18a-nifpt" },
-        { classe: "ag18a-paisgestora" },
+        { classe: "ag18a-paisgestora", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ag18a-anorealizacao", numero: true },
         { classe: "ag18a-mesrealizacao", numero: true },
         { classe: "ag18a-diarealizacao", numero: true },
@@ -6768,7 +7015,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag18a-diaaquisicao", numero: true },
         { classe: "ag18a-valoraquisicao", numero: true },
         { classe: "ag18a-despesas", numero: true },
-        { classe: "ag18a-paiscontraparte" }
+        { classe: "ag18a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
     tabelaAnexoG18B: {
@@ -6777,7 +7024,7 @@ if (typeof module !== "undefined" && module.exports) {
       colunas: [
         { classe: "ag18b-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "ag18b-nifpt" },
-        { classe: "ag18b-paisgestora" },
+        { classe: "ag18b-paisgestora", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ag18b-anorealizacao", numero: true },
         { classe: "ag18b-mesrealizacao", numero: true },
         { classe: "ag18b-diarealizacao", numero: true },
@@ -6787,7 +7034,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag18b-diaaquisicao", numero: true },
         { classe: "ag18b-valoraquisicao", numero: true },
         { classe: "ag18b-despesas", numero: true },
-        { classe: "ag18b-paiscontraparte" }
+        { classe: "ag18b-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
     tabelaAnexoG19: {
@@ -6818,7 +7065,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ah-b-importancia", numero: true },
         { classe: "ah-b-idade", numero: true },
         { classe: "ah-b-nif" },
-        { classe: "ah-b-pais" },
+        { classe: "ah-b-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ah-b-numfiscal" }
       ]
     },
@@ -6831,7 +7078,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ah-i-rendimento", numero: true },
         { classe: "ah-i-retencao", numero: true },
         { classe: "ah-i-nif" },
-        { classe: "ah-i-pais" },
+        { classe: "ah-i-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "ah-i-numfiscal" }
       ]
     },
@@ -6857,7 +7104,7 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ04A",
       colunas: [
         { classe: "aj04a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ04A" } },
-        { classe: "aj04a-pais" },
+        { classe: "aj04a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj04a-rendimento", numero: true },
         { classe: "aj04a-contribsocial", numero: true },
         { classe: "aj04a-impostoestrangeiro", numero: true },
@@ -6871,7 +7118,7 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ04C",
       colunas: [
         { classe: "aj04c-linha" },
-        { classe: "aj04c-pais" },
+        { classe: "aj04c-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj04c-diasmenor", checkbox: true },
         { classe: "aj04c-diasmaior", checkbox: true },
         { classe: "aj04c-fronteirico", checkbox: true },
@@ -6884,7 +7131,7 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ05A",
       colunas: [
         { classe: "aj05a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ05A" } },
-        { classe: "aj05a-pais" },
+        { classe: "aj05a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj05a-rendimento", numero: true },
         { classe: "aj05a-contribsocial", numero: true },
         { classe: "aj05a-impostoestrangeiro", numero: true }
@@ -6906,7 +7153,7 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ06A",
       colunas: [
         { classe: "aj06a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ06A" } },
-        { classe: "aj06a-pais" },
+        { classe: "aj06a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj06a-estabelecimento", opcoes: { tipo: "fixo", valores: ["S", "N"] } },
         { classe: "aj06a-rendimento", numero: true },
         { classe: "aj06a-contribsocial", numero: true },
@@ -6929,7 +7176,7 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ07A",
       colunas: [
         { classe: "aj07a-codigo" },
-        { classe: "aj07a-pais" },
+        { classe: "aj07a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj07a-rendimento", numero: true },
         { classe: "aj07a-impostoestrangeiro", numero: true }
       ]
@@ -6939,10 +7186,10 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ08A",
       colunas: [
         { classe: "aj08a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ08A" } },
-        { classe: "aj08a-pais" },
+        { classe: "aj08a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj08a-rendimento", numero: true },
         { classe: "aj08a-impostopaisfonte", numero: true },
-        { classe: "aj08a-paispagador" },
+        { classe: "aj08a-paispagador", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj08a-impostoretido", numero: true },
         { classe: "aj08a-nif" },
         { classe: "aj08a-retencaofonte", numero: true }
@@ -6952,7 +7199,7 @@ if (typeof module !== "undefined" && module.exports) {
       nomeFicheiro: "modelo-anexo-j091-a",
       adicionar: "adicionarLinhaAnexoJ091A",
       colunas: [
-        { classe: "aj091a-pais" },
+        { classe: "aj091a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj091a-anorealizacao", numero: true },
         { classe: "aj091a-mesrealizacao", numero: true },
         { classe: "aj091a-valorrealizacao", numero: true },
@@ -6968,7 +7215,7 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ091B",
       colunas: [
         { classe: "aj091b-codigo" },
-        { classe: "aj091b-pais" },
+        { classe: "aj091b-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj091b-rendimento", numero: true },
         { classe: "aj091b-impostoestrangeiro", numero: true }
       ]
@@ -6977,7 +7224,7 @@ if (typeof module !== "undefined" && module.exports) {
       nomeFicheiro: "modelo-anexo-j092-a",
       adicionar: "adicionarLinhaAnexoJ092A",
       colunas: [
-        { classe: "aj092a-pais" },
+        { classe: "aj092a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj092a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ092A" } },
         { classe: "aj092a-anorealizacao", numero: true },
         { classe: "aj092a-mesrealizacao", numero: true },
@@ -6989,7 +7236,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj092a-valoraquisicao", numero: true },
         { classe: "aj092a-despesas", numero: true },
         { classe: "aj092a-impostoestrangeiro", numero: true },
-        { classe: "aj092a-paiscontraparte" },
+        { classe: "aj092a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj092a-respeitavm", opcoes: { tipo: "fixo", valores: ["S", "N"] } }
       ]
     },
@@ -7006,17 +7253,17 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoJ092B",
       colunas: [
         { classe: "aj092b-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ092B" } },
-        { classe: "aj092b-pais" },
+        { classe: "aj092b-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj092b-rendimento", numero: true },
         { classe: "aj092b-impostoestrangeiro", numero: true },
-        { classe: "aj092b-paiscontraparte" }
+        { classe: "aj092b-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
     tabelaAnexoJ094A: {
       nomeFicheiro: "modelo-anexo-j094-a",
       adicionar: "adicionarLinhaAnexoJ094A",
       colunas: [
-        { classe: "aj094a-pais" },
+        { classe: "aj094a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj094a-anorealizacao", numero: true },
         { classe: "aj094a-mesrealizacao", numero: true },
         { classe: "aj094a-diarealizacao", numero: true },
@@ -7027,7 +7274,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj094a-valoraquisicao", numero: true },
         { classe: "aj094a-despesas", numero: true },
         { classe: "aj094a-impostoestrangeiro", numero: true },
-        { classe: "aj094a-paiscontraparte" }
+        { classe: "aj094a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
     tabelaAnexoJ10A: {
@@ -7130,7 +7377,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "al05a-codatividadep2010" },
         { classe: "al05a-codatividadep2019" },
         { classe: "al05a-catAouB" },
-        { classe: "al05a-pais" },
+        { classe: "al05a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "al05a-rendimento", numero: true },
         { classe: "al05a-comimposto", numero: true },
         { classe: "al05a-semimposto", checkbox: true }
@@ -7144,7 +7391,7 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "al05b-nlinha" },
         { classe: "al05b-codrendimento", opcoes: { tipo: "datalist", id: "listaCodigoRendimentoAnexoL05B" } },
         { classe: "al05b-catAouH" },
-        { classe: "al05b-pais" },
+        { classe: "al05b-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "al05b-rendimento", numero: true },
         { classe: "al05b-comimposto", numero: true },
         { classe: "al05b-semimposto", checkbox: true }
@@ -7373,7 +7620,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ab07c-profissao" size="4" list="listaProfissoesDesgasteRapido"></td>
       <td><input class="ab07c-valor" type="number" step="0.01"></td>
       <td><input class="ab07c-nifpt" size="10"></td>
-      <td><input class="ab07c-pais" size="4"></td>
+      <td><input class="ab07c-pais" size="4" list="listaPaises"></td>
       <td><input class="ab07c-numfiscal" size="14"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
@@ -7733,7 +7980,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ah-i-rendimento" type="number" step="0.01"></td>
       <td><input class="ah-i-retencao" type="number" step="0.01"></td>
       <td><input class="ah-i-nif" size="10"></td>
-      <td><input class="ah-i-pais" size="4"></td>
+      <td><input class="ah-i-pais" size="4" list="listaPaises"></td>
       <td><input class="ah-i-numfiscal" size="12"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
@@ -7760,7 +8007,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ah-b-importancia" type="number" step="0.01"></td>
       <td><input class="ah-b-idade" type="number" size="4"></td>
       <td><input class="ah-b-nif" size="10"></td>
-      <td><input class="ah-b-pais" size="4"></td>
+      <td><input class="ah-b-pais" size="4" list="listaPaises"></td>
       <td><input class="ah-b-numfiscal" size="12"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
@@ -8129,7 +8376,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ag05a2-mes" type="number" size="4"></td>
       <td><input class="ag05a2-valor" type="number" step="0.01"></td>
       <td><input class="ag05a2-nifpt" size="10"></td>
-      <td><input class="ag05a2-pais" size="4"></td>
+      <td><input class="ag05a2-pais" size="4" list="listaPaises"></td>
       <td><input class="ag05a2-numfiscal" size="14"></td>
       <td><select class="ag05a2-beneficiario"><option value="A">A</option><option value="B">B</option></select></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
@@ -8302,7 +8549,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ag13-codoperacao" size="4" list="listaCodigoOperacaoG13"></td>
       <td><select class="ag13-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
       <td><input class="ag13-rendimento" type="number" step="0.01"></td>
-      <td><input class="ag13-pais" size="4"></td>
+      <td><input class="ag13-pais" size="4" list="listaPaises"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -8340,7 +8587,7 @@ if (typeof module !== "undefined" && module.exports) {
     tr.innerHTML = `
       <td><select class="${prefixoClasse}-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
       <td><input class="${prefixoClasse}-nifpt" size="10"></td>
-      <td><input class="${prefixoClasse}-paisgestora" size="4"></td>
+      <td><input class="${prefixoClasse}-paisgestora" size="4" list="listaPaises"></td>
       <td><input class="${prefixoClasse}-anorealizacao" type="number" size="6"></td>
       <td><input class="${prefixoClasse}-mesrealizacao" type="number" size="4"></td>
       <td><input class="${prefixoClasse}-diarealizacao" type="number" size="4"></td>
@@ -8350,7 +8597,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="${prefixoClasse}-diaaquisicao" type="number" size="4"></td>
       <td><input class="${prefixoClasse}-valoraquisicao" type="number" step="0.01"></td>
       <td><input class="${prefixoClasse}-despesas" type="number" step="0.01"></td>
-      <td><input class="${prefixoClasse}-paiscontraparte" size="4"></td>
+      <td><input class="${prefixoClasse}-paiscontraparte" size="4" list="listaPaises"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     return tr;
@@ -8443,7 +8690,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ag09-diaaquisicao" type="number" size="4"></td>
       <td><input class="ag09-valoraquisicao" type="number" step="0.01"></td>
       <td><input class="ag09-despesas" type="number" step="0.01"></td>
-      <td><input class="ag09-pais" size="4"></td>
+      <td><input class="ag09-pais" size="4" list="listaPaises"></td>
       <td><input class="ag09-respeitavm" type="checkbox"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
@@ -8794,7 +9041,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj04a-codigo" size="4" list="listaCodigoAnexoJ04A"></td>
-      <td><input class="aj04a-pais" size="4"></td>
+      <td><input class="aj04a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj04a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj04a-contribsocial" type="number" step="0.01"></td>
       <td><input class="aj04a-impostoestrangeiro" type="number" step="0.01"></td>
@@ -8824,7 +9071,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj04c-linha" size="6"></td>
-      <td><input class="aj04c-pais" size="4"></td>
+      <td><input class="aj04c-pais" size="4" list="listaPaises"></td>
       <td><input class="aj04c-diasmenor" type="checkbox"></td>
       <td><input class="aj04c-diasmaior" type="checkbox"></td>
       <td><input class="aj04c-fronteirico" type="checkbox"></td>
@@ -8852,7 +9099,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj05a-codigo" size="4" list="listaCodigoAnexoJ05A"></td>
-      <td><input class="aj05a-pais" size="4"></td>
+      <td><input class="aj05a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj05a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj05a-contribsocial" type="number" step="0.01"></td>
       <td><input class="aj05a-impostoestrangeiro" type="number" step="0.01"></td>
@@ -8900,7 +9147,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj06a-codigo" size="4" list="listaCodigoAnexoJ06A"></td>
-      <td><input class="aj06a-pais" size="4"></td>
+      <td><input class="aj06a-pais" size="4" list="listaPaises"></td>
       <td><select class="aj06a-estabelecimento"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select></td>
       <td><input class="aj06a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj06a-contribsocial" type="number" step="0.01"></td>
@@ -8950,7 +9197,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj07a-codigo" size="4" value="F01"></td>
-      <td><input class="aj07a-pais" size="4"></td>
+      <td><input class="aj07a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj07a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj07a-impostoestrangeiro" type="number" step="0.01"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
@@ -8972,10 +9219,10 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj08a-codigo" size="4" list="listaCodigoAnexoJ08A"></td>
-      <td><input class="aj08a-pais" size="4"></td>
+      <td><input class="aj08a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj08a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj08a-impostopaisfonte" type="number" step="0.01"></td>
-      <td><input class="aj08a-paispagador" size="4"></td>
+      <td><input class="aj08a-paispagador" size="4" list="listaPaises"></td>
       <td><input class="aj08a-impostoretido" type="number" step="0.01"></td>
       <td><input class="aj08a-nif" size="10"></td>
       <td><input class="aj08a-retencaofonte" type="number" step="0.01"></td>
@@ -9001,7 +9248,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tbody = document.querySelector("#tabelaAnexoJ091A tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="aj091a-pais" size="4"></td>
+      <td><input class="aj091a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj091a-anorealizacao" type="number" size="6"></td>
       <td><input class="aj091a-mesrealizacao" type="number" size="4"></td>
       <td><input class="aj091a-valorrealizacao" type="number" step="0.01"></td>
@@ -9034,7 +9281,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj091b-codigo" size="4" value="G99"></td>
-      <td><input class="aj091b-pais" size="4"></td>
+      <td><input class="aj091b-pais" size="4" list="listaPaises"></td>
       <td><input class="aj091b-rendimento" type="number" step="0.01"></td>
       <td><input class="aj091b-impostoestrangeiro" type="number" step="0.01"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
@@ -9055,7 +9302,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tbody = document.querySelector("#tabelaAnexoJ092A tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="aj092a-pais" size="4"></td>
+      <td><input class="aj092a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj092a-codigo" size="4" list="listaCodigoAnexoJ092A"></td>
       <td><input class="aj092a-anorealizacao" type="number" size="6"></td>
       <td><input class="aj092a-mesrealizacao" type="number" size="4"></td>
@@ -9067,7 +9314,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj092a-valoraquisicao" type="number" step="0.01"></td>
       <td><input class="aj092a-despesas" type="number" step="0.01"></td>
       <td><input class="aj092a-impostoestrangeiro" type="number" step="0.01"></td>
-      <td><input class="aj092a-paiscontraparte" size="4"></td>
+      <td><input class="aj092a-paiscontraparte" size="4" list="listaPaises"></td>
       <td><select class="aj092a-respeitavm"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
@@ -9119,10 +9366,10 @@ if (typeof module !== "undefined" && module.exports) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="aj092b-codigo" size="4" list="listaCodigoAnexoJ092B"></td>
-      <td><input class="aj092b-pais" size="4"></td>
+      <td><input class="aj092b-pais" size="4" list="listaPaises"></td>
       <td><input class="aj092b-rendimento" type="number" step="0.01"></td>
       <td><input class="aj092b-impostoestrangeiro" type="number" step="0.01"></td>
-      <td><input class="aj092b-paiscontraparte" size="4"></td>
+      <td><input class="aj092b-paiscontraparte" size="4" list="listaPaises"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9142,7 +9389,7 @@ if (typeof module !== "undefined" && module.exports) {
     const tbody = document.querySelector("#tabelaAnexoJ094A tbody");
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><input class="aj094a-pais" size="4"></td>
+      <td><input class="aj094a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj094a-anorealizacao" type="number" size="6"></td>
       <td><input class="aj094a-mesrealizacao" type="number" size="4"></td>
       <td><input class="aj094a-diarealizacao" type="number" size="4"></td>
@@ -9153,7 +9400,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj094a-valoraquisicao" type="number" step="0.01"></td>
       <td><input class="aj094a-despesas" type="number" step="0.01"></td>
       <td><input class="aj094a-impostoestrangeiro" type="number" step="0.01"></td>
-      <td><input class="aj094a-paiscontraparte" size="4"></td>
+      <td><input class="aj094a-paiscontraparte" size="4" list="listaPaises"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9470,7 +9717,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="al05a-codatividadep2010" size="4"></td>
       <td><input class="al05a-codatividadep2019" size="6"></td>
       <td><input class="al05a-catAouB" size="2" maxlength="1"></td>
-      <td><input class="al05a-pais" size="4"></td>
+      <td><input class="al05a-pais" size="4" list="listaPaises"></td>
       <td><input class="al05a-rendimento" type="number" step="0.01"></td>
       <td><input class="al05a-comimposto" type="number" step="0.01"></td>
       <td><input type="checkbox" class="al05a-semimposto"></td>
@@ -9501,7 +9748,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="al05b-nlinha" size="6"></td>
       <td><input class="al05b-codrendimento" size="4" list="listaCodigoRendimentoAnexoL05B"></td>
       <td><input class="al05b-catAouH" size="2" maxlength="1"></td>
-      <td><input class="al05b-pais" size="4"></td>
+      <td><input class="al05b-pais" size="4" list="listaPaises"></td>
       <td><input class="al05b-rendimento" type="number" step="0.01"></td>
       <td><input class="al05b-comimposto" type="number" step="0.01"></td>
       <td><input type="checkbox" class="al05b-semimposto"></td>
