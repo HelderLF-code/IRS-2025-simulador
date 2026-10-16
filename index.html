@@ -1250,6 +1250,36 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG18B')">Descarregar modelo (Excel)</button>
 <button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG18B')">Importar Excel preenchido</button>
 
+<h3>Calculadora FIFO para criptoativos (ferramenta auxiliar)</h3>
+<p class="aviso-topo">
+  Ferramenta de apoio ao preenchimento do Quadro 18 — não faz parte do ficheiro XML oficial
+  (não é exportada). Regista aqui todas as compras e vendas do mesmo criptoativo, por
+  qualquer ordem (a calculadora ordena automaticamente por data), e calcula o custo de
+  aquisição pelo método FIFO ("First In, First Out" — as unidades compradas primeiro são as
+  primeiras a ser consideradas vendidas), conforme exigido pelo Código do IRS para
+  criptoativos fungíveis. Também podes descarregar um modelo em Excel, preencher o livro de
+  transações fora da aplicação e importá-lo. Ao calcular, as linhas das tabelas 18A/18B
+  abaixo são completamente substituídas pelo resultado — indica em cada venda se deve ir
+  para o Quadro 18A ou 18B (a classificação legal entre os dois depende de factos que esta
+  ferramenta não pode inferir, como a residência da contraparte ou a aplicação de um ADT).
+</p>
+<table id="tabelaFifoCripto">
+  <thead><tr>
+    <th>Ativo</th><th>Tipo</th><th>Ano</th><th>Mês</th><th>Dia</th>
+    <th>Quantidade</th><th>Valor total (€)</th><th>Despesas (€)</th>
+    <th>Quadro destino (só venda)</th><th>Titular (só venda)</th>
+    <th>NIF português (só venda)</th><th>País ent. gestora (só venda)</th>
+    <th>País contraparte (só venda)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaFifoCripto()">+ Adicionar transação</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaFifoCripto')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaFifoCripto')">Importar Excel preenchido</button>
+<br><br>
+<button type="button" onclick="calcularFifoCripto()">Calcular FIFO e preencher Quadro 18</button>
+<div id="avisoFifoCripto"></div>
+
 <h3>Amortização de crédito à habitação em transmissão de terrenos/imóveis (Quadro 19)</h3>
 <p class="aviso-topo">
   Amortização de capital em dívida a crédito à habitação destinada a habitação própria e
@@ -2975,6 +3005,25 @@ indicares, assume-se o escalão mais baixo.</small></p>
         { classe: "ag18b-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
+    tabelaFifoCripto: {
+      nomeFicheiro: "modelo-fifo-criptoativos",
+      adicionar: "adicionarLinhaFifoCripto",
+      colunas: [
+        { classe: "fifo-ativo" },
+        { classe: "fifo-tipo", opcoes: { tipo: "fixo", valores: ["compra", "venda"] } },
+        { classe: "fifo-ano", numero: true },
+        { classe: "fifo-mes", numero: true },
+        { classe: "fifo-dia", numero: true },
+        { classe: "fifo-quantidade", numero: true },
+        { classe: "fifo-valortotal", numero: true },
+        { classe: "fifo-despesas", numero: true },
+        { classe: "fifo-quadrodestino", opcoes: { tipo: "fixo", valores: ["18A", "18B"] } },
+        { classe: "fifo-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "fifo-nifpt" },
+        { classe: "fifo-paisgestora", opcoes: { tipo: "datalist", id: "listaPaises" } },
+        { classe: "fifo-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
+      ]
+    },
     tabelaAnexoG19: {
       nomeFicheiro: "modelo-anexo-g19",
       adicionar: "adicionarLinhaAnexoG19",
@@ -4571,6 +4620,157 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const grupoB = lerLinhasAnexoG18("tabelaAnexoG18B", "ag18b");
     return (grupoA.length || grupoB.length) ? { grupoA, grupoB } : undefined;
   }
+
+  // --- Calculadora FIFO para criptoativos (ferramenta auxiliar, não exportada no XML) ---
+
+  window.adicionarLinhaFifoCripto = function () {
+    const tbody = document.querySelector("#tabelaFifoCripto tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="fifo-ativo" size="10"></td>
+      <td><select class="fifo-tipo"><option value="compra">Compra</option><option value="venda">Venda</option></select></td>
+      <td><input class="fifo-ano" type="number" size="6"></td>
+      <td><input class="fifo-mes" type="number" size="4"></td>
+      <td><input class="fifo-dia" type="number" size="4"></td>
+      <td><input class="fifo-quantidade" type="number" step="0.00000001"></td>
+      <td><input class="fifo-valortotal" type="number" step="0.01"></td>
+      <td><input class="fifo-despesas" type="number" step="0.01"></td>
+      <td><select class="fifo-quadrodestino"><option value="">-</option><option value="18A">18A</option><option value="18B">18B</option></select></td>
+      <td><select class="fifo-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="fifo-nifpt" size="10"></td>
+      <td><input class="fifo-paisgestora" size="4" list="listaPaises"></td>
+      <td><input class="fifo-paiscontraparte" size="4" list="listaPaises"></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerLinhasFifoCripto() {
+    return [...document.querySelectorAll("#tabelaFifoCripto tbody tr")].map(tr => ({
+      ativo: tr.querySelector(".fifo-ativo").value.trim(),
+      tipo: tr.querySelector(".fifo-tipo").value,
+      ano: Number(tr.querySelector(".fifo-ano").value),
+      mes: Number(tr.querySelector(".fifo-mes").value),
+      dia: Number(tr.querySelector(".fifo-dia").value),
+      quantidade: Number(tr.querySelector(".fifo-quantidade").value) || 0,
+      valorTotal: Number(tr.querySelector(".fifo-valortotal").value) || 0,
+      despesas: Number(tr.querySelector(".fifo-despesas").value) || 0,
+      quadroDestino: tr.querySelector(".fifo-quadrodestino").value,
+      titular: tr.querySelector(".fifo-titular").value,
+      nifPortugues: tr.querySelector(".fifo-nifpt").value.trim(),
+      codPaisEntGestora: tr.querySelector(".fifo-paisgestora").value.trim(),
+      codPaisContraparte: tr.querySelector(".fifo-paiscontraparte").value.trim()
+    }));
+  }
+
+  function preencherQuadro18ComFifo(prefixoClasse, linhas) {
+    const tabelaId = prefixoClasse === "ag18a" ? "tabelaAnexoG18A" : "tabelaAnexoG18B";
+    const adicionar = prefixoClasse === "ag18a" ? window.adicionarLinhaAnexoG18A : window.adicionarLinhaAnexoG18B;
+    const tbody = document.querySelector(`#${tabelaId} tbody`);
+    tbody.innerHTML = "";
+    for (const linha of linhas) {
+      adicionar();
+      const tr = tbody.lastElementChild;
+      tr.querySelector(`.${prefixoClasse}-titular`).value = linha.titular || "A";
+      tr.querySelector(`.${prefixoClasse}-nifpt`).value = linha.nifPortugues || "";
+      tr.querySelector(`.${prefixoClasse}-paisgestora`).value = linha.codPaisEntGestora || "";
+      tr.querySelector(`.${prefixoClasse}-anorealizacao`).value = linha.anoRealizacao;
+      tr.querySelector(`.${prefixoClasse}-mesrealizacao`).value = linha.mesRealizacao;
+      tr.querySelector(`.${prefixoClasse}-diarealizacao`).value = linha.diaRealizacao;
+      tr.querySelector(`.${prefixoClasse}-valorrealizacao`).value = linha.valorRealizacao.toFixed(2);
+      tr.querySelector(`.${prefixoClasse}-anoaquisicao`).value = linha.anoAquisicao;
+      tr.querySelector(`.${prefixoClasse}-mesaquisicao`).value = linha.mesAquisicao;
+      tr.querySelector(`.${prefixoClasse}-diaaquisicao`).value = linha.diaAquisicao;
+      tr.querySelector(`.${prefixoClasse}-valoraquisicao`).value = linha.valorAquisicao.toFixed(2);
+      tr.querySelector(`.${prefixoClasse}-despesas`).value = linha.despesasEncargos.toFixed(2);
+      tr.querySelector(`.${prefixoClasse}-paiscontraparte`).value = linha.codPaisContraparte || "";
+    }
+  }
+
+  window.calcularFifoCripto = function () {
+    const avisoDiv = document.getElementById("avisoFifoCripto");
+    const transacoes = lerLinhasFifoCripto();
+    if (!transacoes.length) {
+      avisoDiv.innerHTML = "<p class=\"aviso-topo\">O livro de transações está vazio — nada para calcular.</p>";
+      return;
+    }
+
+    const EPSILON = 1e-9;
+    const avisos = [];
+    const porAtivo = new Map();
+
+    transacoes.forEach((t, indice) => {
+      const rotuloLinha = `Linha ${indice + 1}`;
+      if (!t.ativo) { avisos.push(`${rotuloLinha}: sem nome de ativo — ignorada.`); return; }
+      if (!t.ano || !t.mes || !t.dia) { avisos.push(`${rotuloLinha} (${t.ativo}): data incompleta — ignorada.`); return; }
+      if (!(t.quantidade > 0)) { avisos.push(`${rotuloLinha} (${t.ativo}): quantidade inválida — ignorada.`); return; }
+      if (!porAtivo.has(t.ativo)) porAtivo.set(t.ativo, []);
+      porAtivo.get(t.ativo).push({ ...t, indice, chaveData: t.ano * 10000 + t.mes * 100 + t.dia });
+    });
+
+    const resultadoA = [];
+    const resultadoB = [];
+
+    for (const [ativo, lista] of porAtivo) {
+      lista.sort((x, y) => (x.chaveData - y.chaveData) || (x.indice - y.indice));
+      const lotes = [];
+
+      for (const t of lista) {
+        if (t.tipo === "compra") {
+          // As despesas de compra (p. ex. comissões) somam-se ao valor de aquisição do lote.
+          lotes.push({ ano: t.ano, mes: t.mes, dia: t.dia, quantidadeRestante: t.quantidade, quantidadeOriginal: t.quantidade, valorTotalOriginal: t.valorTotal + t.despesas });
+          continue;
+        }
+
+        if (!t.quadroDestino) avisos.push(`Venda de ${ativo} em ${t.dia}/${t.mes}/${t.ano}: Quadro destino não indicado — a assumir 18A.`);
+        const quadro = t.quadroDestino || "18A";
+        const quantidadeVendaTotal = t.quantidade;
+        let restanteAVender = t.quantidade;
+
+        while (restanteAVender > EPSILON) {
+          const lote = lotes.find(l => l.quantidadeRestante > EPSILON);
+          if (!lote) {
+            avisos.push(`Venda de ${ativo} em ${t.dia}/${t.mes}/${t.ano}: faltam ${restanteAVender.toFixed(8)} unidade(s) sem histórico de compra correspondente — essa parte não foi incluída no Quadro 18.`);
+            break;
+          }
+          const quantidadeConsumida = Math.min(lote.quantidadeRestante, restanteAVender);
+          const fracaoLote = quantidadeConsumida / lote.quantidadeOriginal;
+          const fracaoVenda = quantidadeConsumida / quantidadeVendaTotal;
+
+          const linha = {
+            titular: t.titular,
+            nifPortugues: t.nifPortugues,
+            codPaisEntGestora: t.codPaisEntGestora,
+            anoRealizacao: t.ano, mesRealizacao: t.mes, diaRealizacao: t.dia,
+            valorRealizacao: t.valorTotal * fracaoVenda,
+            anoAquisicao: lote.ano, mesAquisicao: lote.mes, diaAquisicao: lote.dia,
+            valorAquisicao: lote.valorTotalOriginal * fracaoLote,
+            despesasEncargos: t.despesas * fracaoVenda,
+            codPaisContraparte: t.codPaisContraparte
+          };
+          (quadro === "18B" ? resultadoB : resultadoA).push(linha);
+
+          lote.quantidadeRestante -= quantidadeConsumida;
+          restanteAVender -= quantidadeConsumida;
+        }
+      }
+    }
+
+    const linhasAtuaisA = document.querySelectorAll("#tabelaAnexoG18A tbody tr").length;
+    const linhasAtuaisB = document.querySelectorAll("#tabelaAnexoG18B tbody tr").length;
+    const confirmaMsg = `Isto vai substituir ${linhasAtuaisA} linha(s) do Quadro 18A e ${linhasAtuaisB} linha(s) do Quadro 18B pelo resultado do cálculo FIFO ` +
+      `(${resultadoA.length} linha(s) novas para 18A, ${resultadoB.length} linha(s) novas para 18B).` +
+      (avisos.length ? `\n\nAvisos (${avisos.length}):\n${avisos.join("\n")}` : "") +
+      `\n\nContinuar?`;
+    if (!confirm(confirmaMsg)) return;
+
+    preencherQuadro18ComFifo("ag18a", resultadoA);
+    preencherQuadro18ComFifo("ag18b", resultadoB);
+
+    avisoDiv.innerHTML = avisos.length
+      ? "<p class=\"aviso-topo\"><strong>Quadro 18 preenchido. Avisos:</strong><br>" + avisos.map(escXML).join("<br>") + "</p>"
+      : "<p class=\"aviso-topo\">Quadro 18 preenchido com sucesso, sem avisos.</p>";
+  };
 
   window.adicionarLinhaAnexoG19 = function () {
     const tbody = document.querySelector("#tabelaAnexoG19 tbody");

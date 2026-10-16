@@ -276,7 +276,7 @@ regenerar o `simulador-irs.html`.
   voltado a importar, as linhas aparecem automaticamente na tabela, sem ter de digitar uma
   a uma na aplicação.
 
-  As 27 colunas de país (código do país da fonte/contraparte/entidade gestora, nos Anexos
+  As 29 colunas de país (código do país da fonte/contraparte/entidade gestora, nos Anexos
   G, H, J e L) têm uma lista pendente comum (`<datalist id="listaPaises">`, 244 países,
   territórios e regiões) construída a partir da Tabela X — a lista oficial de países e
   respetivos códigos que consta no final das instruções de preenchimento dos Anexos G, J e
@@ -300,7 +300,7 @@ regenerar o `simulador-irs.html`.
   compressão "deflate" e referências de "shared strings" que o Excel escreve), e
   reimportar — valores de texto, números e os campos com dropdown ficam todos corretos.
 
-  Disponível em **todas as 78 tabelas de linhas** da aplicação (Anexos A, B, Dependentes,
+  Disponível em **todas as 79 tabelas de linhas** da aplicação (Anexos A, B, Dependentes,
   E, G, H, J e L) — a única tabela de "linhas" sem este mecanismo é a grelha fixa de
   despesas do Quadro 7 do Anexo B (encargos em caso de opção pela categoria A/ato isolado
   superior a €200.000), que não tem botão de adicionar linha porque o número de linhas é
@@ -325,6 +325,37 @@ regenerar o `simulador-irs.html`.
   (`class` antes de `type="checkbox"` nalgumas tabelas, a ordem inversa noutras), o que
   inicialmente fez com que 18 das 20 colunas de checkbox da aplicação fossem classificadas
   como texto simples — corrigido com um extrator de atributos independente da ordem.
+
+- **Calculadora FIFO para criptoativos (Anexo G, Quadro 18)**: um "livro de transações"
+  autónomo (tabela "Calculadora FIFO para criptoativos", entre o Quadro 18 e o Quadro 19
+  do Anexo G) onde se regista cada compra e venda de cada criptoativo (ativo, tipo, data,
+  quantidade, valor total e despesas), por qualquer ordem — a aplicação ordena
+  automaticamente por data. O botão "Calcular FIFO e preencher Quadro 18" aplica o método
+  FIFO ("First In, First Out", exigido pelo Código do IRS para criptoativos fungíveis): para
+  cada venda, consome primeiro as unidades compradas mais antigas ainda disponíveis para
+  esse ativo, dividindo a venda por vários "lotes" de compra quando uma só venda esgota mais
+  do que um lote (cada lote parcialmente consumido gera uma linha própria no Quadro 18, com
+  a data/valor de aquisição e uma fração proporcional do valor de realização e das despesas
+  da venda). As despesas de compra somam-se ao valor de aquisição do lote (custo de
+  aquisição); as despesas de venda são divididas proporcionalmente pelas linhas geradas a
+  partir dessa venda. Cada venda indica para qual sub-quadro deve ir (18A ou 18B) — a
+  aplicação não consegue inferir essa classificação legal (residência da contraparte,
+  existência de ADT, etc.) a partir do livro de transações, por isso fica a cargo de quem
+  preenche; se não for indicado, assume-se 18A com um aviso. Vendas sem lotes de compra
+  suficientes no livro (histórico incompleto) geram um aviso explícito em vez de um valor
+  silenciosamente errado, e a parte sem cobertura não é incluída no Quadro 18. Antes de
+  substituir as linhas do Quadro 18A/18B, mostra uma confirmação com o resumo do que vai
+  mudar e a lista de avisos.
+
+  Esta tabela tem o mesmo suporte de modelo Excel (download/upload) das restantes — incluindo
+  dropdowns para o tipo de transação, o quadro destino, o titular e os países — pelo que o
+  livro de transações também pode ser mantido num ficheiro Excel entre sessões (a própria
+  aplicação não grava o livro em lado nenhum, só o resultado já aplicado ao Quadro 18). É
+  uma **ferramenta de apoio ao preenchimento, não um campo do XML oficial**: o livro de
+  transações em si nunca é exportado para a declaração — só os valores que resultam do
+  cálculo, já dentro das linhas normais do Quadro 18A/18B. Por agora cobre só criptoativos
+  (não os valores mobiliários do Quadro 9, que têm regras de FIFO distintas e outro leque de
+  casos a tratar).
 
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
