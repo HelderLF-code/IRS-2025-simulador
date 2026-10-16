@@ -117,6 +117,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaDependentes')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaDependentes')">Importar Excel preenchido</button>
 </div>
 
 <div class="painel" id="painel-anexoA">
@@ -232,6 +234,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBEntidade()">+ Adicionar entidade</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoBEntidadesRetencao')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoBEntidadesRetencao')">Importar Excel preenchido</button>
 
 <h3>Despesas e encargos — mínimo de despesas (Quadro 17)</h3>
 <p class="aviso-topo">
@@ -248,6 +252,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB17Entidade()">+ Adicionar entidade</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB17Entidades')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB17Entidades')">Importar Excel preenchido</button>
 
 <div class="row">
   <div><label><input type="checkbox" id="anexoB17OptaAlternativa"> Declarar despesas com pessoal/rendas/outras em alternativa ao comunicado pela AT (Quadro 17C)</label></div>
@@ -264,6 +270,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB17Renda()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB17Rendas')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB17Rendas')">Importar Excel preenchido</button>
 
 <h3>Encargos em caso de opção pela categoria A / ato isolado &gt; €200.000 (Quadro 7)</h3>
 <p class="aviso-topo">
@@ -295,6 +303,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB07EntidadeSS()">+ Adicionar entidade</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB07EntidadesSS')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB07EntidadesSS')">Importar Excel preenchido</button>
 
 <datalist id="listaProfissoesDesgasteRapido">
   <option value="1">1 — Praticantes desportivos</option>
@@ -306,12 +316,16 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB07Seguro()">+ Adicionar seguro (7C — desgaste rápido)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB07Seguros')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB07Seguros')">Importar Excel preenchido</button>
 
 <table id="tabelaAnexoB07Predios">
   <thead><tr><th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota parte (%)</th><th>Valor rend. profiss./comerciais (€)</th><th>Valor rend. agrícolas (€)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB07Predio()">+ Adicionar prédio (7D — art.º 41.º)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB07Predios')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB07Predios')">Importar Excel preenchido</button>
 
 <div class="row">
   <div><label>N.º de anos/fração — explorações silvícolas plurianuais (7E)</label><input id="anexoB07C781" type="number" step="1"></div>
@@ -339,6 +353,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB08A()">+ Adicionar imóvel (8A)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB08A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB08A')">Importar Excel preenchido</button>
 
 <div class="row">
   <div><label><input type="checkbox" id="anexoB08Afetos2021"> Tinha imóveis afetos à atividade em 1/jan/2021 (8B)?</label></div>
@@ -349,6 +365,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB08B()">+ Adicionar imóvel (8B)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB08B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB08B')">Importar Excel preenchido</button>
 
 <div class="row">
   <div><label><input type="checkbox" id="anexoB08Alienacao2021"> Houve alienação de imóveis (8C.1, anos 2021+)?</label></div>
@@ -358,6 +376,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB08C1()">+ Adicionar imóvel (8C.1)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB08C1')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB08C1')">Importar Excel preenchido</button>
 
 <div class="row">
   <div><label><input type="checkbox" id="anexoB08Desafetacao2021"> Houve desafetação de imóveis (8C.2, anos 2021+)?</label></div>
@@ -368,6 +388,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB08C2()">+ Adicionar imóvel (8C.2)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB08C2')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB08C2')">Importar Excel preenchido</button>
 
 <h3>Mais-valias — reinvestimento do valor de realização (Quadro 9)</h3>
 <table id="tabelaAnexoB09">
@@ -375,6 +397,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB09()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB09')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB09')">Importar Excel preenchido</button>
 
 <h3>Partes sociais adquiridas ao abrigo do regime de neutralidade fiscal (Quadro 10)</h3>
 <div class="row">
@@ -386,6 +410,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoB10()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoB10')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoB10')">Importar Excel preenchido</button>
 <div class="row">
   <div><label>Destino — Estado membro UE/EEE (código país) <small class="hint">(10C)</small></label><input id="anexoB10DestinoUE" type="text" size="4"></div>
   <div><label>Destino — outro país (código) <small class="hint">(10C)</small></label><input id="anexoB10DestinoOutro" type="text" size="4"></div>
@@ -425,6 +451,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE4A()">+ Adicionar rendimento</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoE4A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoE4A')">Importar Excel preenchido</button>
 
 <div class="row">
   <div><label><input type="checkbox" id="anexoEOptaEnglobamento"> Opta pelo englobamento dos rendimentos do Quadro 4A</label></div>
@@ -437,6 +465,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE4B()">+ Adicionar rendimento</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoE4B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoE4B')">Importar Excel preenchido</button>
 
 <h3>Rendimentos de anos anteriores incluídos nos Quadros 4A/4B (Quadro 5)</h3>
 <p class="aviso-topo">
@@ -448,12 +478,16 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE5A()">+ Adicionar (5A — regime n.º 1 art.º 74.º)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoE5A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoE5A')">Importar Excel preenchido</button>
 
 <table id="tabelaAnexoE5B">
   <thead><tr><th>Quadro (Q4A/Q4B)</th><th>N.º linha</th><th>Ano rendimento</th><th>Rendimento (€)</th><th>Retenções na fonte (€)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE5B()">+ Adicionar (5B — opção regime n.º 3 art.º 74.º)</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoE5B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoE5B')">Importar Excel preenchido</button>
 </div>
 
 <div class="painel" id="painel-anexoG">
@@ -485,6 +519,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04A')">Importar Excel preenchido</button>
 
 <h3>Afetação de bens móveis/imóveis à atividade — 2020 e anteriores (Quadro 4B1)</h3>
 <table id="tabelaAnexoG04B1">
@@ -495,6 +531,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04B1()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04B1')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04B1')">Importar Excel preenchido</button>
 
 <h3>Afetação de bens móveis à atividade — 2021+ (Quadro 4B2)</h3>
 <table id="tabelaAnexoG04B2">
@@ -502,6 +540,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04B2()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04B2')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04B2')">Importar Excel preenchido</button>
 
 <h3>Afetação de imóveis à atividade — regime transitório 2021+ (Quadro 4B3)</h3>
 <table id="tabelaAnexoG04B3">
@@ -513,6 +553,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04B3()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04B3')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04B3')">Importar Excel preenchido</button>
 
 <h3>Alienação de imóveis rústicos a EGF/UGF (Quadro 4C)</h3>
 <table id="tabelaAnexoG04C">
@@ -520,6 +562,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04C()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04C')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04C')">Importar Excel preenchido</button>
 
 <h3>Imóveis com apoio não reembolsável — habitação própria (Quadro 4D)</h3>
 <datalist id="listaFinalidadeApoioG04D">
@@ -532,6 +576,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04D()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04D')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04D')">Importar Excel preenchido</button>
 
 <h3>Imóveis afetos à atividade alienados antes de 3 anos após transferência (Quadro 4E)</h3>
 <table id="tabelaAnexoG04E">
@@ -544,6 +590,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04E()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04E')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04E')">Importar Excel preenchido</button>
 
 <h3>Alienação de imóveis para habitação ao Estado/RA/entidades públicas (Quadro 4F)</h3>
 <table id="tabelaAnexoG04F">
@@ -551,6 +599,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG04F()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG04F')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG04F')">Importar Excel preenchido</button>
 
 <h3>Reinvestimento em habitação própria e permanente (Quadro 5)</h3>
 <p class="aviso-topo">
@@ -638,6 +688,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG05A2()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG05A2')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG05A2')">Importar Excel preenchido</button>
 
 <h4>Amortização de empréstimo (Quadro 5B)</h4>
 <div class="row">
@@ -653,6 +705,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG06()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG06')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG06')">Importar Excel preenchido</button>
 
 <h3>Cessão onerosa de posições contratuais/estruturas fiduciárias (Quadro 7)</h3>
 <datalist id="listaCodOperacaoG07">
@@ -664,6 +718,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG07()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG07')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG07')">Importar Excel preenchido</button>
 
 <h3>Cessão onerosa de créditos, prestações acessórias e suplementares (Quadro 8)</h3>
 <table id="tabelaAnexoG08">
@@ -671,6 +727,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG08()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG08')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG08')">Importar Excel preenchido</button>
 
 <h3>Alienação onerosa de partes sociais e outros valores mobiliários (Quadro 9)</h3>
 <datalist id="listaCodigoG09">
@@ -698,6 +756,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG09()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09')">Importar Excel preenchido</button>
 
 <h4>A — Partes sociais de micro e pequenas empresas</h4>
 <table id="tabelaAnexoG09A">
@@ -705,6 +765,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG09A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09A')">Importar Excel preenchido</button>
 
 <h4>B — Partes sociais adquiridas ao abrigo de regimes de neutralidade fiscal</h4>
 <table id="tabelaAnexoG09B">
@@ -712,6 +774,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG09B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09B')">Importar Excel preenchido</button>
 
 <h4>C — Importâncias em dinheiro recebidas na permuta/fusão/cisão de sociedades</h4>
 <table id="tabelaAnexoG09C">
@@ -719,6 +783,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG09C()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09C')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09C')">Importar Excel preenchido</button>
 
 <h4>D — Incentivos à recapitalização das empresas</h4>
 <table id="tabelaAnexoG09D">
@@ -726,6 +792,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG09D()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09D')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09D')">Importar Excel preenchido</button>
 
 <h4>E — Alienação de participações sociais em EGF/UGF</h4>
 <table id="tabelaAnexoG09E">
@@ -733,6 +801,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG09E()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09E')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09E')">Importar Excel preenchido</button>
 
 <h3>Organismos de investimento coletivo — resgate/liquidação, opção pelo englobamento (Quadro 10)</h3>
 <datalist id="listaCodigoG10">
@@ -748,6 +818,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG10()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG10')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG10')">Importar Excel preenchido</button>
 
 <h3>Organismos de investimento alternativo imobiliário (Quadro 11)</h3>
 <datalist id="listaCodigoG11">
@@ -769,6 +841,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG11A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG11A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG11A')">Importar Excel preenchido</button>
 
 <h4>B — Resgate, opção pelo englobamento</h4>
 <table id="tabelaAnexoG11B">
@@ -776,6 +850,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG11B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG11B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG11B')">Importar Excel preenchido</button>
 
 <h3>Perda da qualidade de residente em território português (Quadro 12)</h3>
 <p class="aviso-topo">
@@ -808,6 +884,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG12B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG12B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG12B')">Importar Excel preenchido</button>
 
 <h4>C — Local da transferência da residência</h4>
 <div class="row">
@@ -830,6 +908,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG13()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG13')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG13')">Importar Excel preenchido</button>
 
 <h3>Outros incrementos patrimoniais (Quadro 14)</h3>
 <datalist id="listaCodigoG14">
@@ -842,6 +922,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG14()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG14')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG14')">Importar Excel preenchido</button>
 
 <h4>A.1 — Incrementos patrimoniais de anos anteriores (regime do n.º 1 do art.º 74.º)</h4>
 <table id="tabelaAnexoG14A1">
@@ -849,6 +931,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG14A1()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG14A1')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG14A1')">Importar Excel preenchido</button>
 
 <h4>A.2 — Incrementos patrimoniais de anos anteriores (opção pelo regime do n.º 3 do art.º 74.º)</h4>
 <table id="tabelaAnexoG14A2">
@@ -856,6 +940,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG14A2()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG14A2')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG14A2')">Importar Excel preenchido</button>
 
 <h3>Pagamentos por conta (Quadro 16)</h3>
 <table id="tabelaAnexoG16">
@@ -863,6 +949,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG16()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG16')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG16')">Importar Excel preenchido</button>
 
 <h3>Informações complementares (Quadro 17)</h3>
 <p class="aviso-topo">
@@ -898,6 +986,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG18A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG18A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG18A')">Importar Excel preenchido</button>
 
 <h4>B — Uma das partes não residente, fora da UE/EEE, sem ADT aplicável</h4>
 <table id="tabelaAnexoG18B">
@@ -910,6 +1000,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG18B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG18B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG18B')">Importar Excel preenchido</button>
 
 <h3>Amortização de crédito à habitação em transmissão de terrenos/imóveis (Quadro 19)</h3>
 <p class="aviso-topo">
@@ -927,6 +1019,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG19()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG19')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG19')">Importar Excel preenchido</button>
 </div>
 
 <div class="painel" id="painel-efatura">
@@ -959,6 +1053,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHPensao()">+ Adicionar pensão de alimentos</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoHPensoes')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoHPensoes')">Importar Excel preenchido</button>
 
 <h3>Rendimentos isentos (Quadro 4)</h3>
 <datalist id="listaCodigosAnexoHIsentos">
@@ -983,6 +1079,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHIsento()">+ Adicionar rendimento isento</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoHIsentos')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoHIsentos')">Importar Excel preenchido</button>
 
 <h3>Propriedade intelectual isenta parcialmente (Quadro 5)</h3>
 <table id="tabelaAnexoHPropInt">
@@ -990,6 +1088,8 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHPropInt()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoHPropInt')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoHPropInt')">Importar Excel preenchido</button>
 
 <h3>Benefícios fiscais e despesas com pessoas com deficiência (Quadro 6B)</h3>
 <p><small class="hint">O cálculo cobre só os códigos mais comuns (601 a 607 — PPR, regimes complementares,
@@ -1011,6 +1111,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoHBeneficio()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoHBeneficios')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoHBeneficios')">Importar Excel preenchido</button>
 </div>
 
 <div class="painel" id="painel-anexoJ">
@@ -1049,6 +1151,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ04A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ04A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ04A')">Importar Excel preenchido</button>
 
 <h3>Pagamentos por conta (Quadro 4B)</h3>
 <div class="row">
@@ -1070,6 +1174,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ04C()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ04C')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ04C')">Importar Excel preenchido</button>
 
 <h3>Regime fiscal aplicável a ex-residentes (Quadro 4D, art.º 12.º-A CIRS)</h3>
 <div class="row">
@@ -1113,6 +1219,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ05A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ05A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ05A')">Importar Excel preenchido</button>
 
 <h3>Pagamentos por conta (Quadro 5B)</h3>
 <div class="row">
@@ -1132,6 +1240,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ05C()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ05C')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ05C')">Importar Excel preenchido</button>
 
 <h3>Opção pelo englobamento das pensões de alimentos (Quadro 5D)</h3>
 <p class="aviso-topo">
@@ -1170,6 +1280,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ06A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ06A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ06A')">Importar Excel preenchido</button>
 
 <h3>Informações complementares — Categoria B (Quadro 6B)</h3>
 <p class="aviso-topo">
@@ -1181,6 +1293,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ06B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ06B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ06B')">Importar Excel preenchido</button>
 
 <h3>Rendimentos prediais (Quadro 7A — Categoria F)</h3>
 <table id="tabelaAnexoJ07A">
@@ -1188,6 +1302,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ07A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ07A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ07A')">Importar Excel preenchido</button>
 
 <h3>Opção pelo englobamento (Quadro 7B)</h3>
 <p class="aviso-topo">
@@ -1234,6 +1350,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ08A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ08A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ08A')">Importar Excel preenchido</button>
 
 <h3>Opção pelo englobamento (Quadro 8B)</h3>
 <p class="aviso-topo">
@@ -1265,6 +1383,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ091A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ091A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ091A')">Importar Excel preenchido</button>
 
 <h3>Outros incrementos patrimoniais de englobamento obrigatório (Quadro 9.1B)</h3>
 <p class="aviso-topo">
@@ -1276,6 +1396,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ091B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ091B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ091B')">Importar Excel preenchido</button>
 
 <h3>Alienação de partes sociais e valores mobiliários (Quadro 9.2A, opção de englobamento)</h3>
 <datalist id="listaCodigoAnexoJ092A">
@@ -1306,6 +1428,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ092A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ092A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ092A')">Importar Excel preenchido</button>
 
 <h3>Partes sociais de micro/pequenas empresas (Quadro 9.2A1)</h3>
 <p class="aviso-topo">
@@ -1318,6 +1442,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ092A1()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ092A1')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ092A1')">Importar Excel preenchido</button>
 
 <h3>Outros incrementos patrimoniais de opção de englobamento (Quadro 9.2B)</h3>
 <datalist id="listaCodigoAnexoJ092B">
@@ -1336,6 +1462,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ092B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ092B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ092B')">Importar Excel preenchido</button>
 
 <h3>Opção pelo englobamento (Quadro 9.2C)</h3>
 <p class="aviso-topo">
@@ -1373,6 +1501,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ094A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ094A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ094A')">Importar Excel preenchido</button>
 
 <h3>Opção pelo englobamento dos criptoativos (Quadro 9.4B)</h3>
 <div class="row">
@@ -1406,6 +1536,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ10A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ10A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ10A')">Importar Excel preenchido</button>
 
 <h3>Opção pelo regime do n.º 3 do art.º 74.º (Quadro 10B)</h3>
 <table id="tabelaAnexoJ10B">
@@ -1417,6 +1549,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ10B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ10B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ10B')">Importar Excel preenchido</button>
 
 <h2>Quadro 11 — Contas no estrangeiro</h2>
 <p class="aviso-topo">
@@ -1431,6 +1565,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ11T01()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ11T01')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ11T01')">Importar Excel preenchido</button>
 
 <h3>Outra identificação, quando não há IBAN nem BIC (Tabela 2)</h3>
 <table id="tabelaAnexoJ11T02">
@@ -1438,6 +1574,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ11T02()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoJ11T02')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoJ11T02')">Importar Excel preenchido</button>
 </div>
 
 <div class="painel" id="painel-anexoL">
@@ -1482,6 +1620,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoL04A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoL04A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoL04A')">Importar Excel preenchido</button>
 
 <h3>Categoria B — regime simplificado (Anexo B) — Quadro 4B</h3>
 <table id="tabelaAnexoL04B">
@@ -1493,6 +1633,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoL04B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoL04B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoL04B')">Importar Excel preenchido</button>
 
 <h3>Categoria B — contabilidade organizada (Anexo C) — Quadro 4C</h3>
 <table id="tabelaAnexoL04C">
@@ -1504,6 +1646,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoL04C()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoL04C')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoL04C')">Importar Excel preenchido</button>
 
 <h3>Categoria B — rendimentos imputados (Anexo D) — Quadro 4D</h3>
 <table id="tabelaAnexoL04D">
@@ -1515,6 +1659,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoL04D()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoL04D')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoL04D')">Importar Excel preenchido</button>
 
 <h2>Quadro 5 — Rendimentos obtidos no estrangeiro (Anexo J) — residentes não habituais</h2>
 <datalist id="listaQuadroOrigemAnexoL05A">
@@ -1542,6 +1688,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoL05A()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoL05A')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoL05A')">Importar Excel preenchido</button>
 
 <h3>Categoria H e outros rendimentos do n.º 12 do art.º 72.º CIRS, anos 2020+ (Quadro 5B)</h3>
 <table id="tabelaAnexoL05B">
@@ -1554,6 +1702,8 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoL05B()">+ Adicionar</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaAnexoL05B')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoL05B')">Importar Excel preenchido</button>
 
 <h2>Quadro 6 — Opções por regimes de tributação (residentes não habituais)</h2>
 <h3>Rendimentos de atividades de elevado valor acrescentado (Quadro 6A)</h3>
@@ -6039,37 +6189,979 @@ if (typeof module !== "undefined" && module.exports) {
   // entrada a CONFIG_MODELOS_TABELA e os dois botões no HTML.
   const CONFIG_MODELOS_TABELA = {
     tabelaAnexoA: {
-      nomeFicheiro: "modelo-anexoA-rendimentos",
+      nomeFicheiro: "modelo-anexo-a",
       adicionar: "adicionarLinhaAnexoA",
       colunas: [
         { classe: "a-nif" },
-        { classe: "a-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoA", titulo: "Código Anexo A" } },
-        { classe: "a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"], titulo: "Titular" } },
+        { classe: "a-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoA" } },
+        { classe: "a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "a-rendimento", numero: true },
         { classe: "a-retencao", numero: true },
         { classe: "a-contribuicao", numero: true }
       ]
     },
+    tabelaAnexoB07EntidadesSS: {
+      nomeFicheiro: "modelo-anexo-b07-entidades-ss",
+      adicionar: "adicionarLinhaAnexoB07EntidadeSS",
+      colunas: [
+        { classe: "ab07b-nif" },
+        { classe: "ab07b-valor", numero: true }
+      ]
+    },
+    tabelaAnexoB07Predios: {
+      nomeFicheiro: "modelo-anexo-b07-predios",
+      adicionar: "adicionarLinhaAnexoB07Predio",
+      colunas: [
+        { classe: "ab07d-freguesia" },
+        { classe: "ab07d-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ab07d-artigo" },
+        { classe: "ab07d-fraccao" },
+        { classe: "ab07d-quota", numero: true },
+        { classe: "ab07d-valorpci", numero: true },
+        { classe: "ab07d-valorasp", numero: true }
+      ]
+    },
+    tabelaAnexoB07Seguros: {
+      nomeFicheiro: "modelo-anexo-b07-seguros",
+      adicionar: "adicionarLinhaAnexoB07Seguro",
+      colunas: [
+        { classe: "ab07c-profissao", opcoes: { tipo: "datalist", id: "listaProfissoesDesgasteRapido" } },
+        { classe: "ab07c-valor", numero: true },
+        { classe: "ab07c-nifpt" },
+        { classe: "ab07c-pais" },
+        { classe: "ab07c-numfiscal" }
+      ]
+    },
+    tabelaAnexoB08A: {
+      nomeFicheiro: "modelo-anexo-b08-a",
+      adicionar: "adicionarLinhaAnexoB08A",
+      colunas: [
+        { classe: "ab08a-freguesia" },
+        { classe: "ab08a-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ab08a-artigo" },
+        { classe: "ab08a-fraccao" },
+        { classe: "ab08a-quota", numero: true },
+        { classe: "ab08a-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoB08A" } },
+        { classe: "ab08a-ano", numero: true },
+        { classe: "ab08a-mes", numero: true },
+        { classe: "ab08a-dia", numero: true },
+        { classe: "ab08a-valor", numero: true },
+        { classe: "ab08a-campoq4" },
+        { classe: "ab08a-valordefinitivo", numero: true },
+        { classe: "ab08a-art139", checkbox: true }
+      ]
+    },
+    tabelaAnexoB08B: {
+      nomeFicheiro: "modelo-anexo-b08-b",
+      adicionar: "adicionarLinhaAnexoB08B",
+      colunas: [
+        { classe: "ab08b-freguesia" },
+        { classe: "ab08b-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ab08b-artigo" },
+        { classe: "ab08b-fraccao" },
+        { classe: "ab08b-quota", numero: true },
+        { classe: "ab08b-codigo" },
+        { classe: "ab08b-ano", numero: true },
+        { classe: "ab08b-mes", numero: true },
+        { classe: "ab08b-dia", numero: true }
+      ]
+    },
+    tabelaAnexoB08C1: {
+      nomeFicheiro: "modelo-anexo-b08-c1",
+      adicionar: "adicionarLinhaAnexoB08C1",
+      colunas: [
+        { classe: "ab08c1-freguesia" },
+        { classe: "ab08c1-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ab08c1-artigo" },
+        { classe: "ab08c1-fraccao" },
+        { classe: "ab08c1-quota", numero: true },
+        { classe: "ab08c1-ano", numero: true },
+        { classe: "ab08c1-mes", numero: true },
+        { classe: "ab08c1-dia", numero: true },
+        { classe: "ab08c1-valor", numero: true },
+        { classe: "ab08c1-campoq4" },
+        { classe: "ab08c1-valordefinitivo", numero: true },
+        { classe: "ab08c1-art139", checkbox: true }
+      ]
+    },
+    tabelaAnexoB08C2: {
+      nomeFicheiro: "modelo-anexo-b08-c2",
+      adicionar: "adicionarLinhaAnexoB08C2",
+      colunas: [
+        { classe: "ab08c2-freguesia" },
+        { classe: "ab08c2-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ab08c2-artigo" },
+        { classe: "ab08c2-fraccao" },
+        { classe: "ab08c2-quota", numero: true },
+        { classe: "ab08c2-codigo" },
+        { classe: "ab08c2-ano", numero: true },
+        { classe: "ab08c2-mes", numero: true },
+        { classe: "ab08c2-dia", numero: true }
+      ]
+    },
+    tabelaAnexoB09: {
+      nomeFicheiro: "modelo-anexo-b09",
+      adicionar: "adicionarLinhaAnexoB09",
+      colunas: [
+        { classe: "ab09-fixostangiveis", numero: true },
+        { classe: "ab09-intangiveis", numero: true },
+        { classe: "ab09-biologicos", numero: true }
+      ]
+    },
+    tabelaAnexoB10: {
+      nomeFicheiro: "modelo-anexo-b10",
+      adicionar: "adicionarLinhaAnexoB10",
+      colunas: [
+        { classe: "ab10-entidade" },
+        { classe: "ab10-codigos" },
+        { classe: "ab10-ntitulos", numero: true },
+        { classe: "ab10-capitalsocial", numero: true },
+        { classe: "ab10-anorealizacao", numero: true },
+        { classe: "ab10-mesrealizacao", numero: true },
+        { classe: "ab10-valorrealizacao", numero: true },
+        { classe: "ab10-anoaquisicao", numero: true },
+        { classe: "ab10-mesaquisicao", numero: true },
+        { classe: "ab10-valoraquisicao", numero: true },
+        { classe: "ab10-despesas", numero: true }
+      ]
+    },
+    tabelaAnexoB17Entidades: {
+      nomeFicheiro: "modelo-anexo-b17-entidades",
+      adicionar: "adicionarLinhaAnexoB17Entidade",
+      colunas: [
+        { classe: "ab17-e-nif" },
+        { classe: "ab17-e-valor", numero: true }
+      ]
+    },
+    tabelaAnexoB17Rendas: {
+      nomeFicheiro: "modelo-anexo-b17-rendas",
+      adicionar: "adicionarLinhaAnexoB17Renda",
+      colunas: [
+        { classe: "ab17d-nif" },
+        { classe: "ab17d-valor", numero: true },
+        { classe: "ab17d-parcial", checkbox: true },
+        { classe: "ab17d-total", checkbox: true }
+      ]
+    },
+    tabelaAnexoBEntidadesRetencao: {
+      nomeFicheiro: "modelo-anexo-b-entidades-retencao",
+      adicionar: "adicionarLinhaAnexoBEntidade",
+      colunas: [
+        { classe: "ab-e-nif" },
+        { classe: "ab-e-valor", numero: true }
+      ]
+    },
     tabelaAnexoBRendimentos: {
-      nomeFicheiro: "modelo-anexoB-rendimentos",
+      nomeFicheiro: "modelo-anexo-b-rendimentos",
       adicionar: "adicionarLinhaAnexoBRendimento",
       colunas: [
-        { classe: "ab-r-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoB", titulo: "Código Anexo B" } },
+        { classe: "ab-r-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoB" } },
         { classe: "ab-r-valor", numero: true }
       ]
     },
+    tabelaAnexoE4A: {
+      nomeFicheiro: "modelo-anexo-e4-a",
+      adicionar: "adicionarLinhaAnexoE4A",
+      colunas: [
+        { classe: "ae4a-nif" },
+        { classe: "ae4a-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoE" } },
+        { classe: "ae4a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ae4a-rendimento", numero: true }
+      ]
+    },
+    tabelaAnexoE4B: {
+      nomeFicheiro: "modelo-anexo-e4-b",
+      adicionar: "adicionarLinhaAnexoE4B",
+      colunas: [
+        { classe: "ae4b-nif" },
+        { classe: "ae4b-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoE" } },
+        { classe: "ae4b-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ae4b-rendimento", numero: true },
+        { classe: "ae4b-retencao", numero: true }
+      ]
+    },
+    tabelaAnexoE5A: {
+      nomeFicheiro: "modelo-anexo-e5-a",
+      adicionar: "adicionarLinhaAnexoE5A",
+      colunas: [
+        { classe: "ae5a-quadro", opcoes: { tipo: "fixo", valores: ["Q4A", "Q4B"] } },
+        { classe: "ae5a-nlinha" },
+        { classe: "ae5a-ano", numero: true },
+        { classe: "ae5a-rendimento", numero: true },
+        { classe: "ae5a-nanos", numero: true }
+      ]
+    },
+    tabelaAnexoE5B: {
+      nomeFicheiro: "modelo-anexo-e5-b",
+      adicionar: "adicionarLinhaAnexoE5B",
+      colunas: [
+        { classe: "ae5b-quadro", opcoes: { tipo: "fixo", valores: ["Q4A", "Q4B"] } },
+        { classe: "ae5b-nlinha" },
+        { classe: "ae5b-ano", numero: true },
+        { classe: "ae5b-rendimento", numero: true },
+        { classe: "ae5b-retencoes", numero: true }
+      ]
+    },
     tabelaAnexoG04: {
-      nomeFicheiro: "modelo-anexoG-quadro4-imoveis",
+      nomeFicheiro: "modelo-anexo-g04",
       adicionar: "adicionarLinhaAnexoG04",
       colunas: [
-        { classe: "ag04-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"], titulo: "Titular" } },
-        { classe: "ag04-anorealizacao" }, { classe: "ag04-mesrealizacao" }, { classe: "ag04-diarealizacao" },
+        { classe: "ag04-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag04-anorealizacao", numero: true },
+        { classe: "ag04-mesrealizacao", numero: true },
+        { classe: "ag04-diarealizacao", numero: true },
         { classe: "ag04-valorrealizacao", numero: true },
-        { classe: "ag04-anoaquisicao" }, { classe: "ag04-mesaquisicao" }, { classe: "ag04-diaaquisicao" },
-        { classe: "ag04-valoraquisicao", numero: true }, { classe: "ag04-despesas", numero: true },
+        { classe: "ag04-anoaquisicao", numero: true },
+        { classe: "ag04-mesaquisicao", numero: true },
+        { classe: "ag04-diaaquisicao", numero: true },
+        { classe: "ag04-valoraquisicao", numero: true },
+        { classe: "ag04-despesas", numero: true },
         { classe: "ag04-freguesia" },
-        { classe: "ag04-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"], titulo: "Tipo" } },
-        { classe: "ag04-artigo" }, { classe: "ag04-fraccao" }, { classe: "ag04-quota", numero: true }
+        { classe: "ag04-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ag04-artigo" },
+        { classe: "ag04-fraccao" },
+        { classe: "ag04-quota", numero: true }
+      ]
+    },
+    tabelaAnexoG04A: {
+      nomeFicheiro: "modelo-anexo-g04-a",
+      adicionar: "adicionarLinhaAnexoG04A",
+      colunas: [
+        { classe: "ag04a-campo" },
+        { classe: "ag04a-ano", numero: true },
+        { classe: "ag04a-mes", numero: true },
+        { classe: "ag04a-dia", numero: true }
+      ]
+    },
+    tabelaAnexoG04B1: {
+      nomeFicheiro: "modelo-anexo-g04-b1",
+      adicionar: "adicionarLinhaAnexoG04B1",
+      colunas: [
+        { classe: "ag04b1-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag04b1-natureza", opcoes: { tipo: "fixo", valores: ["M", "I"] } },
+        { classe: "ag04b1-anoafetacao", numero: true },
+        { classe: "ag04b1-mesafetacao", numero: true },
+        { classe: "ag04b1-valorafetacao", numero: true },
+        { classe: "ag04b1-anoaquisicao", numero: true },
+        { classe: "ag04b1-mesaquisicao", numero: true },
+        { classe: "ag04b1-valoraquisicao", numero: true },
+        { classe: "ag04b1-despesas", numero: true },
+        { classe: "ag04b1-freguesia" },
+        { classe: "ag04b1-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } }
+      ]
+    },
+    tabelaAnexoG04B2: {
+      nomeFicheiro: "modelo-anexo-g04-b2",
+      adicionar: "adicionarLinhaAnexoG04B2",
+      colunas: [
+        { classe: "ag04b2-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag04b2-anoafetacao", numero: true },
+        { classe: "ag04b2-mesafetacao", numero: true },
+        { classe: "ag04b2-valorafetacao", numero: true },
+        { classe: "ag04b2-anoaquisicao", numero: true },
+        { classe: "ag04b2-mesaquisicao", numero: true },
+        { classe: "ag04b2-valoraquisicao", numero: true }
+      ]
+    },
+    tabelaAnexoG04B3: {
+      nomeFicheiro: "modelo-anexo-g04-b3",
+      adicionar: "adicionarLinhaAnexoG04B3",
+      colunas: [
+        { classe: "ag04b3-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag04b3-anoafetacao", numero: true },
+        { classe: "ag04b3-mesafetacao", numero: true },
+        { classe: "ag04b3-valorafetacao", numero: true },
+        { classe: "ag04b3-anoaquisicao", numero: true },
+        { classe: "ag04b3-mesaquisicao", numero: true },
+        { classe: "ag04b3-valoraquisicao", numero: true },
+        { classe: "ag04b3-despesas", numero: true },
+        { classe: "ag04b3-freguesia" },
+        { classe: "ag04b3-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ag04b3-artigo" },
+        { classe: "ag04b3-fracao" },
+        { classe: "ag04b3-quota", numero: true }
+      ]
+    },
+    tabelaAnexoG04C: {
+      nomeFicheiro: "modelo-anexo-g04-c",
+      adicionar: "adicionarLinhaAnexoG04C",
+      colunas: [
+        { classe: "ag04c-campo" },
+        { classe: "ag04c-nif" }
+      ]
+    },
+    tabelaAnexoG04D: {
+      nomeFicheiro: "modelo-anexo-g04-d",
+      adicionar: "adicionarLinhaAnexoG04D",
+      colunas: [
+        { classe: "ag04d-campo" },
+        { classe: "ag04d-finalidade", opcoes: { tipo: "datalist", id: "listaFinalidadeApoioG04D" } },
+        { classe: "ag04d-ano", numero: true },
+        { classe: "ag04d-mes", numero: true },
+        { classe: "ag04d-valorapoio", numero: true },
+        { classe: "ag04d-valorpatrimonial", numero: true }
+      ]
+    },
+    tabelaAnexoG04E: {
+      nomeFicheiro: "modelo-anexo-g04-e",
+      adicionar: "adicionarLinhaAnexoG04E",
+      colunas: [
+        { classe: "ag04e-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag04e-anotransferencia", numero: true },
+        { classe: "ag04e-mestransferencia", numero: true },
+        { classe: "ag04e-diatransferencia", numero: true },
+        { classe: "ag04e-anorealizacao", numero: true },
+        { classe: "ag04e-mesrealizacao", numero: true },
+        { classe: "ag04e-diarealizacao", numero: true },
+        { classe: "ag04e-valorrealizacao", numero: true },
+        { classe: "ag04e-anoaquisicao", numero: true },
+        { classe: "ag04e-mesaquisicao", numero: true },
+        { classe: "ag04e-diaaquisicao", numero: true },
+        { classe: "ag04e-valoraquisicao", numero: true },
+        { classe: "ag04e-freguesia" },
+        { classe: "ag04e-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ag04e-artigo" },
+        { classe: "ag04e-fracao" },
+        { classe: "ag04e-quota", numero: true }
+      ]
+    },
+    tabelaAnexoG04F: {
+      nomeFicheiro: "modelo-anexo-g04-f",
+      adicionar: "adicionarLinhaAnexoG04F",
+      colunas: [
+        { classe: "ag04f-campo" },
+        { classe: "ag04f-nif" }
+      ]
+    },
+    tabelaAnexoG05A2: {
+      nomeFicheiro: "modelo-anexo-g05-a2",
+      adicionar: "adicionarLinhaAnexoG05A2",
+      colunas: [
+        { classe: "ag05a2-campo" },
+        { classe: "ag05a2-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag05a2-codigo", opcoes: { tipo: "datalist", id: "listaCodigoContratoG05A2" } },
+        { classe: "ag05a2-ano", numero: true },
+        { classe: "ag05a2-mes", numero: true },
+        { classe: "ag05a2-valor", numero: true },
+        { classe: "ag05a2-nifpt" },
+        { classe: "ag05a2-pais" },
+        { classe: "ag05a2-numfiscal" },
+        { classe: "ag05a2-beneficiario", opcoes: { tipo: "fixo", valores: ["A", "B"] } }
+      ]
+    },
+    tabelaAnexoG06: {
+      nomeFicheiro: "modelo-anexo-g06",
+      adicionar: "adicionarLinhaAnexoG06",
+      colunas: [
+        { classe: "ag06-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag06-valorrealizacao", numero: true },
+        { classe: "ag06-valoraquisicao", numero: true },
+        { classe: "ag06-despesas", numero: true }
+      ]
+    },
+    tabelaAnexoG07: {
+      nomeFicheiro: "modelo-anexo-g07",
+      adicionar: "adicionarLinhaAnexoG07",
+      colunas: [
+        { classe: "ag07-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag07-codoperacao", opcoes: { tipo: "datalist", id: "listaCodOperacaoG07" } },
+        { classe: "ag07-valorrealizacao", numero: true },
+        { classe: "ag07-valoraquisicao", numero: true }
+      ]
+    },
+    tabelaAnexoG08: {
+      nomeFicheiro: "modelo-anexo-g08",
+      adicionar: "adicionarLinhaAnexoG08",
+      colunas: [
+        { classe: "ag08-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag08-importancia", numero: true },
+        { classe: "ag08-valor", numero: true }
+      ]
+    },
+    tabelaAnexoG09: {
+      nomeFicheiro: "modelo-anexo-g09",
+      adicionar: "adicionarLinhaAnexoG09",
+      colunas: [
+        { classe: "ag09-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag09-nif" },
+        { classe: "ag09-codigo", opcoes: { tipo: "datalist", id: "listaCodigoG09" } },
+        { classe: "ag09-anorealizacao", numero: true },
+        { classe: "ag09-mesrealizacao", numero: true },
+        { classe: "ag09-diarealizacao", numero: true },
+        { classe: "ag09-valorrealizacao", numero: true },
+        { classe: "ag09-anoaquisicao", numero: true },
+        { classe: "ag09-mesaquisicao", numero: true },
+        { classe: "ag09-diaaquisicao", numero: true },
+        { classe: "ag09-valoraquisicao", numero: true },
+        { classe: "ag09-despesas", numero: true },
+        { classe: "ag09-pais" },
+        { classe: "ag09-respeitavm", checkbox: true }
+      ]
+    },
+    tabelaAnexoG09A: {
+      nomeFicheiro: "modelo-anexo-g09-a",
+      adicionar: "adicionarLinhaAnexoG09A",
+      colunas: [
+        { classe: "ag09a-campo" },
+        { classe: "ag09a-nif" }
+      ]
+    },
+    tabelaAnexoG09B: {
+      nomeFicheiro: "modelo-anexo-g09-b",
+      adicionar: "adicionarLinhaAnexoG09B",
+      colunas: [
+        { classe: "ag09b-campo" },
+        { classe: "ag09b-nif" }
+      ]
+    },
+    tabelaAnexoG09C: {
+      nomeFicheiro: "modelo-anexo-g09-c",
+      adicionar: "adicionarLinhaAnexoG09C",
+      colunas: [
+        { classe: "ag09c-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag09c-nifentidade" },
+        { classe: "ag09c-ano", numero: true },
+        { classe: "ag09c-mes", numero: true },
+        { classe: "ag09c-valor", numero: true }
+      ]
+    },
+    tabelaAnexoG09D: {
+      nomeFicheiro: "modelo-anexo-g09-d",
+      adicionar: "adicionarLinhaAnexoG09D",
+      colunas: [
+        { classe: "ag09d-campo" },
+        { classe: "ag09d-nif" },
+        { classe: "ag09d-participacao", numero: true }
+      ]
+    },
+    tabelaAnexoG09E: {
+      nomeFicheiro: "modelo-anexo-g09-e",
+      adicionar: "adicionarLinhaAnexoG09E",
+      colunas: [
+        { classe: "ag09e-campo" },
+        { classe: "ag09e-nif" }
+      ]
+    },
+    tabelaAnexoG10: {
+      nomeFicheiro: "modelo-anexo-g10",
+      adicionar: "adicionarLinhaAnexoG10",
+      colunas: [
+        { classe: "ag10-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag10-nifemitente" },
+        { classe: "ag10-codigo", opcoes: { tipo: "datalist", id: "listaCodigoG10" } },
+        { classe: "ag10-rendimento", numero: true },
+        { classe: "ag10-retencoes", numero: true },
+        { classe: "ag10-nifretentora" }
+      ]
+    },
+    tabelaAnexoG11A: {
+      nomeFicheiro: "modelo-anexo-g11-a",
+      adicionar: "adicionarLinhaAnexoG11A",
+      colunas: [
+        { classe: "ag11a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag11a-nifemitente" },
+        { classe: "ag11a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoG11" } },
+        { classe: "ag11a-anorealizacao", numero: true },
+        { classe: "ag11a-mesrealizacao", numero: true },
+        { classe: "ag11a-diarealizacao", numero: true },
+        { classe: "ag11a-valorrealizacao", numero: true },
+        { classe: "ag11a-anoaquisicao", numero: true },
+        { classe: "ag11a-mesaquisicao", numero: true },
+        { classe: "ag11a-diaaquisicao", numero: true },
+        { classe: "ag11a-valoraquisicao", numero: true },
+        { classe: "ag11a-despesas", numero: true }
+      ]
+    },
+    tabelaAnexoG11B: {
+      nomeFicheiro: "modelo-anexo-g11-b",
+      adicionar: "adicionarLinhaAnexoG11B",
+      colunas: [
+        { classe: "ag11b-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag11b-nifemitente" },
+        { classe: "ag11b-codigo", opcoes: { tipo: "datalist", id: "listaCodigoG11" } },
+        { classe: "ag11b-rendimento", numero: true },
+        { classe: "ag11b-retencoes", numero: true },
+        { classe: "ag11b-nifretentora" }
+      ]
+    },
+    tabelaAnexoG12B: {
+      nomeFicheiro: "modelo-anexo-g12-b",
+      adicionar: "adicionarLinhaAnexoG12B",
+      colunas: [
+        { classe: "ag12b-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag12b-nifemitente" },
+        { classe: "ag12b-ntitulos", numero: true },
+        { classe: "ag12b-capitalsocial", numero: true },
+        { classe: "ag12b-anorealizacao", numero: true },
+        { classe: "ag12b-mesrealizacao", numero: true },
+        { classe: "ag12b-valorrealizacao", numero: true },
+        { classe: "ag12b-anoaquisicao", numero: true },
+        { classe: "ag12b-mesaquisicao", numero: true },
+        { classe: "ag12b-valoraquisicao", numero: true },
+        { classe: "ag12b-despesas", numero: true }
+      ]
+    },
+    tabelaAnexoG13: {
+      nomeFicheiro: "modelo-anexo-g13",
+      adicionar: "adicionarLinhaAnexoG13",
+      colunas: [
+        { classe: "ag13-codoperacao", opcoes: { tipo: "datalist", id: "listaCodigoOperacaoG13" } },
+        { classe: "ag13-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag13-rendimento", numero: true },
+        { classe: "ag13-pais" }
+      ]
+    },
+    tabelaAnexoG14: {
+      nomeFicheiro: "modelo-anexo-g14",
+      adicionar: "adicionarLinhaAnexoG14",
+      colunas: [
+        { classe: "ag14-codigo", opcoes: { tipo: "datalist", id: "listaCodigoG14" } },
+        { classe: "ag14-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag14-rendimento", numero: true },
+        { classe: "ag14-retencoes", numero: true },
+        { classe: "ag14-nifretentora" }
+      ]
+    },
+    tabelaAnexoG14A1: {
+      nomeFicheiro: "modelo-anexo-g14-a1",
+      adicionar: "adicionarLinhaAnexoG14A1",
+      colunas: [
+        { classe: "ag14a1-quadro" },
+        { classe: "ag14a1-nlinha" },
+        { classe: "ag14a1-ano", numero: true },
+        { classe: "ag14a1-rendimento", numero: true },
+        { classe: "ag14a1-nanos", numero: true }
+      ]
+    },
+    tabelaAnexoG14A2: {
+      nomeFicheiro: "modelo-anexo-g14-a2",
+      adicionar: "adicionarLinhaAnexoG14A2",
+      colunas: [
+        { classe: "ag14a2-quadro" },
+        { classe: "ag14a2-nlinha" },
+        { classe: "ag14a2-ano", numero: true },
+        { classe: "ag14a2-rendimento", numero: true },
+        { classe: "ag14a2-retencoes", numero: true }
+      ]
+    },
+    tabelaAnexoG16: {
+      nomeFicheiro: "modelo-anexo-g16",
+      adicionar: "adicionarLinhaAnexoG16",
+      colunas: [
+        { classe: "ag16-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag16-valor", numero: true }
+      ]
+    },
+    tabelaAnexoG18A: {
+      nomeFicheiro: "modelo-anexo-g18-a",
+      adicionar: "adicionarLinhaAnexoG18A",
+      colunas: [
+        { classe: "ag18a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag18a-nifpt" },
+        { classe: "ag18a-paisgestora" },
+        { classe: "ag18a-anorealizacao", numero: true },
+        { classe: "ag18a-mesrealizacao", numero: true },
+        { classe: "ag18a-diarealizacao", numero: true },
+        { classe: "ag18a-valorrealizacao", numero: true },
+        { classe: "ag18a-anoaquisicao", numero: true },
+        { classe: "ag18a-mesaquisicao", numero: true },
+        { classe: "ag18a-diaaquisicao", numero: true },
+        { classe: "ag18a-valoraquisicao", numero: true },
+        { classe: "ag18a-despesas", numero: true },
+        { classe: "ag18a-paiscontraparte" }
+      ]
+    },
+    tabelaAnexoG18B: {
+      nomeFicheiro: "modelo-anexo-g18-b",
+      adicionar: "adicionarLinhaAnexoG18B",
+      colunas: [
+        { classe: "ag18b-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag18b-nifpt" },
+        { classe: "ag18b-paisgestora" },
+        { classe: "ag18b-anorealizacao", numero: true },
+        { classe: "ag18b-mesrealizacao", numero: true },
+        { classe: "ag18b-diarealizacao", numero: true },
+        { classe: "ag18b-valorrealizacao", numero: true },
+        { classe: "ag18b-anoaquisicao", numero: true },
+        { classe: "ag18b-mesaquisicao", numero: true },
+        { classe: "ag18b-diaaquisicao", numero: true },
+        { classe: "ag18b-valoraquisicao", numero: true },
+        { classe: "ag18b-despesas", numero: true },
+        { classe: "ag18b-paiscontraparte" }
+      ]
+    },
+    tabelaAnexoG19: {
+      nomeFicheiro: "modelo-anexo-g19",
+      adicionar: "adicionarLinhaAnexoG19",
+      colunas: [
+        { classe: "ag19-campoq4" },
+        { classe: "ag19-valoramortemprestimo", numero: true },
+        { classe: "ag19-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "ag19-nifdescendente" },
+        { classe: "ag19-valoramortizacao", numero: true },
+        { classe: "ag19-ano", numero: true },
+        { classe: "ag19-mes", numero: true },
+        { classe: "ag19-dia", numero: true },
+        { classe: "ag19-freguesia" },
+        { classe: "ag19-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
+        { classe: "ag19-artigo" },
+        { classe: "ag19-fracao" },
+        { classe: "ag19-quota", numero: true }
+      ]
+    },
+    tabelaAnexoHBeneficios: {
+      nomeFicheiro: "modelo-anexo-h-beneficios",
+      adicionar: "adicionarLinhaAnexoHBeneficio",
+      colunas: [
+        { classe: "ah-b-codigo", opcoes: { tipo: "datalist", id: "listaCodigosBeneficiosH" } },
+        { classe: "ah-b-titular", opcoes: { tipo: "fixo", valores: ["A", "B"] } },
+        { classe: "ah-b-importancia", numero: true },
+        { classe: "ah-b-idade", numero: true },
+        { classe: "ah-b-nif" },
+        { classe: "ah-b-pais" },
+        { classe: "ah-b-numfiscal" }
+      ]
+    },
+    tabelaAnexoHIsentos: {
+      nomeFicheiro: "modelo-anexo-h-isentos",
+      adicionar: "adicionarLinhaAnexoHIsento",
+      colunas: [
+        { classe: "ah-i-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoHIsentos" } },
+        { classe: "ah-i-titular", opcoes: { tipo: "fixo", valores: ["A", "B"] } },
+        { classe: "ah-i-rendimento", numero: true },
+        { classe: "ah-i-retencao", numero: true },
+        { classe: "ah-i-nif" },
+        { classe: "ah-i-pais" },
+        { classe: "ah-i-numfiscal" }
+      ]
+    },
+    tabelaAnexoHPensoes: {
+      nomeFicheiro: "modelo-anexo-h-pensoes",
+      adicionar: "adicionarLinhaAnexoHPensao",
+      colunas: [
+        { classe: "ah-p-sp", opcoes: { tipo: "fixo", valores: ["A", "B"] } },
+        { classe: "ah-p-nif" },
+        { classe: "ah-p-valor", numero: true }
+      ]
+    },
+    tabelaAnexoHPropInt: {
+      nomeFicheiro: "modelo-anexo-h-prop-int",
+      adicionar: "adicionarLinhaAnexoHPropInt",
+      colunas: [
+        { classe: "ah-pi-titular", opcoes: { tipo: "fixo", valores: ["A", "B"] } },
+        { classe: "ah-pi-montante", numero: true }
+      ]
+    },
+    tabelaAnexoJ04A: {
+      nomeFicheiro: "modelo-anexo-j04-a",
+      adicionar: "adicionarLinhaAnexoJ04A",
+      colunas: [
+        { classe: "aj04a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ04A" } },
+        { classe: "aj04a-pais" },
+        { classe: "aj04a-rendimento", numero: true },
+        { classe: "aj04a-contribsocial", numero: true },
+        { classe: "aj04a-impostoestrangeiro", numero: true },
+        { classe: "aj04a-nif" },
+        { classe: "aj04a-retencaofonte", numero: true },
+        { classe: "aj04a-retencaosobretaxa", numero: true }
+      ]
+    },
+    tabelaAnexoJ04C: {
+      nomeFicheiro: "modelo-anexo-j04-c",
+      adicionar: "adicionarLinhaAnexoJ04C",
+      colunas: [
+        { classe: "aj04c-linha" },
+        { classe: "aj04c-pais" },
+        { classe: "aj04c-diasmenor", checkbox: true },
+        { classe: "aj04c-diasmaior", checkbox: true },
+        { classe: "aj04c-fronteirico", checkbox: true },
+        { classe: "aj04c-tornouresidente", checkbox: true },
+        { classe: "aj04c-naotornouresidente", checkbox: true }
+      ]
+    },
+    tabelaAnexoJ05A: {
+      nomeFicheiro: "modelo-anexo-j05-a",
+      adicionar: "adicionarLinhaAnexoJ05A",
+      colunas: [
+        { classe: "aj05a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ05A" } },
+        { classe: "aj05a-pais" },
+        { classe: "aj05a-rendimento", numero: true },
+        { classe: "aj05a-contribsocial", numero: true },
+        { classe: "aj05a-impostoestrangeiro", numero: true }
+      ]
+    },
+    tabelaAnexoJ05C: {
+      nomeFicheiro: "modelo-anexo-j05-c",
+      adicionar: "adicionarLinhaAnexoJ05C",
+      colunas: [
+        { classe: "aj05c-linha" },
+        { classe: "aj05c-empregoanterior", checkbox: true },
+        { classe: "aj05c-segurancasocial", checkbox: true },
+        { classe: "aj05c-outra", checkbox: true },
+        { classe: "aj05c-contribuicoesiniciais", numero: true }
+      ]
+    },
+    tabelaAnexoJ06A: {
+      nomeFicheiro: "modelo-anexo-j06-a",
+      adicionar: "adicionarLinhaAnexoJ06A",
+      colunas: [
+        { classe: "aj06a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ06A" } },
+        { classe: "aj06a-pais" },
+        { classe: "aj06a-estabelecimento", opcoes: { tipo: "fixo", valores: ["S", "N"] } },
+        { classe: "aj06a-rendimento", numero: true },
+        { classe: "aj06a-contribsocial", numero: true },
+        { classe: "aj06a-impostoestrangeiro", numero: true },
+        { classe: "aj06a-nifretentora" },
+        { classe: "aj06a-retencaofonte", numero: true }
+      ]
+    },
+    tabelaAnexoJ06B: {
+      nomeFicheiro: "modelo-anexo-j06-b",
+      adicionar: "adicionarLinhaAnexoJ06B",
+      colunas: [
+        { classe: "aj06b-linha" },
+        { classe: "aj06b-diasmenor", checkbox: true },
+        { classe: "aj06b-diasmaior", checkbox: true }
+      ]
+    },
+    tabelaAnexoJ07A: {
+      nomeFicheiro: "modelo-anexo-j07-a",
+      adicionar: "adicionarLinhaAnexoJ07A",
+      colunas: [
+        { classe: "aj07a-codigo" },
+        { classe: "aj07a-pais" },
+        { classe: "aj07a-rendimento", numero: true },
+        { classe: "aj07a-impostoestrangeiro", numero: true }
+      ]
+    },
+    tabelaAnexoJ08A: {
+      nomeFicheiro: "modelo-anexo-j08-a",
+      adicionar: "adicionarLinhaAnexoJ08A",
+      colunas: [
+        { classe: "aj08a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ08A" } },
+        { classe: "aj08a-pais" },
+        { classe: "aj08a-rendimento", numero: true },
+        { classe: "aj08a-impostopaisfonte", numero: true },
+        { classe: "aj08a-paispagador" },
+        { classe: "aj08a-impostoretido", numero: true },
+        { classe: "aj08a-nif" },
+        { classe: "aj08a-retencaofonte", numero: true }
+      ]
+    },
+    tabelaAnexoJ091A: {
+      nomeFicheiro: "modelo-anexo-j091-a",
+      adicionar: "adicionarLinhaAnexoJ091A",
+      colunas: [
+        { classe: "aj091a-pais" },
+        { classe: "aj091a-anorealizacao", numero: true },
+        { classe: "aj091a-mesrealizacao", numero: true },
+        { classe: "aj091a-valorrealizacao", numero: true },
+        { classe: "aj091a-anoaquisicao", numero: true },
+        { classe: "aj091a-mesaquisicao", numero: true },
+        { classe: "aj091a-valoraquisicao", numero: true },
+        { classe: "aj091a-despesas", numero: true },
+        { classe: "aj091a-impostoestrangeiro", numero: true }
+      ]
+    },
+    tabelaAnexoJ091B: {
+      nomeFicheiro: "modelo-anexo-j091-b",
+      adicionar: "adicionarLinhaAnexoJ091B",
+      colunas: [
+        { classe: "aj091b-codigo" },
+        { classe: "aj091b-pais" },
+        { classe: "aj091b-rendimento", numero: true },
+        { classe: "aj091b-impostoestrangeiro", numero: true }
+      ]
+    },
+    tabelaAnexoJ092A: {
+      nomeFicheiro: "modelo-anexo-j092-a",
+      adicionar: "adicionarLinhaAnexoJ092A",
+      colunas: [
+        { classe: "aj092a-pais" },
+        { classe: "aj092a-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ092A" } },
+        { classe: "aj092a-anorealizacao", numero: true },
+        { classe: "aj092a-mesrealizacao", numero: true },
+        { classe: "aj092a-diarealizacao", numero: true },
+        { classe: "aj092a-valorrealizacao", numero: true },
+        { classe: "aj092a-anoaquisicao", numero: true },
+        { classe: "aj092a-mesaquisicao", numero: true },
+        { classe: "aj092a-diaaquisicao", numero: true },
+        { classe: "aj092a-valoraquisicao", numero: true },
+        { classe: "aj092a-despesas", numero: true },
+        { classe: "aj092a-impostoestrangeiro", numero: true },
+        { classe: "aj092a-paiscontraparte" },
+        { classe: "aj092a-respeitavm", opcoes: { tipo: "fixo", valores: ["S", "N"] } }
+      ]
+    },
+    tabelaAnexoJ092A1: {
+      nomeFicheiro: "modelo-anexo-j092-a1",
+      adicionar: "adicionarLinhaAnexoJ092A1",
+      colunas: [
+        { classe: "aj092a1-campo" },
+        { classe: "aj092a1-nif" }
+      ]
+    },
+    tabelaAnexoJ092B: {
+      nomeFicheiro: "modelo-anexo-j092-b",
+      adicionar: "adicionarLinhaAnexoJ092B",
+      colunas: [
+        { classe: "aj092b-codigo", opcoes: { tipo: "datalist", id: "listaCodigoAnexoJ092B" } },
+        { classe: "aj092b-pais" },
+        { classe: "aj092b-rendimento", numero: true },
+        { classe: "aj092b-impostoestrangeiro", numero: true },
+        { classe: "aj092b-paiscontraparte" }
+      ]
+    },
+    tabelaAnexoJ094A: {
+      nomeFicheiro: "modelo-anexo-j094-a",
+      adicionar: "adicionarLinhaAnexoJ094A",
+      colunas: [
+        { classe: "aj094a-pais" },
+        { classe: "aj094a-anorealizacao", numero: true },
+        { classe: "aj094a-mesrealizacao", numero: true },
+        { classe: "aj094a-diarealizacao", numero: true },
+        { classe: "aj094a-valorrealizacao", numero: true },
+        { classe: "aj094a-anoaquisicao", numero: true },
+        { classe: "aj094a-mesaquisicao", numero: true },
+        { classe: "aj094a-diaaquisicao", numero: true },
+        { classe: "aj094a-valoraquisicao", numero: true },
+        { classe: "aj094a-despesas", numero: true },
+        { classe: "aj094a-impostoestrangeiro", numero: true },
+        { classe: "aj094a-paiscontraparte" }
+      ]
+    },
+    tabelaAnexoJ10A: {
+      nomeFicheiro: "modelo-anexo-j10-a",
+      adicionar: "adicionarLinhaAnexoJ10A",
+      colunas: [
+        { classe: "aj10a-quadro", opcoes: { tipo: "datalist", id: "listaQuadroOrigemAnexoJ10" } },
+        { classe: "aj10a-nlinha" },
+        { classe: "aj10a-anorendimentos", numero: true },
+        { classe: "aj10a-rendimento", numero: true },
+        { classe: "aj10a-nanos", numero: true }
+      ]
+    },
+    tabelaAnexoJ10B: {
+      nomeFicheiro: "modelo-anexo-j10-b",
+      adicionar: "adicionarLinhaAnexoJ10B",
+      colunas: [
+        { classe: "aj10b-quadro", opcoes: { tipo: "datalist", id: "listaQuadroOrigemAnexoJ10" } },
+        { classe: "aj10b-nlinha" },
+        { classe: "aj10b-anorendimentos", numero: true },
+        { classe: "aj10b-rendimento", numero: true },
+        { classe: "aj10b-contribsocial", numero: true },
+        { classe: "aj10b-impostoestrangeiro", numero: true },
+        { classe: "aj10b-retencaofonte", numero: true }
+      ]
+    },
+    tabelaAnexoJ11T01: {
+      nomeFicheiro: "modelo-anexo-j11-t01",
+      adicionar: "adicionarLinhaAnexoJ11T01",
+      colunas: [
+        { classe: "aj11t01-iban" },
+        { classe: "aj11t01-bic" }
+      ]
+    },
+    tabelaAnexoJ11T02: {
+      nomeFicheiro: "modelo-anexo-j11-t02",
+      adicionar: "adicionarLinhaAnexoJ11T02",
+      colunas: [
+        { classe: "aj11t02-outronum" }
+      ]
+    },
+    tabelaAnexoL04A: {
+      nomeFicheiro: "modelo-anexo-l04-a",
+      adicionar: "adicionarLinhaAnexoL04A",
+      colunas: [
+        { classe: "al04a-nifentidade" },
+        { classe: "al04a-codrendimento" },
+        { classe: "al04a-codatividadep2010" },
+        { classe: "al04a-codatividadep2019" },
+        { classe: "al04a-codatividadep2024" },
+        { classe: "al04a-codentidade" },
+        { classe: "al04a-rendimento", numero: true }
+      ]
+    },
+    tabelaAnexoL04B: {
+      nomeFicheiro: "modelo-anexo-l04-b",
+      adicionar: "adicionarLinhaAnexoL04B",
+      colunas: [
+        { classe: "al04b-nifentidade" },
+        { classe: "al04b-campoq4anexob" },
+        { classe: "al04b-codatividadep2010" },
+        { classe: "al04b-codatividadep2019" },
+        { classe: "al04b-codatividadep2024" },
+        { classe: "al04b-codentidade" },
+        { classe: "al04b-rendimento", numero: true }
+      ]
+    },
+    tabelaAnexoL04C: {
+      nomeFicheiro: "modelo-anexo-l04-c",
+      adicionar: "adicionarLinhaAnexoL04C",
+      colunas: [
+        { classe: "al04c-nifentidade" },
+        { classe: "al04c-codatividadep2010" },
+        { classe: "al04c-codatividadep2019" },
+        { classe: "al04c-codatividadep2024" },
+        { classe: "al04c-codentidade" },
+        { classe: "al04c-lucro", numero: true },
+        { classe: "al04c-prejuizo", numero: true }
+      ]
+    },
+    tabelaAnexoL04D: {
+      nomeFicheiro: "modelo-anexo-l04-d",
+      adicionar: "adicionarLinhaAnexoL04D",
+      colunas: [
+        { classe: "al04d-nifentidade" },
+        { classe: "al04d-campoq4anexod" },
+        { classe: "al04d-codatividadep2010" },
+        { classe: "al04d-codatividadep2019" },
+        { classe: "al04d-codatividadep2024" },
+        { classe: "al04d-codentidade" },
+        { classe: "al04d-rendimento", numero: true }
+      ]
+    },
+    tabelaAnexoL05A: {
+      nomeFicheiro: "modelo-anexo-l05-a",
+      adicionar: "adicionarLinhaAnexoL05A",
+      colunas: [
+        { classe: "al05a-quadro", opcoes: { tipo: "datalist", id: "listaQuadroOrigemAnexoL05A" } },
+        { classe: "al05a-nlinha" },
+        { classe: "al05a-codatividadep2010" },
+        { classe: "al05a-codatividadep2019" },
+        { classe: "al05a-catAouB" },
+        { classe: "al05a-pais" },
+        { classe: "al05a-rendimento", numero: true },
+        { classe: "al05a-comimposto", numero: true },
+        { classe: "al05a-semimposto", checkbox: true }
+      ]
+    },
+    tabelaAnexoL05B: {
+      nomeFicheiro: "modelo-anexo-l05-b",
+      adicionar: "adicionarLinhaAnexoL05B",
+      colunas: [
+        { classe: "al05b-quadro", opcoes: { tipo: "datalist", id: "listaQuadroOrigemAnexoL05B" } },
+        { classe: "al05b-nlinha" },
+        { classe: "al05b-codrendimento", opcoes: { tipo: "datalist", id: "listaCodigoRendimentoAnexoL05B" } },
+        { classe: "al05b-catAouH" },
+        { classe: "al05b-pais" },
+        { classe: "al05b-rendimento", numero: true },
+        { classe: "al05b-comimposto", numero: true },
+        { classe: "al05b-semimposto", checkbox: true }
+      ]
+    },
+    tabelaDependentes: {
+      nomeFicheiro: "modelo-dependentes",
+      adicionar: "adicionarDependente",
+      colunas: [
+        { classe: "dep-nif" },
+        { classe: "dep-grau", numero: true },
+        { classe: "dep-guarda", checkbox: true },
+        { classe: "dep-resp", opcoes: { tipo: "fixo", valores: ["A", "B"] } },
+        { classe: "dep-progenitor" },
+        { classe: "dep-integra", checkbox: true },
+        { classe: "dep-partilha", numero: true },
+        { classe: "dep-residencia-alt", checkbox: true }
       ]
     }
   };
@@ -6094,11 +7186,14 @@ if (typeof module !== "undefined" && module.exports) {
     const validacoes = [];
     let colAtual = 0;
     config.colunas.forEach((coluna, idxColunaDados) => {
-      if (!coluna.opcoes) return;
-      const valores = opcoesColuna(coluna.opcoes);
-      const temDescricao = coluna.opcoes.tipo === "datalist";
-      linhasListas[0][colAtual] = `${coluna.opcoes.titulo} — código`;
-      if (temDescricao) linhasListas[0][colAtual + 1] = `${coluna.opcoes.titulo} — descrição`;
+      // Colunas de checkbox na interface tornam-se um dropdown Sim/Não no modelo.
+      const opcoes = coluna.checkbox ? { tipo: "fixo", valores: ["Sim", "Não"] } : coluna.opcoes;
+      if (!opcoes) return;
+      const titulo = (coluna.opcoes && coluna.opcoes.titulo) || cabecalhos[idxColunaDados] || coluna.classe;
+      const valores = opcoesColuna(opcoes);
+      const temDescricao = opcoes.tipo === "datalist";
+      linhasListas[0][colAtual] = temDescricao ? `${titulo} — código` : titulo;
+      if (temDescricao) linhasListas[0][colAtual + 1] = `${titulo} — descrição`;
       valores.forEach((v, i) => {
         if (!linhasListas[i + 1]) linhasListas[i + 1] = [];
         linhasListas[i + 1][colAtual] = v[0];
@@ -6160,7 +7255,11 @@ if (typeof module !== "undefined" && module.exports) {
           const campoEl = tr.querySelector(`.${coluna.classe}`);
           if (!campoEl) return;
           const valorBruto = linha[idx] === undefined ? "" : String(linha[idx]).trim();
-          campoEl.value = coluna.numero ? parsarNumeroPT(valorBruto) : valorBruto;
+          if (coluna.checkbox) {
+            campoEl.checked = /^(s|sim|1|true|x)$/i.test(valorBruto);
+          } else {
+            campoEl.value = coluna.numero ? parsarNumeroPT(valorBruto) : valorBruto;
+          }
         });
         importadas++;
       });

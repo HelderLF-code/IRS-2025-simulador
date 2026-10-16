@@ -292,11 +292,31 @@ regenerar o `simulador-irs.html`.
   compressão "deflate" e referências de "shared strings" que o Excel escreve), e
   reimportar — valores de texto, números e os campos com dropdown ficam todos corretos.
 
-  Por agora, piloto em 3 tabelas — Anexo A (rendimentos), Anexo B (rendimentos brutos) e
-  Anexo G Quadro 4 (alienação de imóveis) — como prova de conceito antes de se estender
-  às restantes ~76 tabelas de linhas da aplicação. O mecanismo é genérico
-  (`CONFIG_MODELOS_TABELA` em `index.html`): alargar a outra tabela é só acrescentar uma
-  entrada à configuração e os dois botões junto à tabela em causa.
+  Disponível em **todas as 78 tabelas de linhas** da aplicação (Anexos A, B, Dependentes,
+  E, G, H, J e L) — a única tabela de "linhas" sem este mecanismo é a grelha fixa de
+  despesas do Quadro 7 do Anexo B (encargos em caso de opção pela categoria A/ato isolado
+  superior a €200.000), que não tem botão de adicionar linha porque o número de linhas é
+  fixo pela própria AT, não havendo "modelo" que faça sentido descarregar. O mecanismo é
+  genérico (`CONFIG_MODELOS_TABELA` em `index.html`): alargar
+  a outra tabela nova no futuro é só acrescentar uma entrada à configuração e os dois
+  botões junto à tabela em causa. As colunas de checkbox da interface (ex: "sem imposto
+  pago no estrangeiro", "opta pela guarda conjunta") tornam-se um dropdown Sim/Não no
+  modelo, e são interpretadas de volta como verdadeiro/falso ao importar (aceita "Sim",
+  "S", "1", "true" ou "X", sem distinguir maiúsculas/minúsculas, como verdadeiro).
+
+  A configuração de todas as 78 tabelas foi gerada por um pequeno script de extração
+  (não faz parte da aplicação) que lê cada função `adicionarLinhaX` de `index.html` e
+  infere a estrutura de colunas (classe CSS, tipo de campo, lista de opções) diretamente
+  do HTML de cada linha — para garantir que a configuração reflete exatamente o que já
+  está implementado, sem transcrever à mão classe a classe. Esse processo apanhou duas
+  armadilhas reais que valem a pena registar: (1) uma primeira versão do extrator,
+  baseada em expressões regulares à procura do fecho de cada função, confundiu o fecho de
+  uma função curta de uma linha com o de uma função posterior, atribuindo as colunas
+  erradas a uma tabela errada — corrigido reescrevendo o extrator com contagem de
+  chavetas; (2) as colunas de checkbox nem sempre têm os atributos HTML pela mesma ordem
+  (`class` antes de `type="checkbox"` nalgumas tabelas, a ordem inversa noutras), o que
+  inicialmente fez com que 18 das 20 colunas de checkbox da aplicação fossem classificadas
+  como texto simples — corrigido com um extrator de atributos independente da ordem.
 
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
@@ -371,11 +391,6 @@ perda de informação.
    `data/parametros_2025.js` (a validar). Falta ainda o limite geral e decrescente por
    escalão de rendimento (art.º 78.º-B) que reduz o total de deduções para rendimentos
    coletáveis mais altos — a app aplica os limites por categoria mas não esse teto global.
-9. **Alargar os modelos Excel às restantes tabelas** — por agora só o Anexo A (rendimentos),
-   o Anexo B (rendimentos brutos) e o Anexo G Quadro 4 (imóveis) têm os botões de
-   descarregar/importar modelo Excel, como prova de conceito. Validado o formato com o
-   utilizador, falta estender a configuração `CONFIG_MODELOS_TABELA` às restantes ~76 tabelas
-   de linhas da aplicação (Anexos B, E, G, H, J, L).
 
 ## Convenção: campos de código
 
