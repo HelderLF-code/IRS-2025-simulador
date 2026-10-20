@@ -364,7 +364,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 
 <h3>Dependentes <small class="hint">(opcional)</small></h3>
 <table id="tabelaDependentes">
-  <thead><tr><th>NIF</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th>Integra agregado?</th><th>Partilha despesas</th><th>Residência alternada?</th><th></th></tr></thead>
+  <thead><tr><th>NIF</th><th>Nome (carta)</th><th>Deficiência (grau %)</th><th>Guarda conjunta?</th><th>Resp. parental</th><th>NIF progenitor</th><th>Integra agregado?</th><th>Partilha despesas</th><th>Residência alternada?</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarDependente()">+ Adicionar dependente</button>
@@ -3465,6 +3465,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
       adicionar: "adicionarDependente",
       colunas: [
         { classe: "dep-nif" },
+        { classe: "dep-nome" },
         { classe: "dep-grau", numero: true },
         { classe: "dep-guarda", checkbox: true },
         { classe: "dep-resp", opcoes: { tipo: "fixo", valores: ["A", "B"] } },
@@ -3592,6 +3593,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><input class="dep-nif" size="10"></td>
+      <td><input class="dep-nome" size="14" placeholder="opcional"></td>
       <td><input class="dep-grau" type="number" size="4" placeholder="ex: 80"></td>
       <td><input class="dep-guarda" type="checkbox"></td>
       <td><select class="dep-resp"><option value="A">A</option><option value="B">B</option></select></td>
@@ -6263,6 +6265,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   function lerAgregado() {
     const dependentes = [...document.querySelectorAll("#tabelaDependentes tbody tr")].map(tr => ({
       nif: tr.querySelector(".dep-nif").value,
+      nome: tr.querySelector(".dep-nome").value.trim() || undefined,
       deficienteGrau: Number(tr.querySelector(".dep-grau").value) || undefined,
       guardaConjunta: tr.querySelector(".dep-guarda").checked,
       respParentais: tr.querySelector(".dep-resp").value,
@@ -6307,19 +6310,45 @@ indicares, assume-se o escalão mais baixo.</small></p>
     const anexoE = lerAnexoE();
     const anexoG = lerAnexoG();
     const anexoH = lerAnexoH();
+    const anexoJ = lerAnexoJ();
     const despesasEFatura = lerDespesasEFatura();
     const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoG, anexoH, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
-    // Linhas em bruto (com a nota de origem opcional) das categorias já refletidas na
-    // carta para cliente — só para discriminar por origem, não entram no cálculo do IRS.
+    const g09 = anexoG && anexoG.quadro09;
+    const g18 = anexoG && anexoG.quadro18;
+    const j04 = anexoJ && anexoJ.quadro04;
+    const j05 = anexoJ && anexoJ.quadro05;
+    const j06 = anexoJ && anexoJ.quadro06;
+    const j07 = anexoJ && anexoJ.quadro07;
+    const j08 = anexoJ && anexoJ.quadro08;
+    const j09 = anexoJ && anexoJ.quadro09;
+    const j11 = anexoJ && anexoJ.quadro11;
+    // Linhas em bruto (com a nota de origem opcional) de todas as tabelas de rendimento
+    // com esse campo, e alguns dados administrativos do agregado — só para a carta para
+    // cliente (discriminação por origem, contas no estrangeiro, etc.); nada disto entra
+    // no cálculo do IRS.
     window._ultimoNotas = {
       anexoA: anexoA.linhas,
       anexoB: anexoB.rendimentosBrutos,
       anexoE4A: anexoE.rendimentosTaxasEspeciais,
       anexoE4B: anexoE.rendimentosTaxasLiberatorias,
       anexoG04: (anexoG && anexoG.quadro04 && anexoG.quadro04.imoveis) || [],
-      anexoG07: (anexoG && anexoG.quadro07) || []
+      anexoG07: (anexoG && anexoG.quadro07) || [],
+      anexoG09: (g09 && g09.linhas) || [],
+      anexoG18A: (g18 && g18.grupoA) || [],
+      anexoG18B: (g18 && g18.grupoB) || [],
+      anexoJ04A: (j04 && j04.linhas) || [],
+      anexoJ05A: (j05 && j05.linhas) || [],
+      anexoJ06A: (j06 && j06.linhas) || [],
+      anexoJ07A: (j07 && j07.linhas) || [],
+      anexoJ08A: (j08 && j08.linhas) || [],
+      anexoJ091A: (j09 && j09.q91a) || [],
+      anexoJ092A: (j09 && j09.q92a) || [],
+      anexoJ094A: (j09 && j09.q94a) || [],
+      dependentes: agregado.dependentes || [],
+      contasEstrangeiroIbanBic: (j11 && j11.contasIbanBic) || [],
+      contasEstrangeiroOutras: (j11 && j11.outrasContas) || []
     };
 
     const div = document.getElementById("resultado");

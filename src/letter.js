@@ -78,7 +78,7 @@ function notasPorOrigem(linhas, campoValor) {
 // única nota cobre a totalidade do valor, evita repetir o valor ("...pagos pela
 // entidade EDP."); com várias origens, ou quando as notas não cobrem tudo, enumera-as
 // e, havendo diferença, refere-a como "origem não especificada".
-function fraseOrigem(totalCategoria, itens, { descricao, preposicaoSingular }) {
+function fraseOrigem(totalCategoria, itens, { descricao, preposicaoSingular, verbo = "considerados" }) {
   if (!itens || !itens.length) return "";
   const somaNotas = itens.reduce((acc, i) => acc + i.valor, 0);
   const resto = totalCategoria - somaNotas;
@@ -92,7 +92,89 @@ function fraseOrigem(totalCategoria, itens, { descricao, preposicaoSingular }) {
     corpo = `provenientes de ${listaPortugues(partes)}`;
     if (resto > 0.005) corpo += `, além de ${formatarMoeda(resto)} € de origem não especificada`;
   }
-  return `<p class="nota">Foram considerados ${formatarMoeda(totalCategoria)} € ${descricao}, ${corpo}.</p>`;
+  return `<p class="nota">Foram ${verbo} ${formatarMoeda(totalCategoria)} € ${descricao}, ${corpo}.</p>`;
+}
+
+// Tabelas de rendimento com nota de origem que ainda não entram no motor de cálculo
+// (Anexo G Quadros 9/18, e todo o Anexo J — regime de não residentes). Mesmo assim, a
+// carta regista o que lá está, com um verbo diferente ("registados", não
+// "considerados") para não sugerir que esses valores influenciaram a estimativa.
+const TABELAS_SEM_CALCULO = [
+  { chave: "anexoG09", campoValor: "valorRealizacao",
+    descricao: "de valor de realização na alienação de partes sociais e valores mobiliários (Anexo G, Quadro 9)",
+    preposicaoSingular: "relativo a" },
+  { chave: "anexoG18A", campoValor: "valorRealizacao",
+    descricao: "de valor de realização na alienação de criptoativos (Anexo G, Quadro 18A)",
+    preposicaoSingular: "relativo a" },
+  { chave: "anexoG18B", campoValor: "valorRealizacao",
+    descricao: "de valor de realização na alienação de criptoativos (Anexo G, Quadro 18B)",
+    preposicaoSingular: "relativo a" },
+  { chave: "anexoJ04A", campoValor: "rendimentoBruto",
+    descricao: "de rendimentos do trabalho dependente obtidos no estrangeiro (Anexo J, Quadro 4A)",
+    preposicaoSingular: "pagos pela entidade" },
+  { chave: "anexoJ05A", campoValor: "rendimentoBruto",
+    descricao: "de rendimentos de pensões obtidos no estrangeiro (Anexo J, Quadro 5A)",
+    preposicaoSingular: "provenientes de" },
+  { chave: "anexoJ06A", campoValor: "rendimento",
+    descricao: "de rendimentos empresariais e profissionais obtidos no estrangeiro (Anexo J, Quadro 6A)",
+    preposicaoSingular: "provenientes de" },
+  { chave: "anexoJ07A", campoValor: "rendimentoLiquido",
+    descricao: "de rendimentos prediais obtidos no estrangeiro (Anexo J, Quadro 7A)",
+    preposicaoSingular: "relativo a" },
+  { chave: "anexoJ08A", campoValor: "rendimentoBruto",
+    descricao: "de rendimentos de capitais obtidos no estrangeiro (Anexo J, Quadro 8A)",
+    preposicaoSingular: "recebidos de" },
+  { chave: "anexoJ091A", campoValor: "valorRealizacao",
+    descricao: "de valor de realização na alienação de imóveis no estrangeiro (Anexo J, Quadro 9.1A)",
+    preposicaoSingular: "relativo a" },
+  { chave: "anexoJ092A", campoValor: "valorRealizacao",
+    descricao: "de valor de realização na alienação de partes sociais e valores mobiliários no estrangeiro (Anexo J, Quadro 9.2A)",
+    preposicaoSingular: "relativo a" },
+  { chave: "anexoJ094A", campoValor: "valorRealizacao",
+    descricao: "de valor de realização na alienação de criptoativos no estrangeiro (Anexo J, Quadro 9.4A)",
+    preposicaoSingular: "relativo a" }
+];
+
+function frasesSemCalculo(notas) {
+  const n = notas || {};
+  return TABELAS_SEM_CALCULO
+    .map(cfg => {
+      const linhas = n[cfg.chave] || [];
+      const total = linhas.reduce((acc, l) => acc + (Number(l[cfg.campoValor]) || 0), 0);
+      const itens = notasPorOrigem(linhas, cfg.campoValor);
+      return fraseOrigem(total, itens, { descricao: cfg.descricao, preposicaoSingular: cfg.preposicaoSingular, verbo: "registados" });
+    })
+    .filter(Boolean)
+    .join("\n  ");
+}
+
+// Notas administrativas (regime de tributação, dependentes, contas no estrangeiro,
+// IBAN de reembolso) — identificação rápida do que foi considerado, ao estilo de uma
+// carta de acompanhamento. Só aparecem quando há algo a dizer (nunca uma lista vazia).
+function notasAdministrativas(agregado, notas) {
+  const n = notas || {};
+  const itens = [];
+
+  itens.push(agregado.tributacaoConjunta ? "Tributação conjunta" : "Tributação separada");
+
+  const dependentes = n.dependentes || [];
+  if (dependentes.length) {
+    const nomes = dependentes.map(d => escHTML(d.nome || d.nif || "(sem identificação)"));
+    itens.push(`${dependentes.length} dependente(s): ${listaPortugues(nomes)}`);
+  }
+
+  const contasIban = (n.contasEstrangeiroIbanBic || []).filter(c => c.iban);
+  const contasOutras = (n.contasEstrangeiroOutras || []).filter(c => c.outrosNumIdentificacao);
+  const totalContas = contasIban.length + contasOutras.length;
+  if (totalContas) {
+    const identificacoes = [...contasIban.map(c => escHTML(c.iban)), ...contasOutras.map(c => escHTML(c.outrosNumIdentificacao))];
+    itens.push(`${totalContas} conta(s) no estrangeiro declarada(s) (Anexo J, Quadro 11): ${listaPortugues(identificacoes)}`);
+  }
+
+  if (agregado.iban) itens.push(`IBAN para reembolso: ${escHTML(agregado.iban)}`);
+
+  if (!itens.length) return "";
+  return `<ul class="elementos-considerados">${itens.map(i => `<li>${i}</li>`).join("")}</ul>`;
 }
 
 function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
@@ -134,6 +216,8 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
     { descricao: "de valor de realização nas alienações de imóveis (Anexo G, Quadro 4)", preposicaoSingular: "relativo ao imóvel identificado como" });
   const fraseG07 = fraseOrigem(totalRealizacaoG07, notasG07,
     { descricao: "de valor de realização em cessões de posições contratuais/direitos (Anexo G, Quadro 7)", preposicaoSingular: "relativo a" });
+  const frasesOutros = frasesSemCalculo(n);
+  const notasAdmin = notasAdministrativas(agregado, n);
 
   return `<!doctype html>
 <html lang="pt">
@@ -153,6 +237,8 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   .taxa-efetiva { text-align: center; color: #555; font-size: 0.85rem; margin-top: 6px; }
   .nota { font-size: 0.8rem; color: #666; margin: 4px 0 0; }
   .saudacao { font-weight: bold; margin-top: 18px; }
+  .elementos-considerados { font-size: 0.85rem; color: #444; margin: 8px 0 0; padding-left: 20px; }
+  .elementos-considerados li { margin-bottom: 2px; }
   .aviso { margin-top: 30px; padding: 12px; background: #f5f5f0; border-left: 4px solid #999; font-size: 0.85rem; }
   @media print { .no-print { display: none; } }
 </style>
@@ -162,6 +248,7 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   <h1>Estimativa de IRS — Rendimentos de ${nomeAno}</h1>
   <p>Data de emissão: ${dataGeracao}</p>
   ${cabecalhoDestinatario(agregado)}
+  ${notasAdmin}
 
   <h2>Rendimentos</h2>
   <table>
@@ -205,6 +292,11 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   valor de aquisição do direito, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do
   CIRS).</p>` : ""}
   ${fraseG07}
+  ${frasesOutros ? `
+  <h2>Outros elementos registados</h2>
+  <p class="nota">Os valores seguintes foram registados na aplicação mas ainda não têm reflexo nesta
+  estimativa (ver aviso final sobre o âmbito atual do cálculo):</p>
+  ${frasesOutros}` : ""}
 
   <h2>Apuramento do imposto</h2>
   <table>

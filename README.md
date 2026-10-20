@@ -376,34 +376,54 @@ regenerar o `simulador-irs.html`.
   do Quadro 9 (9A-9E, que são referências por número de linha a um regime especial, não
   compras/vendas a calcular).
 
-- **Nota/origem por linha de rendimento, discriminada na carta para cliente**: as
-  tabelas de rendimento das categorias já cobertas pelo motor de cálculo (Anexo A,
-  Anexo B — Quadro 4, Anexo E — Quadros 4A/4B, Anexo G — Quadros 4 e 7) e, para já sem
-  reflexo na carta por essas categorias ainda não entrarem no cálculo (ver abaixo),
-  as do Anexo G Quadro 9/18A/18B e as tabelas principais do Anexo J (4A, 5A, 6A, 7A,
-  8A, 9.1A, 9.2A, 9.4A) ganharam uma coluna extra, opcional, de "Nota/origem": um texto
-  livre para identificar de onde vem aquele rendimento (ex: "EDP", "JP Morgan",
+- **Nota/origem por linha de rendimento, discriminada na carta para cliente**: todas as
+  tabelas de rendimento com nota (Anexo A, Anexo B — Quadro 4, Anexo E — Quadros 4A/4B,
+  Anexo G — Quadros 4, 7, 9 e 18A/18B, e as tabelas principais do Anexo J — 4A, 5A, 6A,
+  7A, 8A, 9.1A, 9.2A, 9.4A) ganharam uma coluna extra, opcional, de "Nota/origem": um
+  texto livre para identificar de onde vem aquele rendimento (ex: "EDP", "JP Morgan",
   "Fidelity"). Não é um campo oficial — não é exportado no XML da declaração, existe só
   para apoiar o preenchimento e a comunicação com o cliente, e por isso também não é
   usado em mais nenhum cálculo.
 
-  Ao gerar a carta, cada categoria (Categoria A, Categoria B, Categoria E — conforme
-  opção pelo englobamento, Categoria G dos Quadros 4 e 7) passa a mostrar, numa frase
-  narrativa a seguir ao total da categoria, o que foi considerado e de onde veio — só
-  quando pelo menos uma linha tem nota preenchida (sem notas, a categoria fica só com o
-  total, sem mais nada a dizer). Quando uma única nota cobre a totalidade do valor da
-  categoria, a frase não repete o montante: "Foram considerados 50.000,00 € de
-  rendimentos do trabalho dependente e de pensões (Categoria A), pagos pela entidade
-  EDP." Com várias origens — ou quando as notas não cobrem a totalidade — enumera cada
-  uma com o seu valor e, havendo diferença, refere-a como "origem não especificada":
-  "Foram considerados 9.000,00 € de rendimentos de capitais — juros e dividendos
-  (Categoria E), provenientes de JP Morgan (5.000,00 €) e Fidelity (4.000,00 €)."
-  Linhas sem nota continuam a somar normalmente para o total da categoria, sem forçar
-  menção própria. Nos Quadros 4 e 7 do Anexo G, como o valor mostrado na categoria já é
-  o resultado do cálculo da mais-valia (50% do saldo, com eventuais exclusões por
-  reinvestimento), a frase usa antes o valor de realização somado de todas as linhas
-  (identificado como tal na própria frase), que não é o mesmo valor da categoria — é só
-  informação do montante considerado por origem, não uma reconciliação do cálculo.
+  Ao gerar a carta, cada categoria já coberta pelo motor de cálculo (Categoria A,
+  Categoria B, Categoria E — conforme opção pelo englobamento, Categoria G dos Quadros
+  4 e 7) passa a mostrar, numa frase narrativa a seguir ao total da categoria, o que foi
+  considerado e de onde veio — só quando pelo menos uma linha tem nota preenchida (sem
+  notas, a categoria fica só com o total, sem mais nada a dizer). Quando uma única nota
+  cobre a totalidade do valor da categoria, a frase não repete o montante: "Foram
+  considerados 50.000,00 € de rendimentos do trabalho dependente e de pensões
+  (Categoria A), pagos pela entidade EDP." Com várias origens — ou quando as notas não
+  cobrem a totalidade — enumera cada uma com o seu valor e, havendo diferença, refere-a
+  como "origem não especificada": "Foram considerados 9.000,00 € de rendimentos de
+  capitais — juros e dividendos (Categoria E), provenientes de JP Morgan (5.000,00 €) e
+  Fidelity (4.000,00 €)." Linhas sem nota continuam a somar normalmente para o total da
+  categoria, sem forçar menção própria. Nos Quadros 4 e 7 do Anexo G, como o valor
+  mostrado na categoria já é o resultado do cálculo da mais-valia (50% do saldo, com
+  eventuais exclusões por reinvestimento), a frase usa antes o valor de realização
+  somado de todas as linhas (identificado como tal na própria frase), que não é o mesmo
+  valor da categoria — é só informação do montante considerado por origem, não uma
+  reconciliação do cálculo.
+
+  As tabelas com nota que **ainda não entram no motor de cálculo** (Anexo G Quadros 9 e
+  18A/18B, e todo o Anexo J — regime de não residentes, ver "Por confirmar/próximos
+  passos") também geram frase, mas numa secção própria da carta, "Outros elementos
+  registados", e com o verbo "registados" em vez de "considerados" — para não sugerir
+  que esses valores influenciaram a estimativa quando na realidade ainda não entram no
+  cálculo. Esta secção só aparece quando há pelo menos uma nota preenchida nessas
+  tabelas.
+
+- **Notas administrativas na carta (regime de tributação, dependentes, contas no
+  estrangeiro, IBAN)**: logo após a saudação, a carta lista, em formato compacto, o
+  regime de tributação (conjunta/separada — não existe um campo de "estado civil"
+  próprio; usa-se o que a aplicação já sabe, sem inventar informação não indicada), os
+  dependentes considerados (por nome, quando preenchido — ver abaixo — ou por NIF), as
+  contas no estrangeiro declaradas no Quadro 11 do Anexo J (por IBAN ou outro número de
+  identificação) e o IBAN indicado para reembolso. Cada item só aparece quando há algo a
+  dizer (nunca mostra "0 contas" ou uma lista vazia).
+
+  A tabela de Dependentes ganhou um campo opcional "Nome", só para a carta (fora do
+  XML — a declaração oficial só pede o NIF), para a nota poder identificar cada
+  dependente por nome em vez de pelo NIF.
 
 - **Nome do(s) sujeito(s) passivo(s), para a carta soar a carta de acompanhamento**:
   dois campos opcionais no Rosto ("Nome Sujeito Passivo A/B", só para a carta — não
