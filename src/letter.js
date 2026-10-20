@@ -25,7 +25,35 @@ function linha(label, valor, opcoes) {
   return `<tr${classe}><td>${label}</td><td>${formatarMoeda(valor)} €</td></tr>`;
 }
 
-function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
+function escHTML(texto) {
+  return String(texto === undefined || texto === null ? "" : texto)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Agrupa linhas de uma tabela de rendimentos pela nota/origem opcional que o utilizador
+// preencheu (ex: "EDP", "JP Morgan"), somando o campo monetário indicado. Linhas sem nota
+// não aparecem aqui — ficam só no total da categoria, sem discriminação própria.
+function notasPorOrigem(linhas, campoValor) {
+  const mapa = new Map();
+  (linhas || []).forEach(l => {
+    const chave = (l.nota || "").trim();
+    if (!chave) return;
+    const valor = Number(l[campoValor]) || 0;
+    mapa.set(chave, (mapa.get(chave) || 0) + valor);
+  });
+  return [...mapa.entries()].map(([nota, valor]) => ({ nota, valor }));
+}
+
+// Linha compacta (uma só, todas as origens juntas) a seguir à linha da categoria, só
+// quando há pelo menos uma nota preenchida — para não sobrecarregar a carta.
+function linhaNotas(itens, { comPrefixo } = {}) {
+  if (!itens || !itens.length) return "";
+  const prefixo = comPrefixo ? `${comPrefixo}: ` : "";
+  const texto = itens.map(i => `${escHTML(i.nota)} — ${formatarMoeda(i.valor)} €`).join("; ");
+  return `<tr class="linha-notas"><td colspan="2">${prefixo}${texto}</td></tr>`;
+}
+
+function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   const nomeAno = agregado.ano;
   const sinalResultado = resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "Valor estimado a pagar";
   const valorAbs = formatarMoeda(Math.abs(resultado.resultado));
@@ -37,6 +65,17 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const temCategoriaG = (categoriaG.detalhe || []).length > 0;
   const categoriaGQuadro07 = resultado.categoriaGQuadro07 || {};
   const temCategoriaGQuadro07 = (categoriaGQuadro07.detalhe || []).length > 0;
+
+  // Discriminação por origem (nota opcional em cada linha de rendimento) — só para
+  // informação do cliente, não altera nenhum valor calculado.
+  const n = notas || {};
+  const notasA = notasPorOrigem(n.anexoA, "rendimentos");
+  const notasB = notasPorOrigem(n.anexoB, "valor");
+  const notasE4A = notasPorOrigem(n.anexoE4A, "rendimento");
+  const notasE4B = notasPorOrigem(n.anexoE4B, "rendimento");
+  const notasEEnglobado = [...notasE4A, ...notasE4B];
+  const notasG04 = notasPorOrigem(n.anexoG04, "valorRealizacao");
+  const notasG07 = notasPorOrigem(n.anexoG07, "valorRealizacao");
 
   return `<!doctype html>
 <html lang="pt">
@@ -55,6 +94,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   .resultado-final .valor { font-size: 1.6rem; font-weight: bold; }
   .taxa-efetiva { text-align: center; color: #555; font-size: 0.85rem; margin-top: 6px; }
   .nota { font-size: 0.8rem; color: #666; margin: 4px 0 0; }
+  tr.linha-notas td { font-size: 0.78rem; color: #666; font-style: italic; padding: 0 8px 6px 20px; border-bottom: 1px solid #eee; }
   .aviso { margin-top: 30px; padding: 12px; background: #f5f5f0; border-left: 4px solid #999; font-size: 0.85rem; }
   @media print { .no-print { display: none; } }
 </style>
@@ -69,16 +109,18 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <table>
     ${resultado.rendimentoBrutoA ? `
     ${linha("Categoria A — rendimento bruto (trabalho/pensões)", resultado.rendimentoBrutoA)}
+    ${linhaNotas(notasA)}
     ${linha("Categoria A — dedução específica", -resultado.deducaoEspecifica)}` : ""}
     ${temCategoriaB ? `
     ${linha("Categoria B — rendimento bruto (regime simplificado)", resultado.rendimentoBrutoB)}
+    ${linhaNotas(notasB)}
     ${linha("Categoria B — após coeficiente aplicável", resultado.rendimentoTributavelBaseB)}
     ${temAcrescimo ? linha("Categoria B — acréscimo por despesas insuficientes", resultado.acrescimoAoRendimentoB) : ""}` : ""}
     ${temCategoriaE ? (categoriaE.optaEnglobamento
-      ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
-      : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
-    ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
-    ${temCategoriaGQuadro07 ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel) : ""}
+      ? `${linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)}${linhaNotas(notasEEnglobado)}`
+      : `${linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)}${linhaNotas(notasE4A)}`) : ""}
+    ${temCategoriaG ? `${linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel)}${linhaNotas(notasG04, { comPrefixo: "Valor de realização" })}` : ""}
+    ${temCategoriaGQuadro07 ? `${linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel)}${linhaNotas(notasG07, { comPrefixo: "Valor de realização" })}` : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas

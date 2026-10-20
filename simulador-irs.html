@@ -392,7 +392,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <option value="419">419 — Rendimentos em criptoativos (2024+)</option>
 </datalist>
 <table id="tabelaAnexoA">
-  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th>Contribuições (€)</th><th></th></tr></thead>
+  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th>Contribuições (€)</th><th>Nota/origem (carta)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoA()">+ Adicionar rendimento</button>
@@ -456,7 +456,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <option value="482">482 — Acréscimo de gastos com depreciações/imparidades (4C)</option>
 </datalist>
 <table id="tabelaAnexoBRendimentos">
-  <thead><tr><th>Código</th><th>Valor (€)</th><th></th></tr></thead>
+  <thead><tr><th>Código</th><th>Valor (€)</th><th>Nota/origem (carta)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoBRendimento()">+ Adicionar rendimento</button>
@@ -694,7 +694,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 
 <h3>Rendimentos sujeitos a taxas especiais — art.º 72.º CIRS (Quadro 4A)</h3>
 <table id="tabelaAnexoE4A">
-  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th></th></tr></thead>
+  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Nota/origem (carta)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE4A()">+ Adicionar rendimento</button>
@@ -708,7 +708,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <h3>Rendimentos sujeitos a taxas liberatórias — art.º 71.º CIRS (Quadro 4B)</h3>
 <p class="aviso-topo">Só relevante se optou pelo englobamento acima.</p>
 <table id="tabelaAnexoE4B">
-  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th></th></tr></thead>
+  <thead><tr><th>NIF entidade</th><th>Código</th><th>Titular</th><th>Rendimento (€)</th><th>Retenção (€)</th><th>Nota/origem (carta)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoE4B()">+ Adicionar rendimento</button>
@@ -752,7 +752,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <thead><tr>
     <th>Titular</th><th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
     <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th><th>Despesas/encargos (€)</th>
-    <th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th></th>
+    <th>Freguesia</th><th>Tipo</th><th>Artigo</th><th>Fração</th><th>Quota (%)</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -961,7 +961,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
   <option value="G72">G72 — Direitos sobre estruturas fiduciárias (cessão da posição do beneficiário)</option>
 </datalist>
 <table id="tabelaAnexoG07">
-  <thead><tr><th>Titular</th><th>Cód. operação</th><th>Valor de realização (€)</th><th>Valor de aquisição (€)</th><th></th></tr></thead>
+  <thead><tr><th>Titular</th><th>Cód. operação</th><th>Valor de realização (€)</th><th>Valor de aquisição (€)</th><th>Nota (carta)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoG07()">+ Adicionar</button>
@@ -998,7 +998,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
     <th>Titular</th><th>NIF</th><th>Código</th>
     <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
     <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
-    <th>Despesas/encargos (€)</th><th>País contraparte</th><th>Valores mob. admitidos/OIC abertos?</th><th></th>
+    <th>Despesas/encargos (€)</th><th>País contraparte</th><th>Valores mob. admitidos/OIC abertos?</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1261,7 +1261,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
     <th>Titular</th><th>NIF português</th><th>País ent. gestora</th>
     <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
     <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
-    <th>Despesas/encargos (€)</th><th>País contraparte</th><th></th>
+    <th>Despesas/encargos (€)</th><th>País contraparte</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1275,7 +1275,7 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
     <th>Titular</th><th>NIF português</th><th>País ent. gestora</th>
     <th>Ano realiz.</th><th>Mês</th><th>Dia</th><th>Valor realização (€)</th>
     <th>Ano aquis.</th><th>Mês</th><th>Dia</th><th>Valor aquisição (€)</th>
-    <th>Despesas/encargos (€)</th><th>País contraparte</th><th></th>
+    <th>Despesas/encargos (€)</th><th>País contraparte</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1456,7 +1456,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <table id="tabelaAnexoJ04A">
   <thead><tr>
     <th>Código</th><th>País da fonte</th><th>Rendimento bruto (€)</th><th>Contrib. regime proteção social (€)</th>
-    <th>Imposto pago no estrangeiro (€)</th><th>NIF entidade (PT)</th><th>Retenção na fonte (€)</th><th>Retenção sobretaxa (€)</th><th></th>
+    <th>Imposto pago no estrangeiro (€)</th><th>NIF entidade (PT)</th><th>Retenção na fonte (€)</th><th>Retenção sobretaxa (€)</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1524,7 +1524,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
 <table id="tabelaAnexoJ05A">
   <thead><tr>
     <th>Código</th><th>País da fonte</th><th>Rendimento bruto (€)</th>
-    <th>Contrib. regime proteção social (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th>
+    <th>Contrib. regime proteção social (€)</th><th>Imposto pago no estrangeiro (€)</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1585,7 +1585,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <thead><tr>
     <th>Código</th><th>País da fonte</th><th>Estab. estável/instalação fixa?</th><th>Rendimento (€)</th>
     <th>Contrib. regime proteção social (€)</th><th>Imposto pago no estrangeiro (€)</th>
-    <th>NIF entidade retentora (PT)</th><th>Retenção na fonte (€)</th><th></th>
+    <th>NIF entidade retentora (PT)</th><th>Retenção na fonte (€)</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1608,7 +1608,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
 
 <h3>Rendimentos prediais (Quadro 7A — Categoria F)</h3>
 <table id="tabelaAnexoJ07A">
-  <thead><tr><th>Código</th><th>País da fonte</th><th>Rendimento líquido (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th></tr></thead>
+  <thead><tr><th>Código</th><th>País da fonte</th><th>Rendimento líquido (€)</th><th>Imposto pago no estrangeiro (€)</th><th>Nota (carta)</th><th></th></tr></thead>
   <tbody></tbody>
 </table>
 <button type="button" onclick="adicionarLinhaAnexoJ07A()">+ Adicionar</button>
@@ -1655,7 +1655,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
     <th>Imposto estrangeiro — país da fonte (€)</th>
     <th>Imposto estrangeiro — país agente pagador</th>
     <th>Imposto estrangeiro — imposto retido (€)</th>
-    <th>NIF entidade retentora (PT)</th><th>Retenção na fonte (€)</th><th></th>
+    <th>NIF entidade retentora (PT)</th><th>Retenção na fonte (€)</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1688,7 +1688,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
   <thead><tr>
     <th>País da fonte</th><th>Realização — Ano</th><th>Realização — Mês</th><th>Valor realização (€)</th>
     <th>Aquisição — Ano</th><th>Aquisição — Mês</th><th>Valor aquisição (€)</th>
-    <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th><th></th>
+    <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1733,7 +1733,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
     <th>Realização — Ano</th><th>Realização — Mês</th><th>Realização — Dia</th><th>Valor realização (€)</th>
     <th>Aquisição — Ano</th><th>Aquisição — Mês</th><th>Aquisição — Dia</th><th>Valor aquisição (€)</th>
     <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th>
-    <th>País da contraparte</th><th>Valores mobiliários/OIC aberto?</th><th></th>
+    <th>País da contraparte</th><th>Valores mobiliários/OIC aberto?</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -1806,7 +1806,7 @@ indicares, assume-se o escalão mais baixo.</small></p>
     <th>Realização — Ano</th><th>Realização — Mês</th><th>Realização — Dia</th><th>Valor realização (€)</th>
     <th>Aquisição — Ano</th><th>Aquisição — Mês</th><th>Aquisição — Dia</th><th>Valor aquisição (€)</th>
     <th>Despesas e encargos (€)</th><th>Imposto pago no estrangeiro (€)</th>
-    <th>País da contraparte</th><th></th>
+    <th>País da contraparte</th><th>Nota (carta)</th><th></th>
   </tr></thead>
   <tbody></tbody>
 </table>
@@ -6011,7 +6011,35 @@ function linha(label, valor, opcoes) {
   return `<tr${classe}><td>${label}</td><td>${formatarMoeda(valor)} €</td></tr>`;
 }
 
-function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
+function escHTML(texto) {
+  return String(texto === undefined || texto === null ? "" : texto)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Agrupa linhas de uma tabela de rendimentos pela nota/origem opcional que o utilizador
+// preencheu (ex: "EDP", "JP Morgan"), somando o campo monetário indicado. Linhas sem nota
+// não aparecem aqui — ficam só no total da categoria, sem discriminação própria.
+function notasPorOrigem(linhas, campoValor) {
+  const mapa = new Map();
+  (linhas || []).forEach(l => {
+    const chave = (l.nota || "").trim();
+    if (!chave) return;
+    const valor = Number(l[campoValor]) || 0;
+    mapa.set(chave, (mapa.get(chave) || 0) + valor);
+  });
+  return [...mapa.entries()].map(([nota, valor]) => ({ nota, valor }));
+}
+
+// Linha compacta (uma só, todas as origens juntas) a seguir à linha da categoria, só
+// quando há pelo menos uma nota preenchida — para não sobrecarregar a carta.
+function linhaNotas(itens, { comPrefixo } = {}) {
+  if (!itens || !itens.length) return "";
+  const prefixo = comPrefixo ? `${comPrefixo}: ` : "";
+  const texto = itens.map(i => `${escHTML(i.nota)} — ${formatarMoeda(i.valor)} €`).join("; ");
+  return `<tr class="linha-notas"><td colspan="2">${prefixo}${texto}</td></tr>`;
+}
+
+function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   const nomeAno = agregado.ano;
   const sinalResultado = resultado.tipoResultado === "reembolso" ? "Reembolso estimado" : "Valor estimado a pagar";
   const valorAbs = formatarMoeda(Math.abs(resultado.resultado));
@@ -6023,6 +6051,17 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   const temCategoriaG = (categoriaG.detalhe || []).length > 0;
   const categoriaGQuadro07 = resultado.categoriaGQuadro07 || {};
   const temCategoriaGQuadro07 = (categoriaGQuadro07.detalhe || []).length > 0;
+
+  // Discriminação por origem (nota opcional em cada linha de rendimento) — só para
+  // informação do cliente, não altera nenhum valor calculado.
+  const n = notas || {};
+  const notasA = notasPorOrigem(n.anexoA, "rendimentos");
+  const notasB = notasPorOrigem(n.anexoB, "valor");
+  const notasE4A = notasPorOrigem(n.anexoE4A, "rendimento");
+  const notasE4B = notasPorOrigem(n.anexoE4B, "rendimento");
+  const notasEEnglobado = [...notasE4A, ...notasE4B];
+  const notasG04 = notasPorOrigem(n.anexoG04, "valorRealizacao");
+  const notasG07 = notasPorOrigem(n.anexoG07, "valorRealizacao");
 
   return `<!doctype html>
 <html lang="pt">
@@ -6041,6 +6080,7 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   .resultado-final .valor { font-size: 1.6rem; font-weight: bold; }
   .taxa-efetiva { text-align: center; color: #555; font-size: 0.85rem; margin-top: 6px; }
   .nota { font-size: 0.8rem; color: #666; margin: 4px 0 0; }
+  tr.linha-notas td { font-size: 0.78rem; color: #666; font-style: italic; padding: 0 8px 6px 20px; border-bottom: 1px solid #eee; }
   .aviso { margin-top: 30px; padding: 12px; background: #f5f5f0; border-left: 4px solid #999; font-size: 0.85rem; }
   @media print { .no-print { display: none; } }
 </style>
@@ -6055,16 +6095,18 @@ function gerarCartaHTML({ agregado, resultado, dataGeracao }) {
   <table>
     ${resultado.rendimentoBrutoA ? `
     ${linha("Categoria A — rendimento bruto (trabalho/pensões)", resultado.rendimentoBrutoA)}
+    ${linhaNotas(notasA)}
     ${linha("Categoria A — dedução específica", -resultado.deducaoEspecifica)}` : ""}
     ${temCategoriaB ? `
     ${linha("Categoria B — rendimento bruto (regime simplificado)", resultado.rendimentoBrutoB)}
+    ${linhaNotas(notasB)}
     ${linha("Categoria B — após coeficiente aplicável", resultado.rendimentoTributavelBaseB)}
     ${temAcrescimo ? linha("Categoria B — acréscimo por despesas insuficientes", resultado.acrescimoAoRendimentoB) : ""}` : ""}
     ${temCategoriaE ? (categoriaE.optaEnglobamento
-      ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
-      : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
-    ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
-    ${temCategoriaGQuadro07 ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel) : ""}
+      ? `${linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)}${linhaNotas(notasEEnglobado)}`
+      : `${linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)}${linhaNotas(notasE4A)}`) : ""}
+    ${temCategoriaG ? `${linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel)}${linhaNotas(notasG04, { comPrefixo: "Valor de realização" })}` : ""}
+    ${temCategoriaGQuadro07 ? `${linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel)}${linhaNotas(notasG07, { comPrefixo: "Valor de realização" })}` : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
@@ -6507,7 +6549,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "a-rendimento", numero: true },
         { classe: "a-retencao", numero: true },
-        { classe: "a-contribuicao", numero: true }
+        { classe: "a-contribuicao", numero: true },
+        { classe: "a-nota" }
       ]
     },
     tabelaAnexoB07EntidadesSS: {
@@ -6666,7 +6709,8 @@ if (typeof module !== "undefined" && module.exports) {
       adicionar: "adicionarLinhaAnexoBRendimento",
       colunas: [
         { classe: "ab-r-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoB" } },
-        { classe: "ab-r-valor", numero: true }
+        { classe: "ab-r-valor", numero: true },
+        { classe: "ab-r-nota" }
       ]
     },
     tabelaAnexoE4A: {
@@ -6676,7 +6720,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ae4a-nif" },
         { classe: "ae4a-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoE" } },
         { classe: "ae4a-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
-        { classe: "ae4a-rendimento", numero: true }
+        { classe: "ae4a-rendimento", numero: true },
+        { classe: "ae4a-nota" }
       ]
     },
     tabelaAnexoE4B: {
@@ -6687,7 +6732,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ae4b-codigo", opcoes: { tipo: "datalist", id: "listaCodigosAnexoE" } },
         { classe: "ae4b-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "ae4b-rendimento", numero: true },
-        { classe: "ae4b-retencao", numero: true }
+        { classe: "ae4b-retencao", numero: true },
+        { classe: "ae4b-nota" }
       ]
     },
     tabelaAnexoE5A: {
@@ -6730,7 +6776,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag04-tipo", opcoes: { tipo: "fixo", valores: ["U", "R", "O"] } },
         { classe: "ag04-artigo" },
         { classe: "ag04-fraccao" },
-        { classe: "ag04-quota", numero: true }
+        { classe: "ag04-quota", numero: true },
+        { classe: "ag04-nota" }
       ]
     },
     tabelaAnexoG04A: {
@@ -6876,7 +6923,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag07-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
         { classe: "ag07-codoperacao", opcoes: { tipo: "datalist", id: "listaCodOperacaoG07" } },
         { classe: "ag07-valorrealizacao", numero: true },
-        { classe: "ag07-valoraquisicao", numero: true }
+        { classe: "ag07-valoraquisicao", numero: true },
+        { classe: "ag07-nota" }
       ]
     },
     tabelaAnexoG08: {
@@ -6905,7 +6953,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag09-valoraquisicao", numero: true },
         { classe: "ag09-despesas", numero: true },
         { classe: "ag09-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
-        { classe: "ag09-respeitavm", checkbox: true }
+        { classe: "ag09-respeitavm", checkbox: true },
+        { classe: "ag09-nota" }
       ]
     },
     tabelaAnexoG09A: {
@@ -7078,7 +7127,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag18a-diaaquisicao", numero: true },
         { classe: "ag18a-valoraquisicao", numero: true },
         { classe: "ag18a-despesas", numero: true },
-        { classe: "ag18a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
+        { classe: "ag18a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } },
+        { classe: "ag18a-nota" }
       ]
     },
     tabelaAnexoG18B: {
@@ -7097,7 +7147,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "ag18b-diaaquisicao", numero: true },
         { classe: "ag18b-valoraquisicao", numero: true },
         { classe: "ag18b-despesas", numero: true },
-        { classe: "ag18b-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
+        { classe: "ag18b-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } },
+        { classe: "ag18b-nota" }
       ]
     },
     tabelaFifoCripto: {
@@ -7214,7 +7265,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj04a-impostoestrangeiro", numero: true },
         { classe: "aj04a-nif" },
         { classe: "aj04a-retencaofonte", numero: true },
-        { classe: "aj04a-retencaosobretaxa", numero: true }
+        { classe: "aj04a-retencaosobretaxa", numero: true },
+        { classe: "aj04a-nota" }
       ]
     },
     tabelaAnexoJ04C: {
@@ -7238,7 +7290,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj05a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj05a-rendimento", numero: true },
         { classe: "aj05a-contribsocial", numero: true },
-        { classe: "aj05a-impostoestrangeiro", numero: true }
+        { classe: "aj05a-impostoestrangeiro", numero: true },
+        { classe: "aj05a-nota" }
       ]
     },
     tabelaAnexoJ05C: {
@@ -7263,7 +7316,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj06a-contribsocial", numero: true },
         { classe: "aj06a-impostoestrangeiro", numero: true },
         { classe: "aj06a-nifretentora" },
-        { classe: "aj06a-retencaofonte", numero: true }
+        { classe: "aj06a-retencaofonte", numero: true },
+        { classe: "aj06a-nota" }
       ]
     },
     tabelaAnexoJ06B: {
@@ -7282,7 +7336,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj07a-codigo" },
         { classe: "aj07a-pais", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj07a-rendimento", numero: true },
-        { classe: "aj07a-impostoestrangeiro", numero: true }
+        { classe: "aj07a-impostoestrangeiro", numero: true },
+        { classe: "aj07a-nota" }
       ]
     },
     tabelaAnexoJ08A: {
@@ -7296,7 +7351,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj08a-paispagador", opcoes: { tipo: "datalist", id: "listaPaises" } },
         { classe: "aj08a-impostoretido", numero: true },
         { classe: "aj08a-nif" },
-        { classe: "aj08a-retencaofonte", numero: true }
+        { classe: "aj08a-retencaofonte", numero: true },
+        { classe: "aj08a-nota" }
       ]
     },
     tabelaAnexoJ091A: {
@@ -7311,7 +7367,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj091a-mesaquisicao", numero: true },
         { classe: "aj091a-valoraquisicao", numero: true },
         { classe: "aj091a-despesas", numero: true },
-        { classe: "aj091a-impostoestrangeiro", numero: true }
+        { classe: "aj091a-impostoestrangeiro", numero: true },
+        { classe: "aj091a-nota" }
       ]
     },
     tabelaAnexoJ091B: {
@@ -7341,7 +7398,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj092a-despesas", numero: true },
         { classe: "aj092a-impostoestrangeiro", numero: true },
         { classe: "aj092a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } },
-        { classe: "aj092a-respeitavm", opcoes: { tipo: "fixo", valores: ["S", "N"] } }
+        { classe: "aj092a-respeitavm", opcoes: { tipo: "fixo", valores: ["S", "N"] } },
+        { classe: "aj092a-nota" }
       ]
     },
     tabelaAnexoJ092A1: {
@@ -7378,7 +7436,8 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "aj094a-valoraquisicao", numero: true },
         { classe: "aj094a-despesas", numero: true },
         { classe: "aj094a-impostoestrangeiro", numero: true },
-        { classe: "aj094a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
+        { classe: "aj094a-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } },
+        { classe: "aj094a-nota" }
       ]
     },
     tabelaAnexoJ10A: {
@@ -7655,6 +7714,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="a-rendimento" type="number" step="0.01"></td>
       <td><input class="a-retencao" type="number" step="0.01"></td>
       <td><input class="a-contribuicao" type="number" step="0.01"></td>
+      <td><input class="a-nota" size="14" placeholder="ex: EDP"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -7666,6 +7726,7 @@ if (typeof module !== "undefined" && module.exports) {
     tr.innerHTML = `
       <td><input class="ab-r-codigo" size="4" list="listaCodigosAnexoB"></td>
       <td><input class="ab-r-valor" type="number" step="0.01"></td>
+      <td><input class="ab-r-nota" size="14" placeholder="ex: EDP"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -8026,7 +8087,8 @@ if (typeof module !== "undefined" && module.exports) {
   function lerAnexoB() {
     const rendimentosBrutos = [...document.querySelectorAll("#tabelaAnexoBRendimentos tbody tr")].map(tr => ({
       codigo: tr.querySelector(".ab-r-codigo").value,
-      valor: tr.querySelector(".ab-r-valor").value || 0
+      valor: tr.querySelector(".ab-r-valor").value || 0,
+      nota: tr.querySelector(".ab-r-nota").value.trim() || undefined
     }));
     const entidades = [...document.querySelectorAll("#tabelaAnexoBEntidadesRetencao tbody tr")].map(tr => ({
       nif: tr.querySelector(".ab-e-nif").value,
@@ -8126,6 +8188,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ae4a-codigo" size="5" list="listaCodigosAnexoE"></td>
       <td><select class="ae4a-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
       <td><input class="ae4a-rendimento" type="number" step="0.01"></td>
+      <td><input class="ae4a-nota" size="14" placeholder="ex: JP Morgan"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -8140,6 +8203,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><select class="ae4b-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
       <td><input class="ae4b-rendimento" type="number" step="0.01"></td>
       <td><input class="ae4b-retencao" type="number" step="0.01"></td>
+      <td><input class="ae4b-nota" size="14" placeholder="ex: Fidelity"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -8178,14 +8242,16 @@ if (typeof module !== "undefined" && module.exports) {
       nif: tr.querySelector(".ae4a-nif").value,
       codigo: tr.querySelector(".ae4a-codigo").value,
       titular: tr.querySelector(".ae4a-titular").value,
-      rendimento: tr.querySelector(".ae4a-rendimento").value || 0
+      rendimento: tr.querySelector(".ae4a-rendimento").value || 0,
+      nota: tr.querySelector(".ae4a-nota").value.trim() || undefined
     }));
     const rendimentosTaxasLiberatorias = [...document.querySelectorAll("#tabelaAnexoE4B tbody tr")].map(tr => ({
       nif: tr.querySelector(".ae4b-nif").value,
       codigo: tr.querySelector(".ae4b-codigo").value,
       titular: tr.querySelector(".ae4b-titular").value,
       rendimento: tr.querySelector(".ae4b-rendimento").value || 0,
-      retencao: tr.querySelector(".ae4b-retencao").value || 0
+      retencao: tr.querySelector(".ae4b-retencao").value || 0,
+      nota: tr.querySelector(".ae4b-nota").value.trim() || undefined
     }));
     const rendimentosAnosAnteriores5A = [...document.querySelectorAll("#tabelaAnexoE5A tbody tr")].map(tr => ({
       quadro: tr.querySelector(".ae5a-quadro").value,
@@ -8225,6 +8291,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ag04-artigo" size="8"></td>
       <td><input class="ag04-fraccao" size="6"></td>
       <td><input class="ag04-quota" type="number" step="0.01"></td>
+      <td><input class="ag04-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -8380,7 +8447,8 @@ if (typeof module !== "undefined" && module.exports) {
       tipoPredio: tr.querySelector(".ag04-tipo").value,
       artigo: tr.querySelector(".ag04-artigo").value,
       fraccao: tr.querySelector(".ag04-fraccao").value || undefined,
-      quotaParte: tr.querySelector(".ag04-quota").value || undefined
+      quotaParte: tr.querySelector(".ag04-quota").value || undefined,
+      nota: tr.querySelector(".ag04-nota").value.trim() || undefined
     }));
     const reabilitacao = [...document.querySelectorAll("#tabelaAnexoG04A tbody tr")].map(tr => ({
       campoQ4: tr.querySelector(".ag04a-campo").value,
@@ -8586,6 +8654,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ag07-codoperacao" size="4" list="listaCodOperacaoG07"></td>
       <td><input class="ag07-valorrealizacao" type="number" step="0.01"></td>
       <td><input class="ag07-valoraquisicao" type="number" step="0.01"></td>
+      <td><input class="ag07-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -8596,7 +8665,8 @@ if (typeof module !== "undefined" && module.exports) {
       titular: tr.querySelector(".ag07-titular").value,
       codOperacao: tr.querySelector(".ag07-codoperacao").value,
       valorRealizacao: tr.querySelector(".ag07-valorrealizacao").value || 0,
-      valorAquisicao: tr.querySelector(".ag07-valoraquisicao").value || 0
+      valorAquisicao: tr.querySelector(".ag07-valoraquisicao").value || 0,
+      nota: tr.querySelector(".ag07-nota").value.trim() || undefined
     }));
   }
 
@@ -8702,6 +8772,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="${prefixoClasse}-valoraquisicao" type="number" step="0.01"></td>
       <td><input class="${prefixoClasse}-despesas" type="number" step="0.01"></td>
       <td><input class="${prefixoClasse}-paiscontraparte" size="4" list="listaPaises"></td>
+      <td><input class="${prefixoClasse}-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     return tr;
@@ -8721,7 +8792,8 @@ if (typeof module !== "undefined" && module.exports) {
       diaAquisicao: tr.querySelector(`.${prefixoClasse}-diaaquisicao`).value,
       valorAquisicao: tr.querySelector(`.${prefixoClasse}-valoraquisicao`).value || 0,
       despesasEncargos: tr.querySelector(`.${prefixoClasse}-despesas`).value || 0,
-      codPaisContraparte: tr.querySelector(`.${prefixoClasse}-paiscontraparte`).value || undefined
+      codPaisContraparte: tr.querySelector(`.${prefixoClasse}-paiscontraparte`).value || undefined,
+      nota: tr.querySelector(`.${prefixoClasse}-nota`).value.trim() || undefined
     }));
   }
 
@@ -9129,6 +9201,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="ag09-despesas" type="number" step="0.01"></td>
       <td><input class="ag09-pais" size="4" list="listaPaises"></td>
       <td><input class="ag09-respeitavm" type="checkbox"></td>
+      <td><input class="ag09-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9149,7 +9222,8 @@ if (typeof module !== "undefined" && module.exports) {
       valorAquisicao: tr.querySelector(".ag09-valoraquisicao").value || 0,
       despesasEncargos: tr.querySelector(".ag09-despesas").value || 0,
       paisContraparte: tr.querySelector(".ag09-pais").value || undefined,
-      respeitaValoresMobiliarios: tr.querySelector(".ag09-respeitavm").checked
+      respeitaValoresMobiliarios: tr.querySelector(".ag09-respeitavm").checked,
+      nota: tr.querySelector(".ag09-nota").value.trim() || undefined
     }));
   }
 
@@ -9485,6 +9559,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj04a-nif" size="10"></td>
       <td><input class="aj04a-retencaofonte" type="number" step="0.01"></td>
       <td><input class="aj04a-retencaosobretaxa" type="number" step="0.01"></td>
+      <td><input class="aj04a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9499,7 +9574,8 @@ if (typeof module !== "undefined" && module.exports) {
       impostoPagoEstrangeiro: tr.querySelector(".aj04a-impostoestrangeiro").value || 0,
       nif: tr.querySelector(".aj04a-nif").value || undefined,
       retencaoFonte: tr.querySelector(".aj04a-retencaofonte").value || 0,
-      retencaoSobretaxa: tr.querySelector(".aj04a-retencaosobretaxa").value || 0
+      retencaoSobretaxa: tr.querySelector(".aj04a-retencaosobretaxa").value || 0,
+      nota: tr.querySelector(".aj04a-nota").value.trim() || undefined
     }));
   }
 
@@ -9540,6 +9616,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj05a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj05a-contribsocial" type="number" step="0.01"></td>
       <td><input class="aj05a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj05a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9551,7 +9628,8 @@ if (typeof module !== "undefined" && module.exports) {
       codPais: tr.querySelector(".aj05a-pais").value,
       rendimentoBruto: tr.querySelector(".aj05a-rendimento").value || 0,
       contribSocial: tr.querySelector(".aj05a-contribsocial").value || 0,
-      impostoPagoEstrangeiro: tr.querySelector(".aj05a-impostoestrangeiro").value || 0
+      impostoPagoEstrangeiro: tr.querySelector(".aj05a-impostoestrangeiro").value || 0,
+      nota: tr.querySelector(".aj05a-nota").value.trim() || undefined
     }));
   }
 
@@ -9591,6 +9669,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj06a-impostoestrangeiro" type="number" step="0.01"></td>
       <td><input class="aj06a-nifretentora" size="10"></td>
       <td><input class="aj06a-retencaofonte" type="number" step="0.01"></td>
+      <td><input class="aj06a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9605,7 +9684,8 @@ if (typeof module !== "undefined" && module.exports) {
       contribSocial: tr.querySelector(".aj06a-contribsocial").value || 0,
       impostoPagoEstrangeiro: tr.querySelector(".aj06a-impostoestrangeiro").value || 0,
       nifEntRetentora: tr.querySelector(".aj06a-nifretentora").value || undefined,
-      retencaoFonte: tr.querySelector(".aj06a-retencaofonte").value || 0
+      retencaoFonte: tr.querySelector(".aj06a-retencaofonte").value || 0,
+      nota: tr.querySelector(".aj06a-nota").value.trim() || undefined
     }));
   }
 
@@ -9637,6 +9717,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj07a-pais" size="4" list="listaPaises"></td>
       <td><input class="aj07a-rendimento" type="number" step="0.01"></td>
       <td><input class="aj07a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj07a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9647,7 +9728,8 @@ if (typeof module !== "undefined" && module.exports) {
       codRendimento: tr.querySelector(".aj07a-codigo").value,
       codPais: tr.querySelector(".aj07a-pais").value,
       rendimentoLiquido: tr.querySelector(".aj07a-rendimento").value || 0,
-      impostoPagoEstrangeiro: tr.querySelector(".aj07a-impostoestrangeiro").value || 0
+      impostoPagoEstrangeiro: tr.querySelector(".aj07a-impostoestrangeiro").value || 0,
+      nota: tr.querySelector(".aj07a-nota").value.trim() || undefined
     }));
   }
 
@@ -9663,6 +9745,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj08a-impostoretido" type="number" step="0.01"></td>
       <td><input class="aj08a-nif" size="10"></td>
       <td><input class="aj08a-retencaofonte" type="number" step="0.01"></td>
+      <td><input class="aj08a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9677,7 +9760,8 @@ if (typeof module !== "undefined" && module.exports) {
       impostoPagoEstrangeiroCodPaisPagador: tr.querySelector(".aj08a-paispagador").value || undefined,
       impostoPagoEstrangeiroImpostoRetido: tr.querySelector(".aj08a-impostoretido").value || 0,
       nifEntRetentora: tr.querySelector(".aj08a-nif").value || undefined,
-      retencaoFonte: tr.querySelector(".aj08a-retencaofonte").value || 0
+      retencaoFonte: tr.querySelector(".aj08a-retencaofonte").value || 0,
+      nota: tr.querySelector(".aj08a-nota").value.trim() || undefined
     }));
   }
 
@@ -9694,6 +9778,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj091a-valoraquisicao" type="number" step="0.01"></td>
       <td><input class="aj091a-despesas" type="number" step="0.01"></td>
       <td><input class="aj091a-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><input class="aj091a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9709,7 +9794,8 @@ if (typeof module !== "undefined" && module.exports) {
       mesAquisicao: tr.querySelector(".aj091a-mesaquisicao").value || undefined,
       valorAquisicao: tr.querySelector(".aj091a-valoraquisicao").value || 0,
       despesasEncargos: tr.querySelector(".aj091a-despesas").value || 0,
-      impostoPagoNoEstrangeiro: tr.querySelector(".aj091a-impostoestrangeiro").value || 0
+      impostoPagoNoEstrangeiro: tr.querySelector(".aj091a-impostoestrangeiro").value || 0,
+      nota: tr.querySelector(".aj091a-nota").value.trim() || undefined
     }));
   }
 
@@ -9753,6 +9839,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj092a-impostoestrangeiro" type="number" step="0.01"></td>
       <td><input class="aj092a-paiscontraparte" size="4" list="listaPaises"></td>
       <td><select class="aj092a-respeitavm"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select></td>
+      <td><input class="aj092a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9775,7 +9862,8 @@ if (typeof module !== "undefined" && module.exports) {
         despesasEncargos: tr.querySelector(".aj092a-despesas").value || 0,
         impostoPagoNoEstrangeiro: tr.querySelector(".aj092a-impostoestrangeiro").value || 0,
         codPaisContraparte: tr.querySelector(".aj092a-paiscontraparte").value || undefined,
-        respeitaValoresMobiliarios: respeitaVmValor === "" ? undefined : respeitaVmValor === "S"
+        respeitaValoresMobiliarios: respeitaVmValor === "" ? undefined : respeitaVmValor === "S",
+        nota: tr.querySelector(".aj092a-nota").value.trim() || undefined
       };
     });
   }
@@ -9838,6 +9926,7 @@ if (typeof module !== "undefined" && module.exports) {
       <td><input class="aj094a-despesas" type="number" step="0.01"></td>
       <td><input class="aj094a-impostoestrangeiro" type="number" step="0.01"></td>
       <td><input class="aj094a-paiscontraparte" size="4" list="listaPaises"></td>
+      <td><input class="aj094a-nota" size="14" placeholder="opcional"></td>
       <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
     `;
     tbody.appendChild(tr);
@@ -9856,7 +9945,8 @@ if (typeof module !== "undefined" && module.exports) {
       valorAquisicao: tr.querySelector(".aj094a-valoraquisicao").value || 0,
       despesasEncargos: tr.querySelector(".aj094a-despesas").value || 0,
       impostoPagoNoEstrangeiro: tr.querySelector(".aj094a-impostoestrangeiro").value || 0,
-      codPaisContraparte: tr.querySelector(".aj094a-paiscontraparte").value || undefined
+      codPaisContraparte: tr.querySelector(".aj094a-paiscontraparte").value || undefined,
+      nota: tr.querySelector(".aj094a-nota").value.trim() || undefined
     }));
   }
 
@@ -10302,7 +10392,8 @@ if (typeof module !== "undefined" && module.exports) {
       titular: tr.querySelector(".a-titular").value,
       rendimentos: Number(tr.querySelector(".a-rendimento").value) || 0,
       retencoes: Number(tr.querySelector(".a-retencao").value) || 0,
-      contribuicoes: Number(tr.querySelector(".a-contribuicao").value) || 0
+      contribuicoes: Number(tr.querySelector(".a-contribuicao").value) || 0,
+      nota: tr.querySelector(".a-nota").value.trim() || undefined
     }));
     return { linhas, ...dadosPreservados.extrasAnexoA };
   }
@@ -10318,6 +10409,16 @@ if (typeof module !== "undefined" && module.exports) {
     const resultado = IRSCalc.calcularEstimativa({ agregado, anexoA, anexoB, anexoE, anexoG, anexoH, despesasEFatura, parametros });
     window._ultimoResultado = resultado;
     window._ultimoAgregado = agregado;
+    // Linhas em bruto (com a nota de origem opcional) das categorias já refletidas na
+    // carta para cliente — só para discriminar por origem, não entram no cálculo do IRS.
+    window._ultimoNotas = {
+      anexoA: anexoA.linhas,
+      anexoB: anexoB.rendimentosBrutos,
+      anexoE4A: anexoE.rendimentosTaxasEspeciais,
+      anexoE4B: anexoE.rendimentosTaxasLiberatorias,
+      anexoG04: (anexoG && anexoG.quadro04 && anexoG.quadro04.imoveis) || [],
+      anexoG07: (anexoG && anexoG.quadro07) || []
+    };
 
     const div = document.getElementById("resultado");
     div.style.display = "block";
@@ -11753,6 +11854,7 @@ if (typeof module !== "undefined" && module.exports) {
     const html = IRSLetter.gerarCartaHTML({
       agregado: window._ultimoAgregado,
       resultado: window._ultimoResultado,
+      notas: window._ultimoNotas,
       dataGeracao: new Date().toLocaleDateString("pt-PT")
     });
     const janela = window.open("", "_blank");

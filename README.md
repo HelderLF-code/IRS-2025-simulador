@@ -376,6 +376,29 @@ regenerar o `simulador-irs.html`.
   do Quadro 9 (9A-9E, que são referências por número de linha a um regime especial, não
   compras/vendas a calcular).
 
+- **Nota/origem por linha de rendimento, discriminada na carta para cliente**: as
+  tabelas de rendimento das categorias já cobertas pelo motor de cálculo (Anexo A,
+  Anexo B — Quadro 4, Anexo E — Quadros 4A/4B, Anexo G — Quadros 4 e 7) e, para já sem
+  reflexo na carta por essas categorias ainda não entrarem no cálculo (ver abaixo),
+  as do Anexo G Quadro 9/18A/18B e as tabelas principais do Anexo J (4A, 5A, 6A, 7A,
+  8A, 9.1A, 9.2A, 9.4A) ganharam uma coluna extra, opcional, de "Nota/origem": um texto
+  livre para identificar de onde vem aquele rendimento (ex: "EDP", "JP Morgan",
+  "Fidelity"). Não é um campo oficial — não é exportado no XML da declaração, existe só
+  para apoiar o preenchimento e a comunicação com o cliente, e por isso também não é
+  usado em mais nenhum cálculo.
+
+  Ao gerar a carta, cada categoria (Categoria A, Categoria B, Categoria E — conforme
+  opção pelo englobamento, Categoria G dos Quadros 4 e 7) passa a mostrar, numa única
+  linha compacta e discreta logo abaixo do total da categoria, a soma por nota —
+  "JP Morgan — 5.000,00 €; Fidelity — 4.000,00 €" — só quando pelo menos uma linha tem
+  nota preenchida. Linhas sem nota continuam a somar normalmente para o total da
+  categoria, sem aparecer discriminadas, para a carta não ficar cheia de "sem nota".
+  Nos Quadros 4 e 7 do Anexo G, como o valor mostrado na categoria já é o resultado do
+  cálculo da mais-valia (50% do saldo, com eventuais exclusões por reinvestimento), a
+  discriminação por nota usa antes o valor de realização de cada linha (identificado
+  como tal), que não soma ao valor da categoria — é só informação do montante
+  considerado por origem, não uma reconciliação do cálculo.
+
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
 11-16 e 18 do Anexo B e ao Quadro 6C + Quadros 7-10 do Anexo H (os Anexos G, J e L já estão
