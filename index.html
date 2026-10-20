@@ -325,8 +325,12 @@
   <div class="row">
     <div><label>Ano dos rendimentos</label><input id="ano" type="number" value="2025"></div>
     <div><label>NIF Sujeito Passivo A</label><input id="nifA" type="text" placeholder="256675961"></div>
+    <div><label>Nome Sujeito Passivo A <small class="hint">(para a carta)</small></label><input id="nomeA" type="text" placeholder="opcional"></div>
     <div><label><input id="tributacaoConjunta" type="checkbox"> Tributação conjunta (casado/união de facto)</label></div>
-    <div id="campoNifB" style="display:none"><label>NIF Sujeito Passivo B</label><input id="nifB" type="text"></div>
+    <div id="campoNifB" class="row" style="display:none; margin:0">
+      <div><label>NIF Sujeito Passivo B</label><input id="nifB" type="text"></div>
+      <div><label>Nome Sujeito Passivo B <small class="hint">(para a carta)</small></label><input id="nomeB" type="text" placeholder="opcional"></div>
+    </div>
     <div><label>IBAN para reembolso</label><input id="iban" type="text" placeholder="PT50..." size="30"></div>
   </div>
   <div class="row">
@@ -6271,7 +6275,9 @@ indicares, assume-se o escalão mais baixo.</small></p>
     return {
       ano: Number(document.getElementById("ano").value),
       nifA: document.getElementById("nifA").value,
+      nomeA: document.getElementById("nomeA").value.trim() || undefined,
       nifB: document.getElementById("nifB").value || undefined,
+      nomeB: document.getElementById("nomeB").value.trim() || undefined,
       tributacaoConjunta: document.getElementById("tributacaoConjunta").checked,
       iban: document.getElementById("iban").value || undefined,
       residenciaFiscal: document.getElementById("residenciaFiscal").value || undefined,

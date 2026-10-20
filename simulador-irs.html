@@ -325,8 +325,12 @@
   <div class="row">
     <div><label>Ano dos rendimentos</label><input id="ano" type="number" value="2025"></div>
     <div><label>NIF Sujeito Passivo A</label><input id="nifA" type="text" placeholder="256675961"></div>
+    <div><label>Nome Sujeito Passivo A <small class="hint">(para a carta)</small></label><input id="nomeA" type="text" placeholder="opcional"></div>
     <div><label><input id="tributacaoConjunta" type="checkbox"> Tributação conjunta (casado/união de facto)</label></div>
-    <div id="campoNifB" style="display:none"><label>NIF Sujeito Passivo B</label><input id="nifB" type="text"></div>
+    <div id="campoNifB" class="row" style="display:none; margin:0">
+      <div><label>NIF Sujeito Passivo B</label><input id="nifB" type="text"></div>
+      <div><label>Nome Sujeito Passivo B <small class="hint">(para a carta)</small></label><input id="nomeB" type="text" placeholder="opcional"></div>
+    </div>
     <div><label>IBAN para reembolso</label><input id="iban" type="text" placeholder="PT50..." size="30"></div>
   </div>
   <div class="row">
@@ -6011,6 +6015,34 @@ function linha(label, valor, opcoes) {
   return `<tr${classe}><td>${label}</td><td>${formatarMoeda(valor)} €</td></tr>`;
 }
 
+function listaPortugues(itens) {
+  if (!itens.length) return "";
+  if (itens.length === 1) return itens[0];
+  return itens.slice(0, -1).join(", ") + " e " + itens[itens.length - 1];
+}
+
+// Cabeçalho ao estilo de uma carta de acompanhamento ("transmittal letter"): saudação
+// pelo nome, quando indicado; sem nome, mantém-se a identificação simples por NIF.
+function cabecalhoDestinatario(agregado) {
+  const nomes = [];
+  if (agregado.nomeA) nomes.push(agregado.nomeA);
+  if (agregado.tributacaoConjunta && agregado.nomeB) nomes.push(agregado.nomeB);
+
+  if (!nomes.length) {
+    return `<p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>`;
+  }
+
+  const saudacaoNome = nomes.length > 1 ? "Exmos. Senhores" : "Exmo(a). Senhor(a)";
+  const nifs = agregado.tributacaoConjunta && agregado.nifB
+    ? `NIF ${agregado.nifA} (${agregado.nomeA || "sujeito passivo A"}) e NIF ${agregado.nifB} (${agregado.nomeB || "sujeito passivo B"})`
+    : `NIF ${agregado.nifA}`;
+
+  return `<p class="saudacao">${saudacaoNome} ${escHTML(listaPortugues(nomes))},</p>
+  <p>Junto se remete a estimativa do Imposto sobre o Rendimento das Pessoas Singulares (IRS)
+  relativa aos rendimentos de ${agregado.ano}, elaborada com base nos elementos disponibilizados.</p>
+  <p class="nota">${nifs}</p>`;
+}
+
 function escHTML(texto) {
   return String(texto === undefined || texto === null ? "" : texto)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -6030,13 +6062,27 @@ function notasPorOrigem(linhas, campoValor) {
   return [...mapa.entries()].map(([nota, valor]) => ({ nota, valor }));
 }
 
-// Linha compacta (uma só, todas as origens juntas) a seguir à linha da categoria, só
-// quando há pelo menos uma nota preenchida — para não sobrecarregar a carta.
-function linhaNotas(itens, { comPrefixo } = {}) {
+// Frase narrativa, em vez de uma simples lista, descrevendo o que foi considerado em
+// cada categoria e de onde veio — só quando há pelo menos uma linha com nota
+// preenchida (sem notas, a categoria fica só com o total, sem esta frase). Quando uma
+// única nota cobre a totalidade do valor, evita repetir o valor ("...pagos pela
+// entidade EDP."); com várias origens, ou quando as notas não cobrem tudo, enumera-as
+// e, havendo diferença, refere-a como "origem não especificada".
+function fraseOrigem(totalCategoria, itens, { descricao, preposicaoSingular }) {
   if (!itens || !itens.length) return "";
-  const prefixo = comPrefixo ? `${comPrefixo}: ` : "";
-  const texto = itens.map(i => `${escHTML(i.nota)} — ${formatarMoeda(i.valor)} €`).join("; ");
-  return `<tr class="linha-notas"><td colspan="2">${prefixo}${texto}</td></tr>`;
+  const somaNotas = itens.reduce((acc, i) => acc + i.valor, 0);
+  const resto = totalCategoria - somaNotas;
+  const coberturaTotal = itens.length === 1 && Math.abs(resto) < 0.005;
+
+  let corpo;
+  if (coberturaTotal) {
+    corpo = `${preposicaoSingular} ${escHTML(itens[0].nota)}`;
+  } else {
+    const partes = itens.map(i => `${escHTML(i.nota)} (${formatarMoeda(i.valor)} €)`);
+    corpo = `provenientes de ${listaPortugues(partes)}`;
+    if (resto > 0.005) corpo += `, além de ${formatarMoeda(resto)} € de origem não especificada`;
+  }
+  return `<p class="nota">Foram considerados ${formatarMoeda(totalCategoria)} € ${descricao}, ${corpo}.</p>`;
 }
 
 function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
@@ -6062,6 +6108,22 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   const notasEEnglobado = [...notasE4A, ...notasE4B];
   const notasG04 = notasPorOrigem(n.anexoG04, "valorRealizacao");
   const notasG07 = notasPorOrigem(n.anexoG07, "valorRealizacao");
+  const totalRealizacaoG04 = (n.anexoG04 || []).reduce((acc, l) => acc + (Number(l.valorRealizacao) || 0), 0);
+  const totalRealizacaoG07 = (n.anexoG07 || []).reduce((acc, l) => acc + (Number(l.valorRealizacao) || 0), 0);
+
+  const fraseA = fraseOrigem(resultado.rendimentoBrutoA, notasA,
+    { descricao: "de rendimentos do trabalho dependente e de pensões (Categoria A)", preposicaoSingular: "pagos pela entidade" });
+  const fraseB = fraseOrigem(resultado.rendimentoBrutoB, notasB,
+    { descricao: "de rendimentos empresariais e profissionais (Categoria B)", preposicaoSingular: "provenientes de" });
+  const fraseE = temCategoriaE ? fraseOrigem(
+    categoriaE.optaEnglobamento ? categoriaE.rendimentoEnglobado : categoriaE.rendimentoBrutoTaxasEspeciais,
+    categoriaE.optaEnglobamento ? notasEEnglobado : notasE4A,
+    { descricao: "de rendimentos de capitais — juros e dividendos (Categoria E)", preposicaoSingular: "recebidos de" }
+  ) : "";
+  const fraseG04 = fraseOrigem(totalRealizacaoG04, notasG04,
+    { descricao: "de valor de realização nas alienações de imóveis (Anexo G, Quadro 4)", preposicaoSingular: "relativo ao imóvel identificado como" });
+  const fraseG07 = fraseOrigem(totalRealizacaoG07, notasG07,
+    { descricao: "de valor de realização em cessões de posições contratuais/direitos (Anexo G, Quadro 7)", preposicaoSingular: "relativo a" });
 
   return `<!doctype html>
 <html lang="pt">
@@ -6080,7 +6142,7 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   .resultado-final .valor { font-size: 1.6rem; font-weight: bold; }
   .taxa-efetiva { text-align: center; color: #555; font-size: 0.85rem; margin-top: 6px; }
   .nota { font-size: 0.8rem; color: #666; margin: 4px 0 0; }
-  tr.linha-notas td { font-size: 0.78rem; color: #666; font-style: italic; padding: 0 8px 6px 20px; border-bottom: 1px solid #eee; }
+  .saudacao { font-weight: bold; margin-top: 18px; }
   .aviso { margin-top: 30px; padding: 12px; background: #f5f5f0; border-left: 4px solid #999; font-size: 0.85rem; }
   @media print { .no-print { display: none; } }
 </style>
@@ -6089,29 +6151,30 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   <button class="no-print" onclick="window.print()">Imprimir / Guardar como PDF</button>
   <h1>Estimativa de IRS — Rendimentos de ${nomeAno}</h1>
   <p>Data de emissão: ${dataGeracao}</p>
-  <p>Sujeito passivo A — NIF ${agregado.nifA}${agregado.tributacaoConjunta ? ` | Sujeito passivo B — NIF ${agregado.nifB}` : ""}</p>
+  ${cabecalhoDestinatario(agregado)}
 
   <h2>Rendimentos</h2>
   <table>
     ${resultado.rendimentoBrutoA ? `
     ${linha("Categoria A — rendimento bruto (trabalho/pensões)", resultado.rendimentoBrutoA)}
-    ${linhaNotas(notasA)}
     ${linha("Categoria A — dedução específica", -resultado.deducaoEspecifica)}` : ""}
     ${temCategoriaB ? `
     ${linha("Categoria B — rendimento bruto (regime simplificado)", resultado.rendimentoBrutoB)}
-    ${linhaNotas(notasB)}
     ${linha("Categoria B — após coeficiente aplicável", resultado.rendimentoTributavelBaseB)}
     ${temAcrescimo ? linha("Categoria B — acréscimo por despesas insuficientes", resultado.acrescimoAoRendimentoB) : ""}` : ""}
     ${temCategoriaE ? (categoriaE.optaEnglobamento
-      ? `${linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)}${linhaNotas(notasEEnglobado)}`
-      : `${linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)}${linhaNotas(notasE4A)}`) : ""}
-    ${temCategoriaG ? `${linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel)}${linhaNotas(notasG04, { comPrefixo: "Valor de realização" })}` : ""}
-    ${temCategoriaGQuadro07 ? `${linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel)}${linhaNotas(notasG07, { comPrefixo: "Valor de realização" })}` : ""}
+      ? linha("Categoria E — rendimento englobado (capitais)", categoriaE.rendimentoEnglobado)
+      : linha("Categoria E — rendimento sujeito a taxa especial (capitais)", categoriaE.rendimentoBrutoTaxasEspeciais)) : ""}
+    ${temCategoriaG ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 4)", categoriaG.rendimentoTributavel) : ""}
+    ${temCategoriaGQuadro07 ? linha("Categoria G — mais-valias tributáveis (50% do saldo, Anexo G Quadro 7)", categoriaGQuadro07.rendimentoTributavel) : ""}
     ${linha("Rendimento coletável", resultado.rendimentoLiquido, { destaque: true })}
   </table>
+  ${fraseA}
+  ${fraseB}
   ${temAcrescimo ? `<p class="nota">O acréscimo à Categoria B reflete a regra do regime simplificado: as despesas
   comprovadas (contribuições para a Segurança Social e despesas gerais do e-fatura) têm de atingir 15%
   dos rendimentos sujeitos a coeficiente reduzido; o que falta acresce ao rendimento tributável.</p>` : ""}
+  ${fraseE}
   ${temCategoriaE && !categoriaE.optaEnglobamento ? `<p class="nota">Os rendimentos de capitais (Categoria E)
   não englobados são tributados à parte, à taxa especial de ${(categoriaE.taxaEspecial * 100).toFixed(0)}%
   (a confirmar consoante o tipo de rendimento), somando-se diretamente à coleta líquida.</p>` : ""}
@@ -6126,10 +6189,12 @@ function gerarCartaHTML({ agregado, resultado, notas, dataGeracao }) {
   ${categoriaG.linhasExcluidas > 0 ? `${categoriaG.linhasExcluidas} imóvel(is) do Quadro 4 não entra(m)
   neste cálculo (reabilitação/EGF-UGF/alienação isenta ao Estado — tratamento próprio ainda não
   implementado).` : ""}</p>` : ""}
+  ${fraseG04}
   ${temCategoriaGQuadro07 ? `<p class="nota">Cessão de posições contratuais/direitos sobre bens imóveis
   (Anexo G, Quadro 7): saldo de ${formatarMoeda(categoriaGQuadro07.saldo)} € entre valor de realização e
   valor de aquisição do direito, do qual apenas 50% é tributado quando positivo (art.º 43.º, n.º 2, do
   CIRS).</p>` : ""}
+  ${fraseG07}
 
   <h2>Apuramento do imposto</h2>
   <table>
@@ -10375,7 +10440,9 @@ if (typeof module !== "undefined" && module.exports) {
     return {
       ano: Number(document.getElementById("ano").value),
       nifA: document.getElementById("nifA").value,
+      nomeA: document.getElementById("nomeA").value.trim() || undefined,
       nifB: document.getElementById("nifB").value || undefined,
+      nomeB: document.getElementById("nomeB").value.trim() || undefined,
       tributacaoConjunta: document.getElementById("tributacaoConjunta").checked,
       iban: document.getElementById("iban").value || undefined,
       residenciaFiscal: document.getElementById("residenciaFiscal").value || undefined,

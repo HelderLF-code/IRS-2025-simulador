@@ -388,16 +388,34 @@ regenerar o `simulador-irs.html`.
   usado em mais nenhum cálculo.
 
   Ao gerar a carta, cada categoria (Categoria A, Categoria B, Categoria E — conforme
-  opção pelo englobamento, Categoria G dos Quadros 4 e 7) passa a mostrar, numa única
-  linha compacta e discreta logo abaixo do total da categoria, a soma por nota —
-  "JP Morgan — 5.000,00 €; Fidelity — 4.000,00 €" — só quando pelo menos uma linha tem
-  nota preenchida. Linhas sem nota continuam a somar normalmente para o total da
-  categoria, sem aparecer discriminadas, para a carta não ficar cheia de "sem nota".
-  Nos Quadros 4 e 7 do Anexo G, como o valor mostrado na categoria já é o resultado do
-  cálculo da mais-valia (50% do saldo, com eventuais exclusões por reinvestimento), a
-  discriminação por nota usa antes o valor de realização de cada linha (identificado
-  como tal), que não soma ao valor da categoria — é só informação do montante
-  considerado por origem, não uma reconciliação do cálculo.
+  opção pelo englobamento, Categoria G dos Quadros 4 e 7) passa a mostrar, numa frase
+  narrativa a seguir ao total da categoria, o que foi considerado e de onde veio — só
+  quando pelo menos uma linha tem nota preenchida (sem notas, a categoria fica só com o
+  total, sem mais nada a dizer). Quando uma única nota cobre a totalidade do valor da
+  categoria, a frase não repete o montante: "Foram considerados 50.000,00 € de
+  rendimentos do trabalho dependente e de pensões (Categoria A), pagos pela entidade
+  EDP." Com várias origens — ou quando as notas não cobrem a totalidade — enumera cada
+  uma com o seu valor e, havendo diferença, refere-a como "origem não especificada":
+  "Foram considerados 9.000,00 € de rendimentos de capitais — juros e dividendos
+  (Categoria E), provenientes de JP Morgan (5.000,00 €) e Fidelity (4.000,00 €)."
+  Linhas sem nota continuam a somar normalmente para o total da categoria, sem forçar
+  menção própria. Nos Quadros 4 e 7 do Anexo G, como o valor mostrado na categoria já é
+  o resultado do cálculo da mais-valia (50% do saldo, com eventuais exclusões por
+  reinvestimento), a frase usa antes o valor de realização somado de todas as linhas
+  (identificado como tal na própria frase), que não é o mesmo valor da categoria — é só
+  informação do montante considerado por origem, não uma reconciliação do cálculo.
+
+- **Nome do(s) sujeito(s) passivo(s), para a carta soar a carta de acompanhamento**:
+  dois campos opcionais no Rosto ("Nome Sujeito Passivo A/B", só para a carta — não
+  fazem parte do XML) permitem personalizar a abertura da carta para cliente. Quando
+  preenchidos, a carta substitui a antiga linha solta "Sujeito passivo A — NIF X" por
+  uma saudação ("Exmo(a). Senhor(a) Maria Silva," ou, em tributação conjunta com os
+  dois nomes, "Exmos. Senhores Maria Silva e João Silva,") seguida de uma frase de
+  abertura ao estilo de uma carta de acompanhamento ("Junto se remete a estimativa do
+  Imposto sobre o Rendimento das Pessoas Singulares (IRS) relativa aos rendimentos de
+  X, elaborada com base nos elementos disponibilizados.") e só depois a identificação
+  por NIF, em letra mais pequena. Sem nome preenchido, mantém-se o comportamento
+  anterior (linha simples por NIF), para não haver saudações vazias/estranhas.
 
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros
