@@ -276,7 +276,7 @@ regenerar o `simulador-irs.html`.
   voltado a importar, as linhas aparecem automaticamente na tabela, sem ter de digitar uma
   a uma na aplicação.
 
-  As 29 colunas de país (código do país da fonte/contraparte/entidade gestora, nos Anexos
+  As 31 colunas de país (código do país da fonte/contraparte/entidade gestora, nos Anexos
   G, H, J e L) têm uma lista pendente comum (`<datalist id="listaPaises">`, 244 países,
   territórios e regiões) construída a partir da Tabela X — a lista oficial de países e
   respetivos códigos que consta no final das instruções de preenchimento dos Anexos G, J e
@@ -300,7 +300,7 @@ regenerar o `simulador-irs.html`.
   compressão "deflate" e referências de "shared strings" que o Excel escreve), e
   reimportar — valores de texto, números e os campos com dropdown ficam todos corretos.
 
-  Disponível em **todas as 79 tabelas de linhas** da aplicação (Anexos A, B, Dependentes,
+  Disponível em **todas as 80 tabelas de linhas** da aplicação (Anexos A, B, Dependentes,
   E, G, H, J e L) — a única tabela de "linhas" sem este mecanismo é a grelha fixa de
   despesas do Quadro 7 do Anexo B (encargos em caso de opção pela categoria A/ato isolado
   superior a €200.000), que não tem botão de adicionar linha porque o número de linhas é
@@ -353,9 +353,28 @@ regenerar o `simulador-irs.html`.
   aplicação não grava o livro em lado nenhum, só o resultado já aplicado ao Quadro 18). É
   uma **ferramenta de apoio ao preenchimento, não um campo do XML oficial**: o livro de
   transações em si nunca é exportado para a declaração — só os valores que resultam do
-  cálculo, já dentro das linhas normais do Quadro 18A/18B. Por agora cobre só criptoativos
-  (não os valores mobiliários do Quadro 9, que têm regras de FIFO distintas e outro leque de
-  casos a tratar).
+  cálculo, já dentro das linhas normais do Quadro 18A/18B.
+
+- **Calculadora FIFO para partes sociais e valores mobiliários (Anexo G, Quadro 9 /
+  Anexo J, Quadro 9.2A)**: o mesmo mecanismo do parágrafo anterior, mas para ações,
+  quotas, obrigações, unidades de participação, etc. (tabela "Calculadora FIFO para
+  partes sociais e valores mobiliários", a seguir ao Quadro 9 do Anexo G). O ativo é
+  identificado livremente (p. ex. pelo ISIN ou pelo nome do título) para agrupar as
+  compras/vendas do mesmo título. Cada venda indica para onde deve ir o resultado —
+  Quadro 9 do Anexo G (sujeitos passivos residentes) ou Quadro 9.2A do Anexo J (não
+  residentes, opção de englobamento) — já que os dois quadros pedem campos diferentes
+  (o Anexo G tem titular e NIF da sociedade; o Anexo J tem país da fonte e imposto pago
+  no estrangeiro, mas não titular) e usam listas de códigos de rendimento distintas
+  (G01-G26 num, G01-G90 no outro, com significados que não coincidem código a código).
+  Por isso a coluna "Código" muda de lista pendente automaticamente consoante o quadro
+  destino escolhido nessa linha, tanto na interface como (com uma lista fixa de base,
+  por ser uma só coluna por ficheiro) no modelo Excel. O imposto pago no estrangeiro de
+  cada venda é também dividido proporcionalmente pelos lotes consumidos, tal como o
+  valor de realização e as despesas. Tal como na calculadora de criptoativos, é apenas
+  uma ferramenta de apoio — o livro de transações não é exportado no XML, só o resultado
+  já aplicado às linhas do Quadro 9/9.2A — e não cobre as sub-tabelas de regimes especiais
+  do Quadro 9 (9A-9E, que são referências por número de linha a um regime especial, não
+  compras/vendas a calcular).
 
 A estrutura XML dos Anexos G1, SS ainda **não** está mapeada em detalhe — são emitidos
 apenas com o cabeçalho ano/NIF quando se começa em branco. O mesmo se aplica aos Quadros

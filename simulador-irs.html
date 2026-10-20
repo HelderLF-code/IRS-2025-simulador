@@ -1051,6 +1051,39 @@ ao importar uma declaração com dados nesses quadros, são preservados tal como
 <button type="button" onclick="descarregarModeloXLSX('tabelaAnexoG09E')">Descarregar modelo (Excel)</button>
 <button type="button" onclick="iniciarImportacaoXLSX('tabelaAnexoG09E')">Importar Excel preenchido</button>
 
+<h3>Calculadora FIFO para partes sociais e valores mobiliários (ferramenta auxiliar)</h3>
+<p class="aviso-topo">
+  Ferramenta de apoio ao preenchimento — não faz parte do ficheiro XML oficial (não é
+  exportada). Funciona como a calculadora FIFO dos criptoativos (Quadro 18), mas para
+  partes sociais e outros valores mobiliários: regista aqui todas as compras e vendas do
+  mesmo título (ações, quotas, obrigações, UP's, etc. — identificado livremente, p. ex. pelo
+  ISIN ou pelo nome), por qualquer ordem, e calcula o custo de aquisição pelo método FIFO
+  ("First In, First Out"). Cada venda indica para onde deve ir o resultado: Quadro 9 do
+  Anexo G (sujeitos passivos residentes) ou Quadro 9.2A do Anexo J (não residentes, opção
+  de englobamento) — os códigos de rendimento (coluna "Código") e os campos pedidos
+  diferem entre os dois quadros, pelo que a lista pendente de códigos acompanha o quadro
+  destino escolhido em cada linha. Ao calcular, as linhas das tabelas abaixo (Quadro 9 do
+  Anexo G e/ou Quadro 9.2A do Anexo J) são completamente substituídas pelo resultado.
+</p>
+<table id="tabelaFifoValoresMobiliarios">
+  <thead><tr>
+    <th>Ativo</th><th>Tipo</th><th>Ano</th><th>Mês</th><th>Dia</th>
+    <th>Quantidade</th><th>Valor total (€)</th><th>Despesas (€)</th>
+    <th>Quadro destino (só venda)</th><th>Código (só venda)</th>
+    <th>Titular (só venda, Anexo G)</th><th>NIF entidade (só venda, Anexo G)</th>
+    <th>País da fonte (só venda, Anexo J)</th><th>País contraparte (só venda)</th>
+    <th>Imposto pago no estrangeiro (só venda, Anexo J)</th>
+    <th>Valores mob. admitidos/OIC aberto? (só venda)</th><th></th>
+  </tr></thead>
+  <tbody></tbody>
+</table>
+<button type="button" onclick="adicionarLinhaFifoValoresMobiliarios()">+ Adicionar transação</button>
+<button type="button" onclick="descarregarModeloXLSX('tabelaFifoValoresMobiliarios')">Descarregar modelo (Excel)</button>
+<button type="button" onclick="iniciarImportacaoXLSX('tabelaFifoValoresMobiliarios')">Importar Excel preenchido</button>
+<br><br>
+<button type="button" onclick="calcularFifoValoresMobiliarios()">Calcular FIFO e preencher Quadro 9 / Quadro 9.2A</button>
+<div id="avisoFifoValoresMobiliarios"></div>
+
 <h3>Organismos de investimento coletivo — resgate/liquidação, opção pelo englobamento (Quadro 10)</h3>
 <datalist id="listaCodigoG10">
   <option value="G30">G30 — Resgate/liquidação até 30/06/2015 (art.º 22.º EBF)</option>
@@ -7086,6 +7119,28 @@ if (typeof module !== "undefined" && module.exports) {
         { classe: "fifo-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } }
       ]
     },
+    tabelaFifoValoresMobiliarios: {
+      nomeFicheiro: "modelo-fifo-valores-mobiliarios",
+      adicionar: "adicionarLinhaFifoValoresMobiliarios",
+      colunas: [
+        { classe: "fifovm-ativo" },
+        { classe: "fifovm-tipo", opcoes: { tipo: "fixo", valores: ["compra", "venda"] } },
+        { classe: "fifovm-ano", numero: true },
+        { classe: "fifovm-mes", numero: true },
+        { classe: "fifovm-dia", numero: true },
+        { classe: "fifovm-quantidade", numero: true },
+        { classe: "fifovm-valortotal", numero: true },
+        { classe: "fifovm-despesas", numero: true },
+        { classe: "fifovm-quadrodestino", opcoes: { tipo: "fixo", valores: ["G09", "J092A"] } },
+        { classe: "fifovm-codigo", opcoes: { tipo: "datalist", id: "listaCodigoG09" } },
+        { classe: "fifovm-titular", opcoes: { tipo: "fixo", valores: ["A", "B", "D1"] } },
+        { classe: "fifovm-nifentidade" },
+        { classe: "fifovm-paisfonte", opcoes: { tipo: "datalist", id: "listaPaises" } },
+        { classe: "fifovm-paiscontraparte", opcoes: { tipo: "datalist", id: "listaPaises" } },
+        { classe: "fifovm-impostoestrangeiro", numero: true },
+        { classe: "fifovm-respeitavm", opcoes: { tipo: "fixo", valores: ["S", "N"] } }
+      ]
+    },
     tabelaAnexoG19: {
       nomeFicheiro: "modelo-anexo-g19",
       adicionar: "adicionarLinhaAnexoG19",
@@ -8832,6 +8887,188 @@ if (typeof module !== "undefined" && module.exports) {
     avisoDiv.innerHTML = avisos.length
       ? "<p class=\"aviso-topo\"><strong>Quadro 18 preenchido. Avisos:</strong><br>" + avisos.map(escXML).join("<br>") + "</p>"
       : "<p class=\"aviso-topo\">Quadro 18 preenchido com sucesso, sem avisos.</p>";
+  };
+
+  // --- Calculadora FIFO para partes sociais e valores mobiliários (ferramenta auxiliar) ---
+
+  window.adicionarLinhaFifoValoresMobiliarios = function () {
+    const tbody = document.querySelector("#tabelaFifoValoresMobiliarios tbody");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input class="fifovm-ativo" size="10"></td>
+      <td><select class="fifovm-tipo"><option value="compra">Compra</option><option value="venda">Venda</option></select></td>
+      <td><input class="fifovm-ano" type="number" size="6"></td>
+      <td><input class="fifovm-mes" type="number" size="4"></td>
+      <td><input class="fifovm-dia" type="number" size="4"></td>
+      <td><input class="fifovm-quantidade" type="number" step="0.00000001"></td>
+      <td><input class="fifovm-valortotal" type="number" step="0.01"></td>
+      <td><input class="fifovm-despesas" type="number" step="0.01"></td>
+      <td><select class="fifovm-quadrodestino" onchange="this.closest('tr').querySelector('.fifovm-codigo').setAttribute('list', this.value === 'J092A' ? 'listaCodigoAnexoJ092A' : 'listaCodigoG09')"><option value="">-</option><option value="G09">Anexo G, Q9</option><option value="J092A">Anexo J, Q9.2A</option></select></td>
+      <td><input class="fifovm-codigo" size="4" list="listaCodigoG09"></td>
+      <td><select class="fifovm-titular"><option value="A">A</option><option value="B">B</option><option value="D1">D1</option></select></td>
+      <td><input class="fifovm-nifentidade" size="10"></td>
+      <td><input class="fifovm-paisfonte" size="4" list="listaPaises"></td>
+      <td><input class="fifovm-paiscontraparte" size="4" list="listaPaises"></td>
+      <td><input class="fifovm-impostoestrangeiro" type="number" step="0.01"></td>
+      <td><select class="fifovm-respeitavm"><option value="">-</option><option value="S">Sim</option><option value="N">Não</option></select></td>
+      <td><button type="button" onclick="this.closest('tr').remove()">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  };
+
+  function lerLinhasFifoValoresMobiliarios() {
+    return [...document.querySelectorAll("#tabelaFifoValoresMobiliarios tbody tr")].map(tr => ({
+      ativo: tr.querySelector(".fifovm-ativo").value.trim(),
+      tipo: tr.querySelector(".fifovm-tipo").value,
+      ano: Number(tr.querySelector(".fifovm-ano").value),
+      mes: Number(tr.querySelector(".fifovm-mes").value),
+      dia: Number(tr.querySelector(".fifovm-dia").value),
+      quantidade: Number(tr.querySelector(".fifovm-quantidade").value) || 0,
+      valorTotal: Number(tr.querySelector(".fifovm-valortotal").value) || 0,
+      despesas: Number(tr.querySelector(".fifovm-despesas").value) || 0,
+      quadroDestino: tr.querySelector(".fifovm-quadrodestino").value,
+      codigo: tr.querySelector(".fifovm-codigo").value.trim(),
+      titular: tr.querySelector(".fifovm-titular").value,
+      nifEntidade: tr.querySelector(".fifovm-nifentidade").value.trim(),
+      codPaisFonte: tr.querySelector(".fifovm-paisfonte").value.trim(),
+      codPaisContraparte: tr.querySelector(".fifovm-paiscontraparte").value.trim(),
+      impostoEstrangeiro: Number(tr.querySelector(".fifovm-impostoestrangeiro").value) || 0,
+      respeitaValoresMobiliarios: tr.querySelector(".fifovm-respeitavm").value
+    }));
+  }
+
+  function preencherQuadro09ComFifo(linhas) {
+    const tbody = document.querySelector("#tabelaAnexoG09 tbody");
+    tbody.innerHTML = "";
+    for (const l of linhas) {
+      window.adicionarLinhaAnexoG09();
+      const tr = tbody.lastElementChild;
+      tr.querySelector(".ag09-titular").value = l.titular || "A";
+      tr.querySelector(".ag09-nif").value = l.nifEntidade || "";
+      tr.querySelector(".ag09-codigo").value = l.codigo || "";
+      tr.querySelector(".ag09-anorealizacao").value = l.anoRealizacao;
+      tr.querySelector(".ag09-mesrealizacao").value = l.mesRealizacao;
+      tr.querySelector(".ag09-diarealizacao").value = l.diaRealizacao;
+      tr.querySelector(".ag09-valorrealizacao").value = l.valorRealizacao.toFixed(2);
+      tr.querySelector(".ag09-anoaquisicao").value = l.anoAquisicao;
+      tr.querySelector(".ag09-mesaquisicao").value = l.mesAquisicao;
+      tr.querySelector(".ag09-diaaquisicao").value = l.diaAquisicao;
+      tr.querySelector(".ag09-valoraquisicao").value = l.valorAquisicao.toFixed(2);
+      tr.querySelector(".ag09-despesas").value = l.despesasEncargos.toFixed(2);
+      tr.querySelector(".ag09-pais").value = l.codPaisContraparte || "";
+      tr.querySelector(".ag09-respeitavm").checked = l.respeitaValoresMobiliarios === "S";
+    }
+  }
+
+  function preencherQuadro092AComFifo(linhas) {
+    const tbody = document.querySelector("#tabelaAnexoJ092A tbody");
+    tbody.innerHTML = "";
+    for (const l of linhas) {
+      window.adicionarLinhaAnexoJ092A();
+      const tr = tbody.lastElementChild;
+      tr.querySelector(".aj092a-pais").value = l.codPaisFonte || "";
+      tr.querySelector(".aj092a-codigo").value = l.codigo || "";
+      tr.querySelector(".aj092a-anorealizacao").value = l.anoRealizacao;
+      tr.querySelector(".aj092a-mesrealizacao").value = l.mesRealizacao;
+      tr.querySelector(".aj092a-diarealizacao").value = l.diaRealizacao;
+      tr.querySelector(".aj092a-valorrealizacao").value = l.valorRealizacao.toFixed(2);
+      tr.querySelector(".aj092a-anoaquisicao").value = l.anoAquisicao;
+      tr.querySelector(".aj092a-mesaquisicao").value = l.mesAquisicao;
+      tr.querySelector(".aj092a-diaaquisicao").value = l.diaAquisicao;
+      tr.querySelector(".aj092a-valoraquisicao").value = l.valorAquisicao.toFixed(2);
+      tr.querySelector(".aj092a-despesas").value = l.despesasEncargos.toFixed(2);
+      tr.querySelector(".aj092a-impostoestrangeiro").value = l.impostoEstrangeiro.toFixed(2);
+      tr.querySelector(".aj092a-paiscontraparte").value = l.codPaisContraparte || "";
+      tr.querySelector(".aj092a-respeitavm").value = l.respeitaValoresMobiliarios || "";
+    }
+  }
+
+  window.calcularFifoValoresMobiliarios = function () {
+    const avisoDiv = document.getElementById("avisoFifoValoresMobiliarios");
+    const transacoes = lerLinhasFifoValoresMobiliarios();
+    if (!transacoes.length) {
+      avisoDiv.innerHTML = "<p class=\"aviso-topo\">O livro de transações está vazio — nada para calcular.</p>";
+      return;
+    }
+
+    const EPSILON = 1e-9;
+    const avisos = [];
+    const porAtivo = new Map();
+
+    transacoes.forEach((t, indice) => {
+      const rotuloLinha = `Linha ${indice + 1}`;
+      if (!t.ativo) { avisos.push(`${rotuloLinha}: sem identificação do ativo — ignorada.`); return; }
+      if (!t.ano || !t.mes || !t.dia) { avisos.push(`${rotuloLinha} (${t.ativo}): data incompleta — ignorada.`); return; }
+      if (!(t.quantidade > 0)) { avisos.push(`${rotuloLinha} (${t.ativo}): quantidade inválida — ignorada.`); return; }
+      if (!porAtivo.has(t.ativo)) porAtivo.set(t.ativo, []);
+      porAtivo.get(t.ativo).push({ ...t, indice, chaveData: t.ano * 10000 + t.mes * 100 + t.dia });
+    });
+
+    const resultadoG09 = [];
+    const resultado092A = [];
+
+    for (const [ativo, lista] of porAtivo) {
+      lista.sort((x, y) => (x.chaveData - y.chaveData) || (x.indice - y.indice));
+      const lotes = [];
+
+      for (const t of lista) {
+        if (t.tipo === "compra") {
+          // As despesas de compra (p. ex. comissões) somam-se ao valor de aquisição do lote.
+          lotes.push({ ano: t.ano, mes: t.mes, dia: t.dia, quantidadeRestante: t.quantidade, quantidadeOriginal: t.quantidade, valorTotalOriginal: t.valorTotal + t.despesas });
+          continue;
+        }
+
+        if (!t.quadroDestino) { avisos.push(`Venda de ${ativo} em ${t.dia}/${t.mes}/${t.ano}: Quadro destino não indicado — a assumir Anexo G, Quadro 9.`); }
+        const quadro = t.quadroDestino || "G09";
+        const quantidadeVendaTotal = t.quantidade;
+        let restanteAVender = t.quantidade;
+
+        while (restanteAVender > EPSILON) {
+          const lote = lotes.find(l => l.quantidadeRestante > EPSILON);
+          if (!lote) {
+            avisos.push(`Venda de ${ativo} em ${t.dia}/${t.mes}/${t.ano}: faltam ${restanteAVender.toFixed(8)} unidade(s) sem histórico de compra correspondente — essa parte não foi incluída.`);
+            break;
+          }
+          const quantidadeConsumida = Math.min(lote.quantidadeRestante, restanteAVender);
+          const fracaoLote = quantidadeConsumida / lote.quantidadeOriginal;
+          const fracaoVenda = quantidadeConsumida / quantidadeVendaTotal;
+
+          const linha = {
+            titular: t.titular,
+            nifEntidade: t.nifEntidade,
+            codigo: t.codigo,
+            codPaisFonte: t.codPaisFonte,
+            codPaisContraparte: t.codPaisContraparte,
+            respeitaValoresMobiliarios: t.respeitaValoresMobiliarios,
+            anoRealizacao: t.ano, mesRealizacao: t.mes, diaRealizacao: t.dia,
+            valorRealizacao: t.valorTotal * fracaoVenda,
+            anoAquisicao: lote.ano, mesAquisicao: lote.mes, diaAquisicao: lote.dia,
+            valorAquisicao: lote.valorTotalOriginal * fracaoLote,
+            despesasEncargos: t.despesas * fracaoVenda,
+            impostoEstrangeiro: t.impostoEstrangeiro * fracaoVenda
+          };
+          (quadro === "J092A" ? resultado092A : resultadoG09).push(linha);
+
+          lote.quantidadeRestante -= quantidadeConsumida;
+          restanteAVender -= quantidadeConsumida;
+        }
+      }
+    }
+
+    const linhasAtuaisG09 = document.querySelectorAll("#tabelaAnexoG09 tbody tr").length;
+    const linhasAtuais092A = document.querySelectorAll("#tabelaAnexoJ092A tbody tr").length;
+    const confirmaMsg = `Isto vai substituir ${linhasAtuaisG09} linha(s) do Quadro 9 (Anexo G) e ${linhasAtuais092A} linha(s) do Quadro 9.2A (Anexo J) pelo resultado do cálculo FIFO ` +
+      `(${resultadoG09.length} linha(s) novas para o Quadro 9, ${resultado092A.length} linha(s) novas para o Quadro 9.2A).` +
+      (avisos.length ? `\n\nAvisos (${avisos.length}):\n${avisos.join("\n")}` : "") +
+      `\n\nContinuar?`;
+    if (!confirm(confirmaMsg)) return;
+
+    preencherQuadro09ComFifo(resultadoG09);
+    preencherQuadro092AComFifo(resultado092A);
+
+    avisoDiv.innerHTML = avisos.length
+      ? "<p class=\"aviso-topo\"><strong>Quadro 9 / Quadro 9.2A preenchidos. Avisos:</strong><br>" + avisos.map(escXML).join("<br>") + "</p>"
+      : "<p class=\"aviso-topo\">Quadro 9 / Quadro 9.2A preenchidos com sucesso, sem avisos.</p>";
   };
 
   window.adicionarLinhaAnexoG19 = function () {
